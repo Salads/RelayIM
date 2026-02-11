@@ -14,7 +14,5 @@ public:
 
 private:
     Ui::RelayClientClass ui;
-
-    QVBoxLayout* m_chatRoomsLayout;
 };
 

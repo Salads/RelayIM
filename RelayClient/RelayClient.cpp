@@ -2,23 +2,27 @@
 #include <qboxlayout.h>
 #include <qpushbutton.h>
 #include "src/components/QChatWidget.h"
+#include "src/components/QChatRooms.h"
 
 RelayClient::RelayClient(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this); // Generated UI from visual editor
 
-    QHBoxLayout* hLayoutMainContent = new QHBoxLayout(); // Main Content Layout (ChatRooms, Chat Area)
-    m_chatRoomsLayout = new QVBoxLayout();
+    QHBoxLayout* hLayoutMainContent = new QHBoxLayout(this->centralWidget()); // Main Content Layout (ChatRooms, Chat Area)
+    hLayoutMainContent->setContentsMargins(10, 10, 10, 10);
 
-    this->centralWidget()->setLayout(hLayoutMainContent);
-    hLayoutMainContent->addLayout(m_chatRoomsLayout, 2.5);
+    QChatRooms* chatRooms = new QChatRooms();
+    hLayoutMainContent->addWidget(chatRooms, 2);
 
-    QChatWidget* chatWidget = new QChatWidget(this);
-    hLayoutMainContent->addWidget(chatWidget, 7.5);
+    QChatWidget* chatWidget = new QChatWidget();
+    hLayoutMainContent->addWidget(chatWidget, 7);
 
-    QPushButton* button1 = new QPushButton("Button 1");
-    m_chatRoomsLayout->addWidget(button1);
+    this->setMinimumSize(550, 350);
+
+    // TODO(Salads): Temporary, when we add child widgets this should be unnecessary.
+    chatRooms->setStyleSheet("background-color: #555555");
+    chatRooms->setAttribute(Qt::WA_StyledBackground, true);
 }
 
 RelayClient::~RelayClient()
