@@ -3,5 +3,8 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Server/Server.vcxproj" />
+  <Project Path="RelayClient/RelayClient.vcxproj" Id="0ccf7c6a-4f48-4ab4-a567-2d378eedfbc7">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Server/Server.vcxproj" Id="e77b990f-05ca-43bf-96f3-ec82b6e1d898" />
 </Solution>
