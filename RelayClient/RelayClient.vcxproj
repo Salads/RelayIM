@@ -96,6 +96,7 @@
     <ClCompile Include="src\components\QChatInput.cpp" />
     <ClCompile Include="src\components\QChatRooms.cpp" />
     <ClCompile Include="src\components\QChatWidget.cpp" />
+    <ClCompile Include="src\components\QMessage.cpp" />
     <QtRcc Include="RelayClient.qrc" />
     <QtUic Include="RelayClient.ui" />
     <QtMoc Include="RelayClient.h" />
@@ -105,6 +106,7 @@
     <QtUic Include="src\components\QChatInput.ui" />
     <QtUic Include="src\components\QChatRooms.ui" />
     <QtUic Include="src\components\QChatWidget.ui" />
+    <QtUic Include="src\components\QMessage.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\components\QChatWidget.h" />
@@ -117,6 +119,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\components\QChatInput.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="src\components\QMessage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

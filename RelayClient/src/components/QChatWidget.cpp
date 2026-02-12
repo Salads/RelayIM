@@ -1,4 +1,4 @@
-#include "QChatWidget.h"
+#include "src/components/QChatWidget.h"
 #include <qboxlayout.h>
 #include <qframe.h>
 #include "src/components/QChatHistory.h"
@@ -12,20 +12,25 @@ QChatWidget::QChatWidget(QWidget *parent)
     QVBoxLayout *vLayoutMainContent = new QVBoxLayout(this);
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
 
-    QChatHistory* chatHistory = new QChatHistory();
-    QChatInput* chatInput = new QChatInput();
+    m_chatHistory = new QChatHistory();
+    m_chatInput = new QChatInput();
 
-    vLayoutMainContent->addWidget(chatHistory, 8);
-    vLayoutMainContent->addWidget(chatInput, 2);
+    vLayoutMainContent->addWidget(m_chatHistory, 8);
+    vLayoutMainContent->addWidget(m_chatInput, 2);
 
-    chatHistory->setStyleSheet("background-color: #555555;");
-    chatInput->setStyleSheet("background-color: #555555;");
+    m_chatHistory->setStyleSheet("background-color: #555555;");
+    m_chatInput->setStyleSheet("background-color: #555555;");
 
     // TODO(Salads): Temporary, when we add child widgets this should be unnecessary.
-    chatHistory->setAttribute(Qt::WA_StyledBackground, true);
-    chatInput->setAttribute(Qt::WA_StyledBackground, true);
+    m_chatHistory->setAttribute(Qt::WA_StyledBackground, true);
+    m_chatInput->setAttribute(Qt::WA_StyledBackground, true);
 }
 
 QChatWidget::~QChatWidget()
 {}
+
+void QChatWidget::addChatMessage(const std::string& message)
+{
+    m_chatHistory->addMessage(message);
+}
 
