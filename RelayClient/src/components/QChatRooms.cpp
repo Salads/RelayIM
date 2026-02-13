@@ -8,14 +8,13 @@ QChatRooms::QChatRooms(QWidget *parent)
     ui.setupUi(this);
 
     setMaximumWidth(120);
-    // Ensure this widget stretches to fill available space
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this); // Allows children to stretch out to size of parent widget
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     m_container = new QWidget(this);
-    QVBoxLayout* containerLayout = new QVBoxLayout(m_container);
+    m_containerLayout = new QVBoxLayout(m_container);
     m_scrollArea = new QScrollArea(this);
     m_scrollArea->setWidgetResizable(true);
     m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -23,16 +22,20 @@ QChatRooms::QChatRooms(QWidget *parent)
     m_scrollArea->setWidget(m_container);
     mainLayout->addWidget(m_scrollArea);
 
-    for (int i = 0; i < 10; i++) 
-    {
-        QChatRoom* room = new QChatRoom(this);
-        room->Initialize(i, "Example Room " + std::to_string(i));
-        containerLayout->addWidget(room);
-    }
+    m_containerLayout->addStretch(1);
 
-    containerLayout->addStretch(1); // Pushes rooms to the top of the scroll area
+    for (int i = 0; i < 5; i++)
+    {
+        addRoom(i, "Short Name " + std::to_string(i));
+    }
 }
 
 QChatRooms::~QChatRooms()
 {}
 
+void QChatRooms::addRoom(int roomId, const std::string roomName)
+{
+    QChatRoom* room = new QChatRoom(this);
+    room->Initialize(roomId, roomName);
+    m_containerLayout->insertWidget(m_containerLayout->count() - 1, room);
+}

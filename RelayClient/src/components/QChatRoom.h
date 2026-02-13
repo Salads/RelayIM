@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QWidget>
+#include <QPushButton>
 #include "ui_QChatRoom.h"
-
 #include <qlabel.h>
+#include <qboxlayout.h>
 
 // UI for representing a chat room
-class QChatRoom : public QWidget
+class QChatRoom : public QPushButton
 {
     Q_OBJECT
 
