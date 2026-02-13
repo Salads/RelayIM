@@ -35,7 +35,31 @@ QChatRooms::~QChatRooms()
 
 void QChatRooms::addRoom(int roomId, const std::string roomName)
 {
-    QChatRoom* room = new QChatRoom(this);
-    room->Initialize(roomId, roomName);
-    m_containerLayout->insertWidget(m_containerLayout->count() - 1, room);
+    QChatRoom* newRoom = new QChatRoom(this);
+    newRoom->Initialize(roomId, roomName);
+    m_containerLayout->insertWidget(m_containerLayout->count() - 1, newRoom);
+    m_rooms.push_back(newRoom);
+
+    connect(newRoom, &QChatRoom::clicked, this, [this, newRoom]() { onRoomClicked(newRoom); });
 }
+
+// TODO(Salads): QButtonGroup?
+void QChatRooms::onRoomClicked(QChatRoom *clickedRoom)
+{
+    // Handle clicking already selected room (do nothing)
+    if (clickedRoom == m_selectedRoom)
+    {
+        clickedRoom->setChecked(true);
+        return;
+    }
+
+    m_selectedRoom = clickedRoom;
+
+    for (QChatRoom* room : m_rooms)
+    {
+        if (room != clickedRoom)
+        {
+            room->setChecked(false);
+        }
+    }
+}   

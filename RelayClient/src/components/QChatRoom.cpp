@@ -16,6 +16,7 @@ QChatRoom::QChatRoom(QWidget *parent)
     m_roomNameLabel = new QLabel(this);
     m_roomNameLabel->setAlignment(Qt::AlignCenter);
     m_roomNameLabel->setStyleSheet("color: #000000; background-color: transparent; border: none;");
+    m_roomNameLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
