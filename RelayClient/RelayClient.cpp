@@ -16,13 +16,9 @@ RelayClient::RelayClient(QWidget *parent)
     hLayoutMainContent->addWidget(chatRooms, 2);
 
     QChatWidget* chatWidget = new QChatWidget();
-    hLayoutMainContent->addWidget(chatWidget, 7);
+    hLayoutMainContent->addWidget(chatWidget, 8);
 
     this->setMinimumSize(550, 350);
-
-    // TODO(Salads): Temporary, when we add child widgets this should be unnecessary.
-    chatRooms->setStyleSheet("background-color: #555555");
-    chatRooms->setAttribute(Qt::WA_StyledBackground, true);
 }
 
 RelayClient::~RelayClient()

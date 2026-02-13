@@ -8,6 +8,8 @@ QChatRooms::QChatRooms(QWidget *parent)
     ui.setupUi(this);
 
     setMaximumWidth(120);
+    // Ensure this widget stretches to fill available space
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this); // Allows children to stretch out to size of parent widget
     mainLayout->setContentsMargins(0, 0, 0, 0);

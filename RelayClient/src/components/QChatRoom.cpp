@@ -8,8 +8,6 @@ QChatRoom::QChatRoom(QWidget *parent)
     setMinimumSize(100, 40);
     setFixedSize(100, 40);
 
-    setStyleSheet("background-color: #2E2E2E; border-radius: 5px;");    
-
     m_roomNameLabel = new QLabel(this);
 }
 

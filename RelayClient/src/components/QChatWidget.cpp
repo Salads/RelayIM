@@ -9,6 +9,9 @@ QChatWidget::QChatWidget(QWidget *parent)
 {
     ui.setupUi(this);
 
+    // Ensure this widget stretches to fill available space
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     QVBoxLayout *vLayoutMainContent = new QVBoxLayout(this);
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
 
@@ -17,13 +20,6 @@ QChatWidget::QChatWidget(QWidget *parent)
 
     vLayoutMainContent->addWidget(m_chatHistory, 8);
     vLayoutMainContent->addWidget(m_chatInput, 2);
-
-    m_chatHistory->setStyleSheet("background-color: #555555;");
-    m_chatInput->setStyleSheet("background-color: #555555;");
-
-    // TODO(Salads): Temporary, when we add child widgets this should be unnecessary.
-    m_chatHistory->setAttribute(Qt::WA_StyledBackground, true);
-    m_chatInput->setAttribute(Qt::WA_StyledBackground, true);
 }
 
 QChatWidget::~QChatWidget()
