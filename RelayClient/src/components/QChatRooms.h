@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <qscrollarea.h>
 #include "ui_QChatRooms.h"
 
 class QChatRooms : public QWidget
@@ -13,5 +14,8 @@ public:
 
 private:
     Ui::QChatRoomsClass ui;
+
+    QWidget* m_container;
+    QScrollArea* m_scrollArea;
 };
 

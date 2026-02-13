@@ -3,12 +3,12 @@
 #include <list>
 #include <string>
 #include <QWidget>
-#include <QTimer>
 #include <qscrollbar.h>
 #include <qscrollarea.h>
 #include <qboxlayout.h>
 #include "ui_QChatHistory.h"
 #include "src/components/QMessage.h"
+#include <qtimer.h>
 
 class QChatHistory : public QWidget
 {

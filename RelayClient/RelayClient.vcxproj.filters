@@ -55,6 +55,9 @@
     <ClCompile Include="src\components\QMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\components\QChatRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\components\QChatWidget.h">
@@ -72,6 +75,9 @@
     <QtMoc Include="src\components\QMessage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="src\components\QChatRoom.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="src\components\QChatWidget.ui">
@@ -87,6 +93,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="src\components\QMessage.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="src\components\QChatRoom.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

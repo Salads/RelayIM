@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="src\components\QChatHistory.cpp" />
     <ClCompile Include="src\components\QChatInput.cpp" />
+    <ClCompile Include="src\components\QChatRoom.cpp" />
     <ClCompile Include="src\components\QChatRooms.cpp" />
     <ClCompile Include="src\components\QChatWidget.cpp" />
     <ClCompile Include="src\components\QMessage.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="main.cpp" />
     <QtUic Include="src\components\QChatHistory.ui" />
     <QtUic Include="src\components\QChatInput.ui" />
+    <QtUic Include="src\components\QChatRoom.ui" />
     <QtUic Include="src\components\QChatRooms.ui" />
     <QtUic Include="src\components\QChatWidget.ui" />
     <QtUic Include="src\components\QMessage.ui" />
@@ -122,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\components\QMessage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="src\components\QChatRoom.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
