@@ -19,6 +19,7 @@ public:
     ~QChatHistory();
 
     void addMessage(std::string message);
+    void clear();
 
 private:
     void updateMessages();

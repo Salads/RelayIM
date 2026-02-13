@@ -16,6 +16,7 @@ public:
     ~QChatWidget();
 
     void addChatMessage(const std::string& message);
+    void clear();
 
 private:
     Ui::QChatWidgetClass ui;

@@ -80,3 +80,14 @@ void QChatHistory::updateMessages()
         m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->maximum());
     });
 }
+
+void QChatHistory::clear()
+{
+    m_rawMessages.clear();
+    for (QMessage* messageWidget : m_messages)
+    {
+        m_layout->removeWidget(messageWidget);
+        delete messageWidget;
+    }
+    m_messages.clear();
+}

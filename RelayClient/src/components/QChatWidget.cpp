@@ -34,3 +34,7 @@ void QChatWidget::addChatMessage(const std::string& message)
     m_chatHistory->addMessage(message);
 }
 
+void QChatWidget::clear()
+{
+    m_chatHistory->clear();
+}
