@@ -12,13 +12,17 @@ QChatWidget::QChatWidget(QWidget *parent)
     // Ensure this widget stretches to fill available space
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    m_roomNameLabel = new QLabel(this);
+    m_roomNameLabel->setText("Chat Room Name");
+
     QVBoxLayout *vLayoutMainContent = new QVBoxLayout(this);
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
 
     m_chatHistory = new QChatHistory();
     m_chatInput = new QChatInput();
 
-    vLayoutMainContent->addWidget(m_chatHistory, 8);
+    vLayoutMainContent->addWidget(m_roomNameLabel, 0);
+    vLayoutMainContent->addWidget(m_chatHistory, 7);
     vLayoutMainContent->addWidget(m_chatInput, 2);
 }
 
