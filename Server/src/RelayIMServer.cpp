@@ -79,9 +79,9 @@ bool RelayIMServer::IsInitialized() const
     return m_isInitialized;
 }
 
-void RelayIMServer::Run()
+bool RelayIMServer::Run()
 {
-    if (!m_isInitialized) { return; }
+    if (!m_isInitialized) { return false; }
     
     // TODO(Salads): Listener Thread
     SOCKET clientSocket = INVALID_SOCKET;
@@ -92,6 +92,6 @@ void RelayIMServer::Run()
         PrintWSAError("accept failed");
         closesocket(m_listenSocket);
         WSACleanup();
-        return;
+        return false;
     }
 }

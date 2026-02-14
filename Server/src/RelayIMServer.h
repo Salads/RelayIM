@@ -6,7 +6,7 @@ class RelayIMServer
 {
 public:
     bool Initialize();
-    void Run();
+    bool Run();
     void Stop();
 
     bool IsInitialized() const;
