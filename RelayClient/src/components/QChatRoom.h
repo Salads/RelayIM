@@ -15,6 +15,8 @@ public:
     ~QChatRoom();
 
     void Initialize(int roomId, const std::string roomName);
+    int getRoomId();
+    std::string GetRoomName();
 
 private:
     Ui::QChatRoomClass ui;

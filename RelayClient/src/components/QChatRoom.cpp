@@ -47,3 +47,13 @@ void QChatRoom::Initialize(int roomId, const std::string roomName)
     m_roomId = roomId;
     m_roomNameLabel->setText(QString::fromStdString(roomName));
 }
+
+int QChatRoom::getRoomId()
+{
+    return m_roomId;
+}
+
+std::string QChatRoom::GetRoomName()
+{
+    return m_roomNameLabel->text().toStdString();
+}

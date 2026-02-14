@@ -18,6 +18,10 @@ RelayClient::RelayClient(QWidget *parent)
     QChatWidget* chatWidget = new QChatWidget();
     hLayoutMainContent->addWidget(chatWidget, 8);
 
+    connect(chatRooms, &QChatRooms::roomSelected, this, [chatWidget](QChatRoom* button) {
+        chatWidget->setRoom(button->getRoomId(), button->GetRoomName());
+    });
+
     this->setMinimumSize(550, 350);
 }
 

@@ -13,7 +13,7 @@ QChatWidget::QChatWidget(QWidget *parent)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_roomNameLabel = new QLabel(this);
-    m_roomNameLabel->setText("Chat Room Name");
+    m_roomNameLabel->setText("No chat room selected");
 
     QVBoxLayout *vLayoutMainContent = new QVBoxLayout(this);
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
@@ -37,4 +37,10 @@ void QChatWidget::addChatMessage(const std::string& message)
 void QChatWidget::clear()
 {
     m_chatHistory->clear();
+}
+
+void QChatWidget::setRoom(int roomId, const std::string& roomName)
+{
+    m_roomId = roomId;
+    m_roomNameLabel->setText(roomName.c_str());
 }

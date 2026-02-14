@@ -29,6 +29,10 @@ QChatRooms::QChatRooms(QWidget *parent)
     m_buttonGroup = new QButtonGroup(this);
     m_buttonGroup->setExclusive(true);
 
+    connect(m_buttonGroup, &QButtonGroup::buttonClicked, this, [this](QAbstractButton *clickedButton) {
+        emit roomSelected(qobject_cast<QChatRoom*>(clickedButton));
+    });
+
     for (int i = 0; i < 5; i++)
     {
         addRoom(i, "Short Name " + std::to_string(i));

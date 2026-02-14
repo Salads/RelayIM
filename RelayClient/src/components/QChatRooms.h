@@ -19,6 +19,9 @@ public:
 
     void addRoom(int roomId, const std::string roomName);
 
+signals:
+    void roomSelected(QChatRoom* button);
+
 private:
     Ui::QChatRoomsClass ui;
 
