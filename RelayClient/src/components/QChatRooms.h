@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QButtonGroup>
 #include <qscrollarea.h>
 #include <qboxlayout.h>
 #include "src/components/QChatRoom.h"
@@ -19,16 +20,11 @@ public:
     void addRoom(int roomId, const std::string roomName);
 
 private:
-    void onRoomClicked(QChatRoom *room);
-
-private:
     Ui::QChatRoomsClass ui;
 
+    QButtonGroup* m_buttonGroup;
     QWidget* m_container;
     QVBoxLayout* m_containerLayout;
     QScrollArea* m_scrollArea;
-
-    std::vector<QChatRoom*> m_rooms;
-    QChatRoom* m_selectedRoom;
 };
 

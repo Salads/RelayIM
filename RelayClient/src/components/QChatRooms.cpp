@@ -1,3 +1,4 @@
+
 #include "QChatRooms.h"
 #include "QChatRoom.h"
 #include "qboxlayout.h"
@@ -24,6 +25,10 @@ QChatRooms::QChatRooms(QWidget *parent)
 
     m_containerLayout->addStretch(1);
 
+    // Create button group for exclusive selection (only one room can be selected at a time)
+    m_buttonGroup = new QButtonGroup(this);
+    m_buttonGroup->setExclusive(true);
+
     for (int i = 0; i < 5; i++)
     {
         addRoom(i, "Short Name " + std::to_string(i));
@@ -38,28 +43,7 @@ void QChatRooms::addRoom(int roomId, const std::string roomName)
     QChatRoom* newRoom = new QChatRoom(this);
     newRoom->Initialize(roomId, roomName);
     m_containerLayout->insertWidget(m_containerLayout->count() - 1, newRoom);
-    m_rooms.push_back(newRoom);
 
-    connect(newRoom, &QChatRoom::clicked, this, [this, newRoom]() { onRoomClicked(newRoom); });
+    // Add the room button to the button group (uses roomId as the button ID)
+    m_buttonGroup->addButton(newRoom, roomId);
 }
-
-// TODO(Salads): QButtonGroup?
-void QChatRooms::onRoomClicked(QChatRoom *clickedRoom)
-{
-    // Handle clicking already selected room (do nothing)
-    if (clickedRoom == m_selectedRoom)
-    {
-        clickedRoom->setChecked(true);
-        return;
-    }
-
-    m_selectedRoom = clickedRoom;
-
-    for (QChatRoom* room : m_rooms)
-    {
-        if (room != clickedRoom)
-        {
-            room->setChecked(false);
-        }
-    }
-}   
