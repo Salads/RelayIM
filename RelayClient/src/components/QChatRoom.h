@@ -4,6 +4,7 @@
 #include "ui_QChatRoom.h"
 #include <qlabel.h>
 #include <qboxlayout.h>
+#include "src/ChatRoomInfo.h"
 
 // UI for representing a chat room
 class QChatRoom : public QPushButton
@@ -15,6 +16,7 @@ public:
     ~QChatRoom();
 
     void Initialize(int roomId, const std::string roomName);
+    void Initialize(ChatRoomInfo &roomInfo);
     int getRoomId();
     std::string GetRoomName();
 
@@ -22,6 +24,7 @@ private:
     Ui::QChatRoomClass ui;
 
     QLabel* m_roomNameLabel;
-    int m_roomId;
+    
+    ChatRoomInfo m_roomInfo;
 };
 
