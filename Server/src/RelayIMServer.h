@@ -6,6 +6,10 @@
 #include <atomic>
 #include <mutex>
 
+#include "Types.h"
+#include "ChatRoom.h"
+#include "ChatClient.h"
+
 class RelayIMServer
 {
 public:
@@ -17,7 +21,7 @@ public:
 
     void ListenForClients();
 
-    void ProcessClient(SOCKET clientSocket, uint32_t clientID);
+    void ProcessClient(ChatClient *client);
 
 private:
     bool m_isInitialized = false;
@@ -28,14 +32,11 @@ private:
     std::thread m_listenThread;
 
     std::atomic_uint32_t m_nextClientID{ 0 };
+    std::atomic_uint32_t m_nextRoomID{ 0 };
 
-    std::unordered_map<SOCKET, int> m_connectedClients;
+    std::unordered_map<ClientID, std::unique_ptr<ChatClient>> m_clients;
     std::mutex m_clientsMutex;
 
-    std::atomic_uint32_t m_nextRoomID{ 0 };
-    std::unordered_map<uint32_t, std::vector<int>> m_chatRooms; // roomID -> list of clientIDs
+    std::unordered_map<RoomID, ChatRoom> m_chatRooms;
     std::mutex m_chatRoomsMutex;
-
-    std::unordered_map<uint32_t, std::thread> m_clientThreads; // clientID - > thread
-    std::mutex m_clientThreadsMutex;
 };

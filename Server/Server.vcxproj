@@ -25,6 +25,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ChatClient.h" />
+    <ClInclude Include="src\ChatMessage.h" />
+    <ClInclude Include="src\ChatRoom.h" />
+    <ClInclude Include="src\Types.h" />
     <ClInclude Include="src\Util.h" />
     <ClInclude Include="src\RelayIMServer.h" />
   </ItemGroup>

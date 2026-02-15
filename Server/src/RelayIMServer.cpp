@@ -76,6 +76,18 @@ void RelayIMServer::Stop()
         m_listenThread.join();
     }
 
+    {
+        std::lock_guard<std::mutex> lock(m_clientsMutex);
+        for (auto& [clientID, client] : m_clients)
+        {
+            if (client->m_thread.joinable())
+            {
+                client->m_thread.join();
+            }
+            closesocket(client->m_clientSocket);
+        }
+    }
+
     shutdown(m_listenSocket, SD_BOTH);
     freeaddrinfo(m_listenSocketInfo);
     WSACleanup();
@@ -118,20 +130,34 @@ void RelayIMServer::ListenForClients()
         }
 
         std::cout << "New client connected: " << newClientSocket << std::endl;
-        uint32_t clientID = m_nextClientID++;
+        ChatClient* newClient = std::make_unique<ChatClient>(newClientSocket, m_nextClientID++).release();
+        newClient->m_thread = std::thread(&RelayIMServer::ProcessClient, this, newClient);
         {
             std::lock_guard<std::mutex> lock(m_clientsMutex);
-            m_connectedClients[newClientSocket] = clientID;
-        }
-
-        {
-            std::lock_guard<std::mutex> lock(m_clientThreadsMutex);
-            m_clientThreads.emplace(clientID, std::thread(&RelayIMServer::ProcessClient, this, newClientSocket, clientID));
+            m_clients.emplace(newClient->m_clientID, newClient);
         }
     }
 }
 
-void RelayIMServer::ProcessClient(SOCKET clientSocket, uint32_t clientID)
-{
+#define DEFAULT_BUFLEN 512
+#define BUFLEN DEFAULT_BUFLEN
 
+void RelayIMServer::ProcessClient(ChatClient *client)
+{
+    uint8_t receiveBuffer[BUFLEN];
+
+    int recvResult = recv(client->m_clientSocket, (char*)receiveBuffer, BUFLEN, 0);
+    if (recvResult > 0)
+    {
+        std::cout << "Received data from client " << client->m_clientID << ": " << recvResult << " bytes" << std::endl;
+        // TODO(Salads): Handle the received data.
+    }
+    else if (recvResult == 0)
+    {
+        std::cout << "Client " << client->m_clientID << " disconnected" << std::endl;
+    }
+    else
+    {
+        PrintWSAError("recv failed");
+    }
 }

@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\ChatClientStatus.h" />
     <ClInclude Include="include\NetworkPacker.h" />
     <ClInclude Include="include\PacketType.h" />
   </ItemGroup>
