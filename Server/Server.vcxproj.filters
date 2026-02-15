@@ -8,5 +8,6 @@
   <ItemGroup>
     <ClInclude Include="src\RelayIMServer.h" />
     <ClInclude Include="src\Util.h" />
+    <ClInclude Include="src\ChatClient.h" />
   </ItemGroup>
 </Project>

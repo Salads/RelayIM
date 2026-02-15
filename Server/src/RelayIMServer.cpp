@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Util.h"
+#include "PacketType.h"
 
 #define DEFAULT_PORT "27015"
 
@@ -70,6 +71,12 @@ bool RelayIMServer::Initialize()
 
 void RelayIMServer::Stop()
 {
+    if (m_listenThread.joinable())
+    {
+        m_listenThread.join();
+    }
+
+    shutdown(m_listenSocket, SD_BOTH);
     freeaddrinfo(m_listenSocketInfo);
     WSACleanup();
 }
@@ -79,19 +86,52 @@ bool RelayIMServer::IsInitialized() const
     return m_isInitialized;
 }
 
-bool RelayIMServer::Run()
+bool RelayIMServer::Start()
 {
-    if (!m_isInitialized) { return false; }
-    
-    // TODO(Salads): Listener Thread
-    SOCKET clientSocket = INVALID_SOCKET;
+    if (!IsInitialized()) 
+    { 
+        Initialize();
 
-    // Accept a client socket
-    clientSocket = accept(m_listenSocket, NULL, NULL);
-    if (clientSocket == INVALID_SOCKET) {
-        PrintWSAError("accept failed");
-        closesocket(m_listenSocket);
-        WSACleanup();
-        return false;
+        if (!IsInitialized())
+        {
+            std::cerr << "Failed to initialize server" << std::endl;
+            return false;
+        }
+
+        m_listenThread = std::thread(&RelayIMServer::ListenForClients, this);
     }
+    
+    // TODO(Salads): Receive data from clients and handle it.
+
+    return true;
+}
+
+void RelayIMServer::ListenForClients()
+{
+    while (true)
+    {
+        SOCKET newClientSocket = INVALID_SOCKET;
+        newClientSocket = accept(m_listenSocket, NULL, NULL);
+        if (newClientSocket == INVALID_SOCKET) {
+            PrintWSAError("accept failed");
+            return;
+        }
+
+        std::cout << "New client connected: " << newClientSocket << std::endl;
+        uint32_t clientID = m_nextClientID++;
+        {
+            std::lock_guard<std::mutex> lock(m_clientsMutex);
+            m_connectedClients[newClientSocket] = clientID;
+        }
+
+        {
+            std::lock_guard<std::mutex> lock(m_clientThreadsMutex);
+            m_clientThreads.emplace(clientID, std::thread(&RelayIMServer::ProcessClient, this, newClientSocket, clientID));
+        }
+    }
+}
+
+void RelayIMServer::ProcessClient(SOCKET clientSocket, uint32_t clientID)
+{
+
 }

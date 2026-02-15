@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum PacketType
 {
     PacketType_Connect = 0,
@@ -10,5 +9,4 @@ enum PacketType
     PacketType_JoinChatRoom,
     PacketType_LeaveChatRoom,
     PacketType_SendMessage,
-
 };
