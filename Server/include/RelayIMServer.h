@@ -19,6 +19,7 @@ public:
     void Stop();
 
     bool IsInitialized() const;
+    void HandleNewClient(PeerID newPeerID);
 
 private:
     bool m_isInitialized = false;

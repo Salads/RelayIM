@@ -17,9 +17,23 @@ bool RelayIMServer::Initialize()
         return false;
     }
 
+    m_serverPeer.OnNewClient = [this](PeerID newPeerID) 
+    {
+        HandleNewClient(newPeerID);
+    };
+
     std::cout << "Server Initialized" << std::endl;
     m_isInitialized = true;
     return true;
+}
+
+void RelayIMServer::HandleNewClient(PeerID newPeerID)
+{
+    std::unique_ptr<ChatClient> newChatClient = std::make_unique<ChatClient>(newPeerID);
+    {
+        std::lock_guard<std::mutex> lock(m_clientsMutex);
+        m_clients.emplace(newPeerID, std::move(newChatClient));
+    }
 }
 
 void RelayIMServer::Stop()
