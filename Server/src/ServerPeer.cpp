@@ -59,7 +59,7 @@ bool ServerPeer::Initialize()
         return false;
     }
 
-
+    m_listenThread = std::thread(&ServerPeer::ListenForClients, this);
 }
 
 void ServerPeer::Shutdown()
