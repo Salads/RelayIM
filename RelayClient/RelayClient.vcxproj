@@ -60,8 +60,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>..\RelayIMShared\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <IncludePath>..\RelayIMShared\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -131,6 +133,11 @@
   <ItemGroup>
     <ClInclude Include="src\ChatRoomInfo.h" />
     <ClInclude Include="src\NetworkState.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RelayIMShared\RelayIMShared.vcxproj">
+      <Project>{5e0b233d-e907-4b59-8f80-030776c1771e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

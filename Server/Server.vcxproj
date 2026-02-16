@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,15 +21,18 @@
   <ItemGroup>
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerMain.cpp" />
+    <ClCompile Include="src\ServerPeer.cpp" />
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ChatClient.h" />
-    <ClInclude Include="src\ChatMessage.h" />
-    <ClInclude Include="src\ChatRoom.h" />
-    <ClInclude Include="src\Types.h" />
-    <ClInclude Include="src\Util.h" />
-    <ClInclude Include="src\RelayIMServer.h" />
+    <ClInclude Include="include\ChatClient.h" />
+    <ClInclude Include="include\ChatMessage.h" />
+    <ClInclude Include="include\ChatRoom.h" />
+    <ClInclude Include="include\PeerClient.h" />
+    <ClInclude Include="include\ServerPeer.h" />
+    <ClInclude Include="include\Types.h" />
+    <ClInclude Include="include\Util.h" />
+    <ClInclude Include="include\RelayIMServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RelayIMShared\RelayIMShared.vcxproj">
@@ -91,7 +94,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>build\intermediate\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)build\$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>..\RelayIMShared\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Git Repositories\RelayIM\Server\include;..\RelayIMShared\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\Git Repositories\RelayIM\Server\include;..\RelayIMShared\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -9,6 +9,7 @@
 #include "Types.h"
 #include "ChatRoom.h"
 #include "ChatClient.h"
+#include "ServerPeer.h"
 
 class RelayIMServer
 {
@@ -19,22 +20,14 @@ public:
 
     bool IsInitialized() const;
 
-    void ListenForClients();
-
-    void ProcessClient(ChatClient *client);
-
 private:
     bool m_isInitialized = false;
 
-    addrinfo* m_listenSocketInfo = nullptr;
-    SOCKET m_listenSocket = INVALID_SOCKET;
+    ServerPeer m_serverPeer;
 
-    std::thread m_listenThread;
-
-    std::atomic_uint32_t m_nextClientID{ 0 };
     std::atomic_uint32_t m_nextRoomID{ 0 };
 
-    std::unordered_map<ClientID, std::unique_ptr<ChatClient>> m_clients;
+    std::unordered_map<PeerID, std::unique_ptr<ChatClient>> m_clients;
     std::mutex m_clientsMutex;
 
     std::unordered_map<RoomID, ChatRoom> m_chatRooms;

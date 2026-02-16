@@ -11,5 +11,5 @@ class ChatRoom
 public:
     int m_roomID;
     std::vector<ChatMessage> m_messages;
-    std::unordered_set<ClientID> m_clientIDs;
+    std::unordered_set<PeerID> m_clientIDs;
 };

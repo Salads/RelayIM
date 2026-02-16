@@ -4,13 +4,16 @@
     <ClCompile Include="src\ServerMain.cpp" />
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\Util.cpp" />
+    <ClCompile Include="src\ServerPeer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\RelayIMServer.h" />
-    <ClInclude Include="src\Util.h" />
-    <ClInclude Include="src\ChatClient.h" />
-    <ClInclude Include="src\ChatRoom.h" />
-    <ClInclude Include="src\ChatMessage.h" />
-    <ClInclude Include="src\Types.h" />
+    <ClInclude Include="include\RelayIMServer.h" />
+    <ClInclude Include="include\Util.h" />
+    <ClInclude Include="include\ChatClient.h" />
+    <ClInclude Include="include\ChatRoom.h" />
+    <ClInclude Include="include\ChatMessage.h" />
+    <ClInclude Include="include\Types.h" />
+    <ClInclude Include="include\ServerPeer.h" />
+    <ClInclude Include="include\PeerClient.h" />
   </ItemGroup>
 </Project>
