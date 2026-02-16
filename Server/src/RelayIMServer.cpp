@@ -9,7 +9,7 @@
 
 bool RelayIMServer::Initialize()
 {
-    if (m_isInitialized) { return false; }
+    if (m_isInitialized) { return true; }
 
     if (!m_serverPeer.Initialize())
     {
