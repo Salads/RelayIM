@@ -59,6 +59,7 @@ bool ServerPeer::Initialize()
         return false;
     }
 
+    m_running = true;
     m_listenThread = std::thread(&ServerPeer::ListenForClients, this);
 }
 
@@ -78,9 +79,9 @@ void ServerPeer::Shutdown()
 
     for (auto &[peerID, peerClient] : m_peerClients)
     {
-        if (peerClient->m_thread.joinable())
+        if (peerClient->m_receiveThread.joinable())
         {
-            peerClient->m_thread.join();
+            peerClient->m_receiveThread.join();
         }
 
         shutdown(peerClient->m_clientSocket, SD_BOTH);
@@ -103,7 +104,7 @@ void ServerPeer::ListenForClients()
 
         std::cout << "New client connected: " << newClientSocket << std::endl;
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
-        newPeerClient->m_thread = std::thread(&ServerPeer::UpdateNetworkForPeer, this, newPeerClient.get()->m_peerID, newClientSocket);
+        newPeerClient->m_receiveThread = std::thread(&ServerPeer::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
         {
             std::lock_guard<std::mutex> lock(m_peerClientsMutex);
             PeerID newClientID = newPeerClient->m_peerID;
@@ -120,24 +121,71 @@ void ServerPeer::ListenForClients()
 #define DEFAULT_BUFLEN 512
 #define BUFLEN DEFAULT_BUFLEN
 
-void ServerPeer::UpdateNetworkForPeer(PeerID peerID, SOCKET peerSocket)
+void ServerPeer::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
 {
     uint8_t receiveBuffer[BUFLEN];
-    
-    // TODO(Salads): This is a one shot for now, so the thread will end immediatly if we dont send data. Change to a while loop.
 
-    int recvResult = recv(peerSocket, (char*)receiveBuffer, BUFLEN, 0);
-    if (recvResult > 0)
+    while (m_running)
     {
-        std::cout << "Received data from client " << peerID << ": " << recvResult << " bytes" << std::endl;
-        // TODO(Salads): Handle the received data.
-    }
-    else if (recvResult == 0)
-    {
-        std::cout << "Client " << peerID << " disconnected" << std::endl;
-    }
-    else
-    {
-        PrintWSAError("recv failed");
-    }
+        memset(receiveBuffer, 0, BUFLEN);
+
+        int recvResult = recv(peerSocket, (char*)receiveBuffer, BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
+        if (recvResult == 0)
+        {
+            std::cout << "Client " << client->m_peerID << " disconnected" << std::endl;
+
+            if (OnClientDisconnected) {
+                OnClientDisconnected(client->m_peerID);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(m_peerClientsMutex);
+                m_peerClients.erase(client->m_peerID);
+            }
+
+            break;
+        }
+        else if(recvResult == SOCKET_ERROR)
+        {
+            PrintWSAError("recv failed");
+            break;
+        }
+
+        std::cout << "Received data from client " << client->m_peerID << ": " << recvResult << " bytes" << std::endl;
+        client->m_receiveBuffer.insert(client->m_receiveBuffer.end(), receiveBuffer, receiveBuffer + recvResult);
+
+        /////////////////////////////////////////////
+        // PROCESS ACCUMULATED DATA INTO PACKETS
+        /////////////////////////////////////////////
+
+        // TODO(Salads): Send and Receive in Network Byte-Order (Big Endian), then convert on host.
+        while (true) // We might receive multiple packets in one recv.
+        {
+            size_t receivedDataSize = client->m_receiveBuffer.size();
+            if (receivedDataSize < 2) // Packer Header (Just size for now)
+            {
+                break;
+            }
+
+            uint16_t packetSize = *reinterpret_cast<uint16_t*>(client->m_receiveBuffer.data()); // Includes the size field (2 bytes)
+            std::vector<uint8_t> packet;
+            if (receivedDataSize >= packetSize) // We have a full packet in the buffer
+            {
+                // Insert packet data (excluding size)
+                packet.insert(packet.end(), client->m_receiveBuffer.begin() + 2, client->m_receiveBuffer.begin() + 2 + packetSize);
+
+                // Remove the processed packet from the buffer (including size)
+                client->m_receiveBuffer.erase(client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize); // Remove the processed packet from the buffer
+                if (OnPacketReceived)
+                {
+                    OnPacketReceived(client->m_peerID, &packet);
+                }
+            }
+            else
+            {
+                break; // We don't have a full packet yet, wait for more data.
+            }
+        }
+
+    } // while(m_running)
 }

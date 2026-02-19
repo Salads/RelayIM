@@ -21,13 +21,17 @@ public:
     void Shutdown() override;
 
     void ListenForClients();
-    void UpdateNetworkForPeer(PeerID peerID, SOCKET peerSocket);
+    void UpdateNetworkForPeer(PeerClient* client, SOCKET peerSocket);
 
     std::function<void(PeerID)> OnNewClient;
+    std::function<void(PeerID, std::vector<uint8_t> *packet)> OnPacketReceived;
+    std::function<void(PeerID)> OnClientDisconnected;
 
 private:
     addrinfo* m_listenSocketInfo = nullptr;
     SOCKET m_listenSocket = INVALID_SOCKET;
+
+    std::atomic_bool m_running = false;
 
     std::thread m_listenThread;
 

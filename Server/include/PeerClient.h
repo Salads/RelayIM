@@ -2,6 +2,7 @@
 
 #include <WinSock2.h>
 #include <thread>
+#include <vector>
 #include "Types.h"
 
 struct PeerClient
@@ -11,5 +12,10 @@ struct PeerClient
 
     PeerID m_peerID = INVALID_PEER_ID;
     SOCKET m_clientSocket;
-    std::thread m_thread;
+    std::thread m_receiveThread;
+    std::vector<uint8_t> m_receiveBuffer;
+
+    std::thread m_sendThread;
+    std::condition_variable m_sendThreadCV;
+    std::mutex m_sendThreadMutex;
 };
