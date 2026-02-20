@@ -99,7 +99,7 @@ void ClientPeer::Send(std::vector<uint8_t> &data)
     uint16_t dataSize = static_cast<uint16_t>(data.size());
     data.insert(data.begin(), reinterpret_cast<uint8_t*>(&dataSize), reinterpret_cast<uint8_t*>(&dataSize) + sizeof(uint16_t));
 
-    int iResult = send(m_clientSocket, (const char *)data.data(), data.size(), 0);
+    int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), data.size(), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
     }
