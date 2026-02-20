@@ -28,6 +28,12 @@ bool RelayIMServer::Initialize()
         m_clients.erase(peerID);
     };
 
+    m_serverPeer.OnPacketReceived = [this](PeerID peerID, std::vector<uint8_t> *packet)
+    {
+        std::string test(packet->begin(), packet->end());
+        std::cout << "Packet: " << test << std::endl;
+    };
+
     std::cout << "Server Initialized" << std::endl;
     m_isInitialized = true;
     return true;
