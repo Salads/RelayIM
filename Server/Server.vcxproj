@@ -22,7 +22,6 @@
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerMain.cpp" />
     <ClCompile Include="src\ServerPeer.cpp" />
-    <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChatClient.h" />
@@ -31,7 +30,6 @@
     <ClInclude Include="include\PeerClient.h" />
     <ClInclude Include="include\ServerPeer.h" />
     <ClInclude Include="include\Types.h" />
-    <ClInclude Include="include\Util.h" />
     <ClInclude Include="include\RelayIMServer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +153,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

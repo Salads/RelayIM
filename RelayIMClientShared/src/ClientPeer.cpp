@@ -1,0 +1,108 @@
+#include "pch.h"
+#include "ClientPeer.h"
+#include "Util.h"
+
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <iostream>
+
+#define DEFAULT_PORT "27015"
+#define DEFAULT_ADDRESS "localhost"
+
+bool ClientPeer::Initialize()
+{
+    WSADATA wsaData;
+    int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (wsaStartupError) {
+        PrintWSAError("WSAStartup failed");
+        return false;
+    }
+
+    std::cout << "WSAStartup succeeded. Version: " << (wsaData.wVersion >> 8) << "." << (wsaData.wVersion & 0xFF) << std::endl;
+
+    struct addrinfo * result = NULL,
+                    * ptr = NULL,
+                    hints;
+
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    // Resolve the server address and port
+    int iResult = getaddrinfo(DEFAULT_ADDRESS, DEFAULT_PORT, &hints, &result);
+    if (iResult != 0) {
+        PrintWSAError("getaddrinfo failed");
+        WSACleanup();
+        return false;
+    }
+
+    // Attempt to connect to the first address returned by
+    // the call to getaddrinfo
+    ptr = result;
+
+    // Create a SOCKET for connecting to server
+    m_clientSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+
+    if (m_clientSocket == INVALID_SOCKET) {
+        PrintWSAError("Error at socket()");
+        freeaddrinfo(result);
+        WSACleanup();
+        return false;
+    }
+
+    // Connect to server.
+    iResult = connect(m_clientSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        closesocket(m_clientSocket);
+        m_clientSocket = INVALID_SOCKET;
+        return false;
+    }
+
+    // Should really try the next address returned by getaddrinfo
+    // if the connect call failed
+    // But for this simple example we just free the resources
+    // returned by getaddrinfo and print an error message
+
+    freeaddrinfo(result);
+
+    if (m_clientSocket == INVALID_SOCKET) {
+        printf("Unable to connect to server!\n");
+        WSACleanup();
+        return false;
+    }
+
+    m_isInitialized = true;
+    return true;
+}
+
+void ClientPeer::Shutdown()
+{
+    if (m_clientSocket != INVALID_SOCKET) {
+        closesocket(m_clientSocket);
+        m_clientSocket = INVALID_SOCKET;
+    }
+
+    WSACleanup();
+    m_isInitialized = false;
+}
+
+void ClientPeer::Send(std::vector<uint8_t> &data)
+{
+    if (!m_isInitialized)
+    {
+        printf("ClientPeer not initialized. Cannot send data.\n");
+        return;
+    }
+
+    // packet header (just size)
+    uint16_t dataSize = static_cast<uint16_t>(data.size());
+    data.insert(data.begin(), reinterpret_cast<uint8_t*>(&dataSize), reinterpret_cast<uint8_t*>(&dataSize) + sizeof(uint16_t));
+
+    int iResult = send(m_clientSocket, (const char *)data.data(), data.size(), 0);
+    if (iResult == SOCKET_ERROR) {
+        printf("send failed: %d\n", WSAGetLastError());
+    }
+
+    printf("Bytes Sent: %ld\n", iResult);
+}

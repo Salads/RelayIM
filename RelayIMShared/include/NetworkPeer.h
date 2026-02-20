@@ -9,6 +9,6 @@ public:
     virtual void Shutdown() = 0;
     bool GetIsInitialized() const { return m_isInitialized; }
 
-private:
+protected:
     bool m_isInitialized = false;
 };

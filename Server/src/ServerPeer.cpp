@@ -10,7 +10,7 @@ bool ServerPeer::Initialize()
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaStartupError) {
         PrintWSAError("WSAStartup failed");
-        return 1;
+        return false;
     }
 
     std::cout << "WSAStartup succeeded. Version: " << (wsaData.wVersion >> 8) << "." << (wsaData.wVersion & 0xFF) << std::endl;
@@ -61,6 +61,7 @@ bool ServerPeer::Initialize()
 
     m_running = true;
     m_listenThread = std::thread(&ServerPeer::ListenForClients, this);
+    m_isInitialized = true;
 }
 
 void ServerPeer::Shutdown()
@@ -102,7 +103,7 @@ void ServerPeer::ListenForClients()
             return;
         }
 
-        std::cout << "New client connected: " << newClientSocket << std::endl;
+        std::cout << "New client connected: " << m_nextClientID << std::endl;
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
         newPeerClient->m_receiveThread = std::thread(&ServerPeer::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
         {
@@ -136,11 +137,6 @@ void ServerPeer::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
 
             if (OnClientDisconnected) {
                 OnClientDisconnected(client->m_peerID);
-            }
-
-            {
-                std::lock_guard<std::mutex> lock(m_peerClientsMutex);
-                m_peerClients.erase(client->m_peerID);
             }
 
             break;

@@ -11,7 +11,9 @@ int main()
         return 1;
     }
 
-    // while (server.Run()) {};
+    server.Start();
+
+    while (true) {};
 
     std::cout << "Stopping server..." << std::endl;
     server.Stop();

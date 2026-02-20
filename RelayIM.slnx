@@ -6,6 +6,8 @@
   <Project Path="RelayClient/RelayClient.vcxproj" Id="0ccf7c6a-4f48-4ab4-a567-2d378eedfbc7">
     <Platform Project="x64" />
   </Project>
+  <Project Path="RelayIMClientShared/RelayIMClientShared.vcxproj" Id="40351d4c-c3a8-4598-bc24-64d03926d969" />
   <Project Path="RelayIMShared/RelayIMShared.vcxproj" Id="5e0b233d-e907-4b59-8f80-030776c1771e" />
   <Project Path="Server/Server.vcxproj" Id="e77b990f-05ca-43bf-96f3-ec82b6e1d898" />
+  <Project Path="SimpleClientTest/SimpleClientTest.vcxproj" Id="d392a511-4364-4c52-b0d8-c120ffe79823" />
 </Solution>
