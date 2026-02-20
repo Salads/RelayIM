@@ -149,11 +149,15 @@
     <ClInclude Include="include\NetworkPeer.h" />
     <ClInclude Include="include\NetworkPacker.h" />
     <ClInclude Include="include\NetworkTypes.h" />
+    <ClInclude Include="include\PacketReader.h" />
     <ClInclude Include="include\PacketType.h" />
+    <ClInclude Include="include\PacketWriter.h" />
     <ClInclude Include="include\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NetworkPacker.cpp" />
+    <ClCompile Include="src\PacketReader.cpp" />
+    <ClCompile Include="src\PacketWriter.cpp" />
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

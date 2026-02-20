@@ -23,6 +23,8 @@ public:
     void ListenForClients();
     void UpdateNetworkForPeer(PeerClient* client, SOCKET peerSocket);
 
+    void Send(PeerID, std::vector<uint8_t>* packet);
+
     std::function<void(PeerID)> OnNewClient;
     std::function<void(PeerID, std::vector<uint8_t> *packet)> OnPacketReceived;
     std::function<void(PeerID)> OnClientDisconnected;

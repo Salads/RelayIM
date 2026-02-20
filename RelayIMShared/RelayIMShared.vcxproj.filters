@@ -33,12 +33,24 @@
     <ClInclude Include="include\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PacketReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PacketWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NetworkPacker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PacketReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PacketWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,6 +4,7 @@
     <ClCompile Include="src\ServerMain.cpp" />
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerPeer.cpp" />
+    <ClCompile Include="src\ChatRoom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\RelayIMServer.h" />

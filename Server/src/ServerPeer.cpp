@@ -158,20 +158,21 @@ void ServerPeer::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
         while (true) // We might receive multiple packets in one recv.
         {
             size_t receivedDataSize = client->m_receiveBuffer.size();
-            if (receivedDataSize < 2) // Packer Header (Just size for now)
+            if (receivedDataSize < 2) // Need packet size to continue.
             {
                 break;
             }
 
-            uint16_t packetSize = *reinterpret_cast<uint16_t*>(client->m_receiveBuffer.data()); // Includes the size field (2 bytes)
-            std::vector<uint8_t> packet;
+            uint16_t packetSize;
+            memcpy(&packetSize, client->m_receiveBuffer.data(), 2);
+
             if (receivedDataSize >= packetSize) // We have a full packet in the buffer
             {
-                // Insert packet data (excluding size)
-                packet.insert(packet.end(), client->m_receiveBuffer.begin() + 2, client->m_receiveBuffer.begin() + 2 + packetSize);
+                // Insert to packet, then remove from receive buffer.
+                std::vector<uint8_t> packet;
+                packet.insert(packet.end(), client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
+                client->m_receiveBuffer.erase(client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
 
-                // Remove the processed packet from the buffer (including size)
-                client->m_receiveBuffer.erase(client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize); // Remove the processed packet from the buffer
                 if (OnPacketReceived)
                 {
                     OnPacketReceived(client->m_peerID, &packet);

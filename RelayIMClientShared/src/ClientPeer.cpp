@@ -6,9 +6,6 @@
 #include <WS2tcpip.h>
 #include <iostream>
 
-#define DEFAULT_PORT "27015"
-#define DEFAULT_ADDRESS "localhost"
-
 bool ClientPeer::Initialize()
 {
     WSADATA wsaData;
@@ -95,10 +92,7 @@ void ClientPeer::Send(std::vector<uint8_t> &data)
         return;
     }
 
-    // packet header (just size)
-    uint16_t dataSize = static_cast<uint16_t>(data.size());
-    data.insert(data.begin(), reinterpret_cast<uint8_t*>(&dataSize), reinterpret_cast<uint8_t*>(&dataSize) + sizeof(uint16_t));
-
+    // TODO(Salads): Instead of trying to precog the packet size, insert it here instead. Resize the vector beforehand and just edit to avoid vector shifting O(n).
     int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), data.size(), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());

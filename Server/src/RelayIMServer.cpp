@@ -6,6 +6,7 @@
 #include "Util.h"
 #include "PacketType.h"
 #include "NetworkTypes.h"
+#include "PacketReader.h"
 
 bool RelayIMServer::Initialize()
 {
@@ -28,15 +29,66 @@ bool RelayIMServer::Initialize()
         m_clients.erase(peerID);
     };
 
-    m_serverPeer.OnPacketReceived = [this](PeerID peerID, std::vector<uint8_t> *packet)
+    m_serverPeer.OnPacketReceived = [this](PeerID peerID, std::vector<uint8_t>* packet)
     {
-        std::string test(packet->begin(), packet->end());
-        std::cout << "Packet: " << test << std::endl;
+        HandleClientPacket(peerID, packet);
     };
 
     std::cout << "Server Initialized" << std::endl;
     m_isInitialized = true;
     return true;
+}
+
+void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* packet)
+{
+    // TODO(Salads): Process packet and respond accordingly
+
+    PacketReader reader(packet);
+
+    // Read Packet Header
+    uint16_t packetSize = 0; reader.ReadUInt16(packetSize);
+    uint32_t passCode = 0; reader.ReadUInt32(passCode);
+    uint8_t version = 0; reader.ReadUInt8(version);
+    uint8_t packetType = 0; reader.ReadUInt8(packetType);
+
+    // Read Packet Payload
+    switch (packetType)
+    {
+        // TODO(Salads): Update server state from client packets
+        case PacketType_JoinChatRoom:
+        {
+            uint32_t roomID = 0; reader.ReadUInt32(roomID);
+            uint8_t create = 0; reader.ReadUInt8(create);
+            std::string roomName; reader.ReadString(roomName);
+            std::cout << "Client " << peerID << " wants to join chat room " << roomID << " (Create: " << (int)create << ", Room Name: " << roomName << ")" << std::endl;
+            break;
+        }
+        case PacketType_LeaveChatRoom:
+        {
+            uint32_t roomID = 0; reader.ReadUInt32(roomID);
+            std::cout << "Client " << peerID << " wants to leave chat room " << roomID << std::endl;
+            break;
+        }
+        case PacketType_SendMessage:
+        {
+            uint32_t roomID = 0; reader.ReadUInt32(roomID);
+            std::string message; reader.ReadString(message);
+            std::cout << "Client " << peerID << " wants to send message to chat room " << roomID << ": " << message << std::endl;
+            break;
+        }
+        case PacketType_RoomUpdate:
+        {
+            uint32_t roomID = 0; reader.ReadUInt32(roomID);
+            std::string message; reader.ReadString(message);
+            std::cout << "Client " << peerID << " received room update for chat room " << roomID << ": " << message << std::endl;
+            break;
+        }
+        default:
+        {
+            std::cout << "Client " << peerID << " sent unknown packet type: " << (int)packetType << std::endl;
+            break;
+        }
+    }
 }
 
 void RelayIMServer::HandleNewClient(PeerID newPeerID)

@@ -2,6 +2,8 @@
 #include <WinSock2.h>
 
 #include "ClientPeer.h"
+#include "PacketWriter.h"
+#include "NetworkTypes.h"
 
 int main()
 {
@@ -15,8 +17,24 @@ int main()
 
     std::cout << "Client peer initialized successfully." << std::endl;
 
-    std::vector<uint8_t> testData = {'H', 'e', 'l', 'l', 'o'};
-    clientPeer.Send(testData);
+    std::string testRoomName = "Hello Test Room";
+    std::string testMessage = "We're doing it!";
+
+    std::vector<uint8_t> testPacket;
+    PacketWriter writer(testPacket);
+
+    // Header
+    writer.WriteUInt16(PACKETSIZE_HEADER + PACKETSIZE_JOINROOM_NOSTR + sizeof(uint16_t) + testRoomName.size());
+    writer.WriteUInt32(0xDEADBEEF); // PassCode, should be random and unlikely to appear in normal data. Not useful for open source, but better than nothing.
+    writer.WriteUInt8(1); // Version
+    writer.WriteUInt8(PacketType_JoinChatRoom);
+
+    // Payload
+    writer.WriteUInt32(0); // RoomID, 0 for new room.
+    writer.WriteUInt8(1); // Create room if it doesn't exist.
+    writer.WriteString(testRoomName);
+
+    clientPeer.Send(testPacket);
 
     system("pause");
 

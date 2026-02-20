@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ChatRoom.cpp" />
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerMain.cpp" />
     <ClCompile Include="src\ServerPeer.cpp" />

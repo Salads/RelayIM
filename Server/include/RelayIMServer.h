@@ -22,6 +22,9 @@ public:
     void HandleNewClient(PeerID newPeerID);
 
 private:
+    void HandleClientPacket(PeerID peerID, std::vector<uint8_t>* packet);
+
+private:
     bool m_isInitialized = false;
 
     ServerPeer m_serverPeer;
