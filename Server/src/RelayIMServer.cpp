@@ -22,6 +22,12 @@ bool RelayIMServer::Initialize()
         HandleNewClient(newPeerID);
     };
 
+    m_serverPeer.OnClientDisconnected = [this](PeerID peerID)
+    {
+        std::lock_guard<std::mutex> lock(m_clientsMutex);
+        m_clients.erase(peerID);
+    };
+
     std::cout << "Server Initialized" << std::endl;
     m_isInitialized = true;
     return true;
