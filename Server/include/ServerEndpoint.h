@@ -14,7 +14,7 @@
 #include "ChatClient.h"
 #include "PeerClient.h"
 
-class ServerPeer : public NetworkPeer
+class ServerEndpoint : public NetworkPeer
 {
 public:
     bool Initialize() override;

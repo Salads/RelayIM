@@ -1,10 +1,10 @@
 #include <iostream>
-#include "ServerPeer.h"
+#include "ServerEndpoint.h"
 
 using std::cout;
 using std::endl;
 
-bool ServerPeer::Initialize()
+bool ServerEndpoint::Initialize()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -60,11 +60,11 @@ bool ServerPeer::Initialize()
     }
 
     m_running = true;
-    m_listenThread = std::thread(&ServerPeer::ListenForClients, this);
+    m_listenThread = std::thread(&ServerEndpoint::ListenForClients, this);
     m_isInitialized = true;
 }
 
-void ServerPeer::Shutdown()
+void ServerEndpoint::Shutdown()
 {
     if (m_listenSocket != INVALID_SOCKET)
     {
@@ -92,7 +92,7 @@ void ServerPeer::Shutdown()
     WSACleanup();
 }
 
-void ServerPeer::ListenForClients()
+void ServerEndpoint::ListenForClients()
 {
     while (true)
     {
@@ -105,7 +105,7 @@ void ServerPeer::ListenForClients()
 
         std::cout << "New client connected: " << m_nextClientID << std::endl;
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
-        newPeerClient->m_receiveThread = std::thread(&ServerPeer::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
+        newPeerClient->m_receiveThread = std::thread(&ServerEndpoint::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
         {
             std::lock_guard<std::mutex> lock(m_peerClientsMutex);
             PeerID newClientID = newPeerClient->m_peerID;
@@ -122,7 +122,7 @@ void ServerPeer::ListenForClients()
 #define DEFAULT_BUFLEN 512
 #define BUFLEN DEFAULT_BUFLEN
 
-void ServerPeer::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
+void ServerEndpoint::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
 {
     uint8_t receiveBuffer[BUFLEN];
 
@@ -185,4 +185,9 @@ void ServerPeer::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
         }
 
     } // while(m_running)
+}
+
+void ServerEndpoint::Send(PeerID clientPeerID, std::vector<uint8_t>* packet)
+{
+
 }

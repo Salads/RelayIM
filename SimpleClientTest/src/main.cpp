@@ -1,13 +1,13 @@
 #include <iostream>
 #include <WinSock2.h>
 
-#include "ClientPeer.h"
+#include "ClientEndpoint.h"
 #include "PacketWriter.h"
 #include "NetworkTypes.h"
 
 int main()
 {
-    ClientPeer clientPeer;
+    ClientEndpoint clientPeer;
 
     if (!clientPeer.Initialize())
     {

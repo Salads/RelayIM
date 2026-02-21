@@ -5,7 +5,7 @@
 
 #include "NetworkPeer.h"
 
-class ClientPeer : public NetworkPeer
+class ClientEndpoint : public NetworkPeer
 {
 public:
     bool Initialize() override;

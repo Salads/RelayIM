@@ -21,7 +21,7 @@
     <ClInclude Include="include\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ClientPeer.h">
+    <ClInclude Include="include\ClientEndpoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,7 +32,7 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ClientPeer.cpp">
+    <ClCompile Include="src\ClientEndpoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

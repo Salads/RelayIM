@@ -22,14 +22,14 @@
     <ClCompile Include="src\ChatRoom.cpp" />
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerMain.cpp" />
-    <ClCompile Include="src\ServerPeer.cpp" />
+    <ClCompile Include="src\ServerEndpoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChatClient.h" />
     <ClInclude Include="include\ChatMessage.h" />
     <ClInclude Include="include\ChatRoom.h" />
     <ClInclude Include="include\PeerClient.h" />
-    <ClInclude Include="include\ServerPeer.h" />
+    <ClInclude Include="include\ServerEndpoint.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\RelayIMServer.h" />
   </ItemGroup>

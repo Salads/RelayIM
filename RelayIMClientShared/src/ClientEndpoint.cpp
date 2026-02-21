@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "ClientPeer.h"
+#include "ClientEndpoint.h"
 #include "Util.h"
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <iostream>
 
-bool ClientPeer::Initialize()
+bool ClientEndpoint::Initialize()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -73,7 +73,7 @@ bool ClientPeer::Initialize()
     return true;
 }
 
-void ClientPeer::Shutdown()
+void ClientEndpoint::Shutdown()
 {
     if (m_clientSocket != INVALID_SOCKET) {
         closesocket(m_clientSocket);
@@ -84,11 +84,11 @@ void ClientPeer::Shutdown()
     m_isInitialized = false;
 }
 
-void ClientPeer::Send(std::vector<uint8_t> &data)
+void ClientEndpoint::Send(std::vector<uint8_t> &data)
 {
     if (!m_isInitialized)
     {
-        printf("ClientPeer not initialized. Cannot send data.\n");
+        printf("ClientEndpoint not initialized. Cannot send data.\n");
         return;
     }
 
