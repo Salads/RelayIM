@@ -27,7 +27,7 @@ private:
 private:
     bool m_isInitialized = false;
 
-    ServerEndpoint m_serverPeer;
+    ServerEndpoint m_serverEndpoint;
 
     std::atomic_uint32_t m_nextRoomID{ 0 };
 

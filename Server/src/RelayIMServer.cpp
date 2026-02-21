@@ -12,24 +12,24 @@ bool RelayIMServer::Initialize()
 {
     if (m_isInitialized) { return true; }
 
-    if (!m_serverPeer.Initialize())
+    if (!m_serverEndpoint.Initialize())
     {
         std::cerr << "Failed to initialize server peer" << std::endl;
         return false;
     }
 
-    m_serverPeer.OnNewClient = [this](PeerID newPeerID) 
+    m_serverEndpoint.OnNewClient = [this](PeerID newPeerID) 
     {
         HandleNewClient(newPeerID);
     };
 
-    m_serverPeer.OnClientDisconnected = [this](PeerID peerID)
+    m_serverEndpoint.OnClientDisconnected = [this](PeerID peerID)
     {
         std::lock_guard<std::mutex> lock(m_clientsMutex);
         m_clients.erase(peerID);
     };
 
-    m_serverPeer.OnPacketReceived = [this](PeerID peerID, std::vector<uint8_t>* packet)
+    m_serverEndpoint.OnPacketReceived = [this](PeerID peerID, std::vector<uint8_t>* packet)
     {
         HandleClientPacket(peerID, packet);
     };
@@ -102,7 +102,7 @@ void RelayIMServer::HandleNewClient(PeerID newPeerID)
 
 void RelayIMServer::Stop()
 {
-    m_serverPeer.Shutdown();
+    m_serverEndpoint.Shutdown();
 }
 
 bool RelayIMServer::IsInitialized() const

@@ -7,9 +7,9 @@
 
 int main()
 {
-    ClientEndpoint clientPeer;
+    ClientEndpoint clientEndpoint;
 
-    if (!clientPeer.Initialize())
+    if (!clientEndpoint.Initialize())
     {
         std::cerr << "Failed to initialize client peer." << std::endl;
         return 1;
@@ -34,9 +34,9 @@ int main()
     writer.WriteUInt8(1); // Create room if it doesn't exist.
     writer.WriteString(testRoomName);
 
-    clientPeer.Send(testPacket);
+    clientEndpoint.Send(testPacket);
 
     system("pause");
 
-    clientPeer.Shutdown();
+    clientEndpoint.Shutdown();
 }
