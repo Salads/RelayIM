@@ -62,6 +62,8 @@ bool ServerEndpoint::Initialize()
     m_running = true;
     m_listenThread = std::thread(&ServerEndpoint::ListenForClients, this);
     m_isInitialized = true;
+
+    return true;
 }
 
 void ServerEndpoint::Shutdown()
