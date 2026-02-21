@@ -2,7 +2,7 @@
 
 #include "NetworkTypes.h"
 
-class NetworkPeer
+class NetworkEndpoint
 {
 public: 
     virtual bool Initialize() = 0;

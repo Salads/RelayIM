@@ -27,7 +27,7 @@
     <ClInclude Include="include\NetworkTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\NetworkPeer.h">
+    <ClInclude Include="include\NetworkEndpoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Util.h">

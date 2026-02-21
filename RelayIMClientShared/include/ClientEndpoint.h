@@ -3,9 +3,9 @@
 #include <WinSock2.h>
 #include <vector>
 
-#include "NetworkPeer.h"
+#include "NetworkEndpoint.h"
 
-class ClientEndpoint : public NetworkPeer
+class ClientEndpoint : public NetworkEndpoint
 {
 public:
     bool Initialize() override;

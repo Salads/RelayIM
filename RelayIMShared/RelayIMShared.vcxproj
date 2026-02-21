@@ -146,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\ChatClientStatus.h" />
-    <ClInclude Include="include\NetworkPeer.h" />
+    <ClInclude Include="include\NetworkEndpoint.h" />
     <ClInclude Include="include\NetworkPacker.h" />
     <ClInclude Include="include\NetworkTypes.h" />
     <ClInclude Include="include\PacketReader.h" />
