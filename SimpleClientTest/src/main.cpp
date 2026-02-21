@@ -24,7 +24,7 @@ int main()
     PacketWriter writer(testPacket);
 
     // Header
-    writer.WriteUInt16(PACKETSIZE_HEADER + PACKETSIZE_JOINROOM_NOSTR + sizeof(uint16_t) + testRoomName.size());
+    writer.WriteUInt16(PACKETSIZE_HEADER + PACKETSIZE_JOINROOM_NOSTR + static_cast<uint16_t>(sizeof(uint16_t)) + testRoomName.size());
     writer.WriteUInt32(0xDEADBEEF); // PassCode, should be random and unlikely to appear in normal data. Not useful for open source, but better than nothing.
     writer.WriteUInt8(1); // Version
     writer.WriteUInt8(PacketType_JoinChatRoom);

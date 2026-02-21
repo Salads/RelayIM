@@ -93,7 +93,7 @@ void ClientEndpoint::Send(std::vector<uint8_t> &data)
     }
 
     // TODO(Salads): Instead of trying to precog the packet size, insert it here instead. Resize the vector beforehand and just edit to avoid vector shifting O(n).
-    int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), data.size(), 0);
+    int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
     }
