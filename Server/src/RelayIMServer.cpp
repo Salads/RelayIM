@@ -59,9 +59,13 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
         case PacketType_JoinChatRoom:
         {
             uint32_t roomID = 0; reader.ReadUInt32(roomID);
-            uint8_t create = 0; reader.ReadUInt8(create);
+            std::cout << "Client " << peerID << " wants to join chat room " << roomID << std::endl;
+            break;
+        }
+        case PacketType_CreateChatRoom:
+        {
             std::string roomName; reader.ReadString(roomName);
-            std::cout << "Client " << peerID << " wants to join chat room " << roomID << " (Create: " << (int)create << ", Room Name: " << roomName << ")" << std::endl;
+            std::cout << "Client " << peerID << " wants to create chat room: '" << roomName << "'" << std::endl;
             break;
         }
         case PacketType_LeaveChatRoom:
@@ -75,13 +79,6 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
             uint32_t roomID = 0; reader.ReadUInt32(roomID);
             std::string message; reader.ReadString(message);
             std::cout << "Client " << peerID << " wants to send message to chat room " << roomID << ": " << message << std::endl;
-            break;
-        }
-        case PacketType_RoomUpdate:
-        {
-            uint32_t roomID = 0; reader.ReadUInt32(roomID);
-            std::string message; reader.ReadString(message);
-            std::cout << "Client " << peerID << " received room update for chat room " << roomID << ": " << message << std::endl;
             break;
         }
         default:
@@ -98,7 +95,7 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
         BinaryWriter writer(responsePacket);
         writer.WriteUInt32(0xDEADBEEF);
         writer.WriteUInt8(1);
-        writer.WriteUInt8(PacketType_RoomUpdate);
+        writer.WriteUInt8(PacketType_RoomUpdate_MSG);
         writer.WriteUInt32(0);
         writer.WriteString("This is a test room update message from the server.");
 

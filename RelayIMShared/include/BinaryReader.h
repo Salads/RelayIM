@@ -4,6 +4,7 @@
 #include <string>
 
 #include "NetworkTypes.h"
+#include "PacketHeader.h"
 
 class BinaryReader
 {
@@ -14,6 +15,8 @@ public:
     bool ReadUInt16(uint16_t& outValue);
     bool ReadUInt32(uint32_t& outValue);
     bool ReadString(std::string &outString);
+
+    bool ReadHeader(PacketHeader& outHeader);
 
 private:
     const std::vector<uint8_t> *m_data;

@@ -57,3 +57,16 @@ bool BinaryReader::ReadString(std::string& outString)
     m_cursor += stringLength;
     return true;
 }
+
+bool BinaryReader::ReadHeader(PacketHeader& outHeader)
+{
+    if (m_cursor + sizeof(PacketHeader) > m_end)
+    {
+        return false;
+    }
+
+    outHeader = *reinterpret_cast<const PacketHeader*>(m_cursor);
+    m_cursor += sizeof(PacketHeader);
+
+    return true;
+}

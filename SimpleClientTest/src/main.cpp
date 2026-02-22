@@ -6,21 +6,19 @@
 #include "BinaryReader.h"
 #include "NetworkTypes.h"
 #include "Types.h"
+#include "PacketType.h"
 
 void HandlePacket(std::vector<uint8_t>* serverPacket)
 {
     BinaryReader reader(serverPacket);
-    uint16_t packetSize = 0; reader.ReadUInt16(packetSize);
-    uint32_t passCode   = 0; reader.ReadUInt32(passCode);
-    uint8_t version     = 0; reader.ReadUInt8(version);
-    uint8_t packetType  = 0; reader.ReadUInt8(packetType);
+    PacketHeader header; reader.ReadHeader(header);
 
-    std::cout << "Received serverPacket - PassCode: " << std::hex << passCode << ", Version: " << (int)version << ", PacketType: " << (int)packetType << std::endl;
+    std::cout << "Received serverPacket - PassCode: " << std::hex << header.m_passCode << ", Version: " << (int)header.m_version << ", PacketType: " << PacketTypeToString(header.m_packetType) << std::endl;
     // Handle different packet types here based on packetType.
 
-    switch (packetType) 
+    switch (header.m_packetType) 
     {
-        case PacketType_RoomUpdate:
+        case PacketType_RoomUpdate_MSG:
         {
             RoomID roomID = 0;   reader.ReadUInt32(roomID);
             std::string message; reader.ReadString(message);

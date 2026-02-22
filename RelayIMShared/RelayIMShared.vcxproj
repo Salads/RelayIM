@@ -74,6 +74,9 @@
     <IncludePath>D:\Git Repositories\RelayIM\RelayIMShared\include;$(IncludePath)</IncludePath>
     <SourcePath>D:\Git Repositories\RelayIM\RelayIMShared\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <SourcePath>D:\Git Repositories\RelayIM\RelayIMShared\src;$(SourcePath)</SourcePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -150,6 +153,7 @@
     <ClInclude Include="include\NetworkPacker.h" />
     <ClInclude Include="include\NetworkTypes.h" />
     <ClInclude Include="include\BinaryReader.h" />
+    <ClInclude Include="include\PacketHeader.h" />
     <ClInclude Include="include\PacketType.h" />
     <ClInclude Include="include\BinaryWriter.h" />
     <ClInclude Include="include\Types.h" />
@@ -159,6 +163,7 @@
     <ClCompile Include="src\NetworkPacker.cpp" />
     <ClCompile Include="src\BinaryReader.cpp" />
     <ClCompile Include="src\BinaryWriter.cpp" />
+    <ClCompile Include="src\PacketType.cpp" />
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
