@@ -6,7 +6,7 @@
 #include "Util.h"
 #include "PacketType.h"
 #include "NetworkTypes.h"
-#include "PacketReader.h"
+#include "BinaryReader.h"
 
 bool RelayIMServer::Initialize()
 {
@@ -43,7 +43,7 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
 {
     // TODO(Salads): Process packet and respond accordingly
 
-    PacketReader reader(packet);
+    BinaryReader reader(packet);
 
     // Read Packet Header
     uint16_t packetSize = 0; reader.ReadUInt16(packetSize);

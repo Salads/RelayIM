@@ -5,10 +5,10 @@
 
 #include "NetworkTypes.h"
 
-class PacketWriter
+class BinaryWriter
 {
 public:
-    PacketWriter(std::vector<uint8_t> &buffer);
+    BinaryWriter(std::vector<uint8_t> &buffer);
 
     void WriteUInt8(uint8_t value);
     void WriteUInt16(uint16_t value);

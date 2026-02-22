@@ -2,7 +2,7 @@
 #include <WinSock2.h>
 
 #include "ClientNetworkInterface.h"
-#include "PacketWriter.h"
+#include "BinaryWriter.h"
 #include "NetworkTypes.h"
 
 int main()
@@ -21,7 +21,7 @@ int main()
     std::string testMessage = "We're doing it!";
 
     std::vector<uint8_t> testPacket;
-    PacketWriter writer(testPacket);
+    BinaryWriter writer(testPacket);
 
     // Header
     writer.WriteUInt32(0xDEADBEEF); // PassCode

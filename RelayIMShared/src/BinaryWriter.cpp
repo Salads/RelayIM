@@ -1,12 +1,12 @@
-#include "PacketWriter.h"
+#include "BinaryWriter.h"
 
-PacketWriter::PacketWriter(std::vector<uint8_t>& buffer)
+BinaryWriter::BinaryWriter(std::vector<uint8_t>& buffer)
     : m_buffer(&buffer)
 {
     WriteUInt16(0); // Placeholder for packet size, will be updated later.
 }
 
-void PacketWriter::WriteUInt8(uint8_t value)
+void BinaryWriter::WriteUInt8(uint8_t value)
 {
     for (int i = 0; i < sizeof(uint8_t); i++)
     {
@@ -14,7 +14,7 @@ void PacketWriter::WriteUInt8(uint8_t value)
     }
 }
 
-void PacketWriter::WriteUInt16(uint16_t value)
+void BinaryWriter::WriteUInt16(uint16_t value)
 {
     for(int i = 0; i < sizeof(uint16_t); i++)
     {
@@ -22,7 +22,7 @@ void PacketWriter::WriteUInt16(uint16_t value)
     }
 }
 
-void PacketWriter::WriteUInt32(uint32_t value)
+void BinaryWriter::WriteUInt32(uint32_t value)
 {
     for (int i = 0; i < sizeof(uint32_t); i++)
     {
@@ -30,7 +30,7 @@ void PacketWriter::WriteUInt32(uint32_t value)
     }
 }
 
-void PacketWriter::WriteString(std::string& string)
+void BinaryWriter::WriteString(std::string& string)
 {
     WriteUInt16(static_cast<uint16_t>(string.size()));
     m_buffer->insert(m_buffer->end(), string.begin(), string.end());

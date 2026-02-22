@@ -33,10 +33,10 @@
     <ClInclude Include="include\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PacketReader.h">
+    <ClInclude Include="include\BinaryReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PacketWriter.h">
+    <ClInclude Include="include\BinaryWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,10 +47,10 @@
     <ClCompile Include="src\Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PacketReader.cpp">
+    <ClCompile Include="src\BinaryReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PacketWriter.cpp">
+    <ClCompile Include="src\BinaryWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
