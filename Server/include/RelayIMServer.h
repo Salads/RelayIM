@@ -9,7 +9,7 @@
 #include "Types.h"
 #include "ChatRoom.h"
 #include "ChatClient.h"
-#include "ServerEndpoint.h"
+#include "ServerNetworkInterface.h"
 
 class RelayIMServer
 {
@@ -27,7 +27,7 @@ private:
 private:
     bool m_isInitialized = false;
 
-    ServerEndpoint m_serverEndpoint;
+    ServerNetworkInterface m_serverNetwork;
 
     std::atomic_uint32_t m_nextRoomID{ 0 };
 

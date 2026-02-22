@@ -3,9 +3,9 @@
 #include <WinSock2.h>
 #include <vector>
 
-#include "NetworkEndpoint.h"
+#include "NetworkInterface.h"
 
-class ClientEndpoint : public NetworkEndpoint
+class ClientNetworkInterface : public NetworkInterface
 {
 public:
     bool Initialize() override;

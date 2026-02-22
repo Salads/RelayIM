@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "ClientEndpoint.h"
+#include "ClientNetworkInterface.h"
 #include "Util.h"
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <iostream>
 
-bool ClientEndpoint::Initialize()
+bool ClientNetworkInterface::Initialize()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -73,7 +73,7 @@ bool ClientEndpoint::Initialize()
     return true;
 }
 
-void ClientEndpoint::Shutdown()
+void ClientNetworkInterface::Shutdown()
 {
     if (m_clientSocket != INVALID_SOCKET) {
         closesocket(m_clientSocket);
@@ -84,15 +84,17 @@ void ClientEndpoint::Shutdown()
     m_isInitialized = false;
 }
 
-void ClientEndpoint::Send(std::vector<uint8_t> &data)
+void ClientNetworkInterface::Send(std::vector<uint8_t> &data)
 {
     if (!m_isInitialized)
     {
-        printf("ClientEndpoint not initialized. Cannot send data.\n");
+        printf("ClientNetworkInterface not initialized. Cannot send data.\n");
         return;
     }
 
-    // TODO(Salads): Instead of trying to precog the packet size, insert it here instead. Resize the vector beforehand and just edit to avoid vector shifting O(n).
+    // Update the packet size at the beginning of the data buffer.
+    *reinterpret_cast<uint16_t*>(data.data()) = static_cast<uint16_t>(data.size());
+
     int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());

@@ -2,7 +2,9 @@
 
 PacketWriter::PacketWriter(std::vector<uint8_t>& buffer)
     : m_buffer(&buffer)
-{}
+{
+    WriteUInt16(0); // Placeholder for packet size, will be updated later.
+}
 
 void PacketWriter::WriteUInt8(uint8_t value)
 {

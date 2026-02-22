@@ -9,12 +9,12 @@
 #include <mutex>
 
 #include "Util.h"
-#include "NetworkEndpoint.h"
+#include "NetworkInterface.h"
 #include "Types.h"
 #include "ChatClient.h"
 #include "PeerClient.h"
 
-class ServerEndpoint : public NetworkEndpoint
+class ServerNetworkInterface : public NetworkInterface
 {
 public:
     bool Initialize() override;

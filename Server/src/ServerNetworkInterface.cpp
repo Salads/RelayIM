@@ -1,10 +1,10 @@
 #include <iostream>
-#include "ServerEndpoint.h"
+#include "ServerNetworkInterface.h"
 
 using std::cout;
 using std::endl;
 
-bool ServerEndpoint::Initialize()
+bool ServerNetworkInterface::Initialize()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -60,13 +60,13 @@ bool ServerEndpoint::Initialize()
     }
 
     m_running = true;
-    m_listenThread = std::thread(&ServerEndpoint::ListenForClients, this);
+    m_listenThread = std::thread(&ServerNetworkInterface::ListenForClients, this);
     m_isInitialized = true;
 
     return true;
 }
 
-void ServerEndpoint::Shutdown()
+void ServerNetworkInterface::Shutdown()
 {
     if (m_listenSocket != INVALID_SOCKET)
     {
@@ -94,7 +94,7 @@ void ServerEndpoint::Shutdown()
     WSACleanup();
 }
 
-void ServerEndpoint::ListenForClients()
+void ServerNetworkInterface::ListenForClients()
 {
     while (true)
     {
@@ -107,7 +107,7 @@ void ServerEndpoint::ListenForClients()
 
         std::cout << "New client connected: " << m_nextClientID << std::endl;
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
-        newPeerClient->m_receiveThread = std::thread(&ServerEndpoint::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
+        newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
         {
             std::lock_guard<std::mutex> lock(m_peerClientsMutex);
             PeerID newClientID = newPeerClient->m_peerID;
@@ -124,7 +124,7 @@ void ServerEndpoint::ListenForClients()
 #define DEFAULT_BUFLEN 512
 #define BUFLEN DEFAULT_BUFLEN
 
-void ServerEndpoint::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
+void ServerNetworkInterface::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
 {
     uint8_t receiveBuffer[BUFLEN];
 
@@ -189,7 +189,7 @@ void ServerEndpoint::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
     } // while(m_running)
 }
 
-void ServerEndpoint::Send(PeerID clientPeerID, std::vector<uint8_t>* packet)
+void ServerNetworkInterface::Send(PeerID clientPeerID, std::vector<uint8_t>* packet)
 {
 
 }
