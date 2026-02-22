@@ -7,8 +7,7 @@
 #include <string>
 
 #include "ChatClientStatus.h"
-
-#define INVALID_PEER_ID -1
+#include "NetworkTypes.h"
 
 class ChatClient
 {

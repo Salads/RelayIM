@@ -152,6 +152,7 @@
     <ClInclude Include="include\BinaryReader.h" />
     <ClInclude Include="include\PacketType.h" />
     <ClInclude Include="include\BinaryWriter.h" />
+    <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\Util.h" />
   </ItemGroup>
   <ItemGroup>

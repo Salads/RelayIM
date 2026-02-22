@@ -7,6 +7,7 @@
 #include "PacketType.h"
 #include "NetworkTypes.h"
 #include "BinaryReader.h"
+#include "BinaryWriter.h"
 
 bool RelayIMServer::Initialize()
 {
@@ -88,6 +89,20 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
             std::cout << "Client " << peerID << " sent unknown packet type: " << (int)packetType << std::endl;
             break;
         }
+    }
+
+    // TEMP(Salads): Testing server->client communication
+    {
+        std::cout << "Sending test RoomUpdate packet to client " << peerID << std::endl;
+        std::vector<uint8_t> responsePacket;
+        BinaryWriter writer(responsePacket);
+        writer.WriteUInt32(0xDEADBEEF);
+        writer.WriteUInt8(1);
+        writer.WriteUInt8(PacketType_RoomUpdate);
+        writer.WriteUInt32(0);
+        writer.WriteString("This is a test room update message from the server.");
+
+        m_serverNetwork.SendToClient(peerID, &responsePacket);
     }
 }
 

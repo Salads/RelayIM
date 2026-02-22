@@ -14,6 +14,7 @@ public:
     void WriteUInt16(uint16_t value);
     void WriteUInt32(uint32_t value);
     void WriteString(std::string &string);
+    void WriteString(const char* str);
 
 private:
     std::vector<uint8_t> *m_buffer;

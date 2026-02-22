@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ChatRoom.cpp" />
+    <ClCompile Include="src\PeerClient.cpp" />
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerMain.cpp" />
     <ClCompile Include="src\ServerNetworkInterface.cpp" />
@@ -30,7 +31,6 @@
     <ClInclude Include="include\ChatRoom.h" />
     <ClInclude Include="include\PeerClient.h" />
     <ClInclude Include="include\ServerNetworkInterface.h" />
-    <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\RelayIMServer.h" />
   </ItemGroup>
   <ItemGroup>

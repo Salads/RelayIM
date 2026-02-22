@@ -107,7 +107,8 @@ void ServerNetworkInterface::ListenForClients()
 
         std::cout << "New client connected: " << m_nextClientID << std::endl;
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
-        newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::UpdateNetworkForPeer, this, newPeerClient.get(), newClientSocket);
+        newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::ReceiveLoopForClient, this, newPeerClient.get(), newClientSocket);
+        newPeerClient->m_sendThread = std::thread(&ServerNetworkInterface::SendLoopForClient, this, newPeerClient.get(), newClientSocket);
         {
             std::lock_guard<std::mutex> lock(m_peerClientsMutex);
             PeerID newClientID = newPeerClient->m_peerID;
@@ -121,18 +122,15 @@ void ServerNetworkInterface::ListenForClients()
     }
 }
 
-#define DEFAULT_BUFLEN 512
-#define BUFLEN DEFAULT_BUFLEN
-
-void ServerNetworkInterface::UpdateNetworkForPeer(PeerClient *client, SOCKET peerSocket)
+void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET peerSocket)
 {
-    uint8_t receiveBuffer[BUFLEN];
+    uint8_t receiveBuffer[NETWORK_BUFLEN];
 
     while (m_running)
     {
-        memset(receiveBuffer, 0, BUFLEN);
+        memset(receiveBuffer, 0, NETWORK_BUFLEN);
 
-        int recvResult = recv(peerSocket, (char*)receiveBuffer, BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
+        int recvResult = recv(peerSocket, (char*)receiveBuffer, NETWORK_BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
         if (recvResult == 0)
         {
             std::cout << "Client " << client->m_peerID << " disconnected" << std::endl;
@@ -189,7 +187,37 @@ void ServerNetworkInterface::UpdateNetworkForPeer(PeerClient *client, SOCKET pee
     } // while(m_running)
 }
 
-void ServerNetworkInterface::Send(PeerID clientPeerID, std::vector<uint8_t>* packet)
+void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSocket)
 {
+    while (m_running)
+    {
+        // Wait untill we have data to send
+        std::unique_lock<std::mutex> lock(client->m_sendThreadCVMutex);
+        client->m_sendThreadCV.wait(lock, [this, client]() {
+            std::lock_guard<std::mutex> sendBufferLock(client->m_sendBufferMutex);
+            return !client->m_sendBuffer.empty();
+        });
 
+        {
+            std::lock_guard<std::mutex> sendBufferLock(client->m_sendBufferMutex);
+            int sendResult = send(peerSocket, (char*)client->m_sendBuffer.data(), (int)client->m_sendBuffer.size(), 0);
+            if (sendResult == SOCKET_ERROR)
+            {
+                PrintWSAError("send failed");
+            }
+            else
+            {
+                std::cout << "Sent data to client " << client->m_peerID << ": " << sendResult << " bytes" << std::endl;
+                client->m_sendBuffer.erase(client->m_sendBuffer.begin(), client->m_sendBuffer.begin() + sendResult);
+            }
+        }
+    }
+}
+
+void ServerNetworkInterface::SendToClient(PeerID clientPeerID, std::vector<uint8_t>* packet)
+{
+    *reinterpret_cast<uint16_t*>(packet->data()) = static_cast<uint16_t>(packet->size()); // Update packet size in header
+
+    std::lock_guard<std::mutex> lock(m_peerClientsMutex);
+    m_peerClients[clientPeerID]->Send(packet);
 }

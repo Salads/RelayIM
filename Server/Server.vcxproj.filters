@@ -5,13 +5,13 @@
     <ClCompile Include="src\RelayIMServer.cpp" />
     <ClCompile Include="src\ServerNetworkInterface.cpp" />
     <ClCompile Include="src\ChatRoom.cpp" />
+    <ClCompile Include="src\PeerClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\RelayIMServer.h" />
     <ClInclude Include="include\ChatClient.h" />
     <ClInclude Include="include\ChatRoom.h" />
     <ClInclude Include="include\ChatMessage.h" />
-    <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\ServerNetworkInterface.h" />
     <ClInclude Include="include\PeerClient.h" />
   </ItemGroup>

@@ -35,3 +35,9 @@ void BinaryWriter::WriteString(std::string& string)
     WriteUInt16(static_cast<uint16_t>(string.size()));
     m_buffer->insert(m_buffer->end(), string.begin(), string.end());
 }
+
+void BinaryWriter::WriteString(const char* str)
+{
+    std::string strWrapper(str);
+    WriteString(strWrapper);
+}

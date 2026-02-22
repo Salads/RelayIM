@@ -70,7 +70,75 @@ bool ClientNetworkInterface::Initialize()
     }
 
     m_isInitialized = true;
+    m_running = true;
     return true;
+}
+
+
+
+void ClientNetworkInterface::ReceiveLoop()
+{
+    uint8_t receiveBuffer[NETWORK_BUFLEN];
+
+    while (m_running)
+    {
+        memset(receiveBuffer, 0, NETWORK_BUFLEN);
+
+        int recvResult = recv(m_clientSocket, (char*)receiveBuffer, NETWORK_BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
+        if (recvResult == 0)
+        {
+            std::cout << "Server disconnected" << std::endl;
+
+            if (OnServerDisconnected) {
+                OnServerDisconnected();
+            }
+
+            break;
+        }
+        else if (recvResult == SOCKET_ERROR)
+        {
+            PrintWSAError("recv failed");
+            break;
+        }
+
+        std::cout << "Received data from server: " << recvResult << " bytes" << std::endl;
+        m_receiveBuffer.insert(m_receiveBuffer.end(), receiveBuffer, receiveBuffer + recvResult);
+
+        /////////////////////////////////////////////
+        // PROCESS ACCUMULATED DATA INTO PACKETS
+        /////////////////////////////////////////////
+
+        // TODO(Salads): Send and Receive in Network Byte-Order (Big Endian), then convert on host.
+        while (true) // We might receive multiple packets in one recv.
+        {
+            size_t receivedDataSize = m_receiveBuffer.size();
+            if (receivedDataSize < 2) // Need packet size to continue.
+            {
+                break;
+            }
+
+            uint16_t packetSize;
+            memcpy(&packetSize, m_receiveBuffer.data(), 2);
+
+            if (receivedDataSize >= packetSize) // We have a full packet in the buffer
+            {
+                // Insert to packet, then remove from receive buffer.
+                std::vector<uint8_t> packet;
+                packet.insert(packet.end(), m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
+                m_receiveBuffer.erase(m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
+
+                if (OnPacketReceived)
+                {
+                    OnPacketReceived(&packet);
+                }
+            }
+            else
+            {
+                break; // We don't have a full packet yet, wait for more data.
+            }
+        }
+
+    } // while(m_running)
 }
 
 void ClientNetworkInterface::Shutdown()

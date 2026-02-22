@@ -21,9 +21,10 @@ public:
     void Shutdown() override;
 
     void ListenForClients();
-    void UpdateNetworkForPeer(PeerClient* client, SOCKET peerSocket);
+    void ReceiveLoopForClient(PeerClient* client, SOCKET peerSocket);
+    void SendLoopForClient(PeerClient* client, SOCKET peerSocket);
 
-    void Send(PeerID, std::vector<uint8_t>* packet);
+    void SendToClient(PeerID, std::vector<uint8_t>* packet);
 
     std::function<void(PeerID)> OnNewClient;
     std::function<void(PeerID, std::vector<uint8_t> *packet)> OnPacketReceived;

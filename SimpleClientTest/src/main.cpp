@@ -3,7 +3,31 @@
 
 #include "ClientNetworkInterface.h"
 #include "BinaryWriter.h"
+#include "BinaryReader.h"
 #include "NetworkTypes.h"
+#include "Types.h"
+
+void HandlePacket(std::vector<uint8_t>* serverPacket)
+{
+    BinaryReader reader(serverPacket);
+    uint16_t packetSize = 0; reader.ReadUInt16(packetSize);
+    uint32_t passCode   = 0; reader.ReadUInt32(passCode);
+    uint8_t version     = 0; reader.ReadUInt8(version);
+    uint8_t packetType  = 0; reader.ReadUInt8(packetType);
+
+    std::cout << "Received serverPacket - PassCode: " << std::hex << passCode << ", Version: " << (int)version << ", PacketType: " << (int)packetType << std::endl;
+    // Handle different packet types here based on packetType.
+
+    switch (packetType) 
+    {
+        case PacketType_RoomUpdate:
+        {
+            RoomID roomID = 0;   reader.ReadUInt32(roomID);
+            std::string message; reader.ReadString(message);
+            std::cout << "Received RoomUpdate serverPacket. (Room ID: " << roomID << ", Message: '" << message << "'" << std::endl;
+        }
+    }
+}
 
 int main()
 {
@@ -14,6 +38,10 @@ int main()
         std::cerr << "Failed to initialize client peer." << std::endl;
         return 1;
     }
+
+    clientNetwork.OnPacketReceived = HandlePacket;
+
+    std::thread receiveThread(&ClientNetworkInterface::ReceiveLoop, &clientNetwork);
 
     std::cout << "Client peer initialized successfully." << std::endl;
 
@@ -35,7 +63,7 @@ int main()
 
     clientNetwork.Send(testPacket);
 
-    system("pause");
+    while (true) {}
 
     clientNetwork.Shutdown();
 }
