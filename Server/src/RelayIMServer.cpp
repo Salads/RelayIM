@@ -132,6 +132,7 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
                 writer.WriteUInt32(roomID);
                 writer.WriteUInt32(peerID);
                 writer.WriteString(joiningUsername);
+                writer.Finalize();
 
                 std::vector<PeerID> roomClients;
                 {
@@ -207,6 +208,7 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
                 writer.WriteUInt8(PacketType_RoomUpdate_UserLeft);
                 writer.WriteUInt32(roomID);
                 writer.WriteUInt32(peerID);
+                writer.Finalize();
 
                 std::vector<PeerID> roomClients;
                 {

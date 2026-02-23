@@ -159,9 +159,6 @@ void ClientNetworkInterface::Send(std::vector<uint8_t> &data)
         return;
     }
 
-    // Update the packet size at the beginning of the data buffer.
-    *reinterpret_cast<uint16_t*>(data.data()) = static_cast<uint16_t>(data.size());
-
     int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());

@@ -58,6 +58,7 @@ int main()
     writer.WriteUInt32(0); // RoomID, 0 for new room.
     writer.WriteUInt8(1); // Create room if it doesn't exist.
     writer.WriteString(testRoomName);
+    writer.Finalize();
 
     clientNetwork.Send(testPacket);
 
