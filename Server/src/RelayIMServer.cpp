@@ -142,8 +142,14 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
 
                 for (PeerID roomClient : roomClients)
                 {
-                    m_serverNetwork.SendToClient(roomClient, &responsePacket);
+                    if (roomClient != peerID)
+                    {
+                        m_serverNetwork.SendToClient(roomClient, &responsePacket);
+                    }
                 }
+
+                // TODO(Salads): Give the new peer a FULL room update. (users, messages) 
+                // PacketType_RoomUpdate_MSG_FULL
             }
             else
             {
