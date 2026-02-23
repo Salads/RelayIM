@@ -4,20 +4,8 @@
 
 const char* PacketTypeToString(uint8_t type);
 
-//enum PacketType : uint8_t
-//{
-//    PacketType_JoinChatRoom,    
-//    PacketType_CreateChatRoom,  
-//    PacketType_LeaveChatRoom,
-//    PacketType_SendMessage,
-//    PacketType_RoomUpdate_MSG,        // Server -> Client only. Sent when a new message is sent to a chat room
-//    PacketType_RoomUpdate_MSG_FULL,   // Server -> Client only. Sent when a client joins a chat room, contains the full message history of the room.
-//    PacketType_RoomUpdate_UserJoined, // Server -> Client only. Sent when a new user joins a chat room.
-//    PacketType_RoomUpdate_UserLeft,   // Server -> Client only. Sent when a user leaves a chat room.
-//    PacketType_Response,              // Server -> Client only. Sent in response to a client packet, contains success/failure flag
-//};
-
 #define PACKET_TYPES \
+    X(PacketType_Connect)               \
     X(PacketType_JoinChatRoom)          \
     X(PacketType_CreateChatRoom)        \
     X(PacketType_LeaveChatRoom)         \
@@ -47,6 +35,8 @@ enum PacketType : uint8_t
         PacketType (1 ubyte) : Determines the format of the payload
 
     PAYLOAD:
+        PacketType_Connect:
+            Username (VarLen) : Desired Username
         PacketType_JoinChatRoom:
             RoomID (4 ubytes) : The ID of the chat room to join.
         PacketType_CreateChatRoom:
@@ -59,6 +49,7 @@ enum PacketType : uint8_t
         PacketType_RoomUpdate_MSG :
             RoomID (4 ubytes) : The ID of the chat room that the update is for.
             Message (VarLen)  : The message that was sent to the chat room. ASCII for now.
+            PeerID (4 ubytes) : Who sent the message (This is last, so we can write it last and minimize rewrite of data)
         PacketType_RoomUpdate_MSG_FULL :
             RoomID (4 ubytes) : The ID of the chat room that the update is for.
             ARRAY Message (VarLen)  : History of all messages in chat room.

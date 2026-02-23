@@ -10,9 +10,18 @@
 class ChatRoom
 {
 public:
-    ChatRoom(RoomID roomID);
+    ChatRoom(RoomID roomID, std::string roomName);
 
-    int m_roomID;
+    void AddClient(PeerID peerID);
+    void RemoveClient(PeerID peerID);
+    void AddMessage(const ChatMessage& message);
+
+    std::string GetRoomName();
+    std::vector<PeerID> GetClients();
+
+private:
+    RoomID m_roomID;
+    std::string m_roomName;
     std::vector<ChatMessage> m_messages;
-    std::unordered_set<PeerID> m_clientIDs;
+    std::unordered_set<PeerID> m_clients;
 };

@@ -16,6 +16,11 @@ public:
     void WriteString(std::string &string);
     void WriteString(const char* str);
 
+    void RewindBytes(uint32_t numBytes);
+
+    // Updates the first two bytes to be the total size of the buffer.
+    void Finalize();
+
 private:
     std::vector<uint8_t> *m_buffer;
 };

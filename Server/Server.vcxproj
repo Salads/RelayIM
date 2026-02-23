@@ -27,7 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ChatClient.h" />
-    <ClInclude Include="include\ChatMessage.h" />
     <ClInclude Include="include\ChatRoom.h" />
     <ClInclude Include="include\PeerClient.h" />
     <ClInclude Include="include\ServerNetworkInterface.h" />

@@ -41,3 +41,16 @@ void BinaryWriter::WriteString(const char* str)
     std::string strWrapper(str);
     WriteString(strWrapper);
 }
+
+void BinaryWriter::Finalize()
+{
+    *reinterpret_cast<uint16_t*>(m_buffer->data()) = static_cast<uint16_t>(m_buffer->size());
+}
+
+void BinaryWriter::RewindBytes(uint32_t numBytes)
+{
+    for (uint32_t i = 0; i < numBytes; i++)
+    {
+        m_buffer->pop_back();
+    }
+}

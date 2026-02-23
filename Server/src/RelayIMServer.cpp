@@ -40,6 +40,19 @@ bool RelayIMServer::Initialize()
     return true;
 }
 
+void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
+{
+    std::vector<uint8_t> responsePacket;
+    BinaryWriter writer(responsePacket);
+    writer.WriteUInt32(NETWORK_PASSCODE);
+    writer.WriteUInt8(NETWORK_VERSION);
+    writer.WriteUInt8(PacketType_Response);
+    writer.WriteUInt8(success);
+    writer.Finalize();
+
+    m_serverNetwork.SendToClient(peerID, &responsePacket);
+}
+
 void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* packet)
 {
     // TODO(Salads): Process packet and respond accordingly
@@ -55,30 +68,219 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
     // Read Packet Payload
     switch (packetType)
     {
-        // TODO(Salads): Update server state from client packets
+        case PacketType_Connect:
+        {
+            std::string newUsername;
+            if (!reader.ReadString(newUsername)) 
+            {
+                SendSimpleResponsePacket(peerID, false);
+                break;
+            }
+
+            if (!IsUsernameTaken(newUsername))
+            {
+                {
+                    std::lock_guard<std::mutex> lock(m_clientsMutex);
+
+                    std::unique_ptr<ChatClient> newChatClient;
+                    newChatClient.get()->m_username = newUsername;
+                    newChatClient.get()->m_status = ChatClientStatus_Connected;
+                    m_clients[peerID] = std::move(newChatClient);
+                }
+
+                SendSimpleResponsePacket(peerID, true);
+            }
+            else
+            {
+                SendSimpleResponsePacket(peerID, false);
+            }
+
+            break;
+        }
         case PacketType_JoinChatRoom:
         {
-            uint32_t roomID = 0; reader.ReadUInt32(roomID);
-            std::cout << "Client " << peerID << " wants to join chat room " << roomID << std::endl;
+            uint32_t roomID = 0;
+            if (!reader.ReadUInt32(roomID))
+            {
+                SendSimpleResponsePacket(peerID, false);
+                break;
+            }
+
+            bool roomExists = false;
+            {
+                std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                roomExists = m_chatRooms.contains(roomID);
+            }
+
+            if (roomExists)
+            {
+                m_chatRooms[roomID]->AddClient(peerID);
+                SendSimpleResponsePacket(peerID, true);
+
+                std::string joiningUsername;
+                {
+                    std::lock_guard<std::mutex> lock(m_clientsMutex);
+                    joiningUsername = m_clients[peerID]->m_username;
+                }
+
+                // Notify all clients of this chat room of the new client
+                std::vector<uint8_t> responsePacket;
+                BinaryWriter writer(responsePacket);
+                writer.WriteUInt32(NETWORK_PASSCODE);
+                writer.WriteUInt8(NETWORK_VERSION);
+                writer.WriteUInt8(PacketType_RoomUpdate_UserJoined);
+                writer.WriteUInt32(roomID);
+                writer.WriteUInt32(peerID);
+                writer.WriteString(joiningUsername);
+
+                std::vector<PeerID> roomClients;
+                {
+                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                    roomClients = m_chatRooms[roomID]->GetClients();
+                }
+
+                for (PeerID roomClient : roomClients)
+                {
+                    m_serverNetwork.SendToClient(roomClient, &responsePacket);
+                }
+            }
+            else
+            {
+                SendSimpleResponsePacket(peerID, false);
+            }
+
             break;
         }
         case PacketType_CreateChatRoom:
         {
-            std::string roomName; reader.ReadString(roomName);
-            std::cout << "Client " << peerID << " wants to create chat room: '" << roomName << "'" << std::endl;
+            std::string roomName;
+            if (!reader.ReadString(roomName))
+            {
+                SendSimpleResponsePacket(peerID, false);
+                break;
+            }
+
+            if (!IsRoomnameTaken(roomName))
+            {
+                RoomID newRoomID = m_nextRoomID++;
+                std::unique_ptr<ChatRoom> newChatRoom = std::make_unique<ChatRoom>(newRoomID, roomName);
+                {
+                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                    m_chatRooms[newRoomID] = std::move(newChatRoom);
+                    m_chatRooms[newRoomID]->AddClient(peerID);
+                }
+
+                SendSimpleResponsePacket(peerID, true);
+            }
+            else
+            {
+                SendSimpleResponsePacket(peerID, false);
+            }
+
             break;
         }
         case PacketType_LeaveChatRoom:
         {
-            uint32_t roomID = 0; reader.ReadUInt32(roomID);
-            std::cout << "Client " << peerID << " wants to leave chat room " << roomID << std::endl;
+            uint32_t roomID = 0;
+            if (!reader.ReadUInt32(roomID))
+            {
+                SendSimpleResponsePacket(peerID, false);
+                break;
+            }
+
+            bool roomExists = false;
+            {
+                std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                roomExists = m_chatRooms.contains(roomID);
+            }
+
+            if (roomExists)
+            {
+                m_chatRooms[roomID]->RemoveClient(peerID);
+                SendSimpleResponsePacket(peerID, true);
+
+                // Notify chat room members of leaving user
+                std::vector<uint8_t> responsePacket;
+                BinaryWriter writer(responsePacket);
+                writer.WriteUInt32(NETWORK_PASSCODE);
+                writer.WriteUInt8(NETWORK_VERSION);
+                writer.WriteUInt8(PacketType_RoomUpdate_UserLeft);
+                writer.WriteUInt32(roomID);
+                writer.WriteUInt32(peerID);
+
+                std::vector<PeerID> roomClients;
+                {
+                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                    roomClients = m_chatRooms[roomID]->GetClients();
+                }
+
+                for (PeerID roomClient : roomClients)
+                {
+                    m_serverNetwork.SendToClient(roomClient, &responsePacket);
+                }
+            }
+            else
+            {
+                SendSimpleResponsePacket(peerID, false);
+            }
+
             break;
         }
         case PacketType_SendMessage:
         {
-            uint32_t roomID = 0; reader.ReadUInt32(roomID);
-            std::string message; reader.ReadString(message);
-            std::cout << "Client " << peerID << " wants to send message to chat room " << roomID << ": " << message << std::endl;
+            uint32_t roomID = 0;
+            if (!reader.ReadUInt32(roomID))
+            {
+                SendSimpleResponsePacket(peerID, false);
+                break;
+            }
+
+            std::string message;
+            if (!reader.ReadString(message))
+            {
+                SendSimpleResponsePacket(peerID, false);
+                break;
+            }
+
+            bool roomExists = false;
+            {
+                std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                roomExists = m_chatRooms.contains(roomID);
+            }
+
+            if (roomExists)
+            {
+                ChatMessage newMessage(peerID, message);
+                std::vector<PeerID> chatRoomClients;
+
+                // Add message to chat room, get all clients in chat room
+                {
+                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+                    m_chatRooms[roomID]->AddMessage(newMessage);
+                    chatRoomClients = m_chatRooms[roomID]->GetClients();
+                }
+
+                // Notify all clients in chat room about the message
+                std::vector<uint8_t> messagePacket;
+                BinaryWriter writer(messagePacket);
+                writer.WriteUInt32(NETWORK_PASSCODE);
+                writer.WriteUInt8(NETWORK_VERSION);
+                writer.WriteUInt8(PacketType_RoomUpdate_MSG);
+                writer.WriteUInt32(roomID);
+                writer.WriteString(message);
+                writer.WriteUInt32(peerID);
+                writer.Finalize();
+                
+                for (PeerID chatRoomClientID : chatRoomClients)
+                {
+                    m_serverNetwork.SendToClient(chatRoomClientID, &messagePacket);
+                }
+            }
+            else
+            {
+                SendSimpleResponsePacket(peerID, false);
+            }
+
             break;
         }
         default:
@@ -87,20 +289,34 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
             break;
         }
     }
+}
 
-    // TEMP(Salads): Testing server->client communication
+bool RelayIMServer::IsRoomnameTaken(std::string& newRoomname)
+{
+    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
+    for (auto &[roomID, chatRoom] : m_chatRooms)
     {
-        std::cout << "Sending test RoomUpdate packet to client " << peerID << std::endl;
-        std::vector<uint8_t> responsePacket;
-        BinaryWriter writer(responsePacket);
-        writer.WriteUInt32(0xDEADBEEF);
-        writer.WriteUInt8(1);
-        writer.WriteUInt8(PacketType_RoomUpdate_MSG);
-        writer.WriteUInt32(0);
-        writer.WriteString("This is a test room update message from the server.");
-
-        m_serverNetwork.SendToClient(peerID, &responsePacket);
+        if (chatRoom->GetRoomName() == newRoomname)
+        {
+            return false;
+        }
     }
+
+    return true;
+}
+
+bool RelayIMServer::IsUsernameTaken(std::string &newUsername)
+{
+    std::lock_guard<std::mutex> lock(m_clientsMutex);
+    for (auto& [peerID, clientPtr] : m_clients)
+    {
+        if (clientPtr->m_username == newUsername)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void RelayIMServer::HandleNewClient(PeerID newPeerID)

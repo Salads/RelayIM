@@ -216,8 +216,6 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
 
 void ServerNetworkInterface::SendToClient(PeerID clientPeerID, std::vector<uint8_t>* packet)
 {
-    *reinterpret_cast<uint16_t*>(packet->data()) = static_cast<uint16_t>(packet->size()); // Update packet size in header
-
     std::lock_guard<std::mutex> lock(m_peerClientsMutex);
     m_peerClients[clientPeerID]->Send(packet);
 }
