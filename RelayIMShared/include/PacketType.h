@@ -6,6 +6,8 @@ const char* PacketTypeToString(uint8_t type);
 
 #define PACKET_TYPES \
     X(PacketType_Connect)               \
+    X(PacketType_ListChatRooms)         \
+    X(PacketType_ListChatRooms_Result)  \
     X(PacketType_JoinChatRoom)          \
     X(PacketType_CreateChatRoom)        \
     X(PacketType_LeaveChatRoom)         \
@@ -37,29 +39,35 @@ enum PacketType : uint8_t
     PAYLOAD:
         PacketType_Connect:
             Username (VarLen) : Desired Username
+        PacketType_ListChatRooms:
+            NOTHING
+        PacketType_ListChatRooms_Result: Sent as a response to PacketType_ListChatRooms
+            ARRAY (VarLen)
+                RoomID (4 ubytes)
+                String (VarLen) : Room Name
         PacketType_JoinChatRoom:
-            RoomID (4 ubytes) : The ID of the chat room to join.
+            RoomID (4 ubytes) :
         PacketType_CreateChatRoom:
             Room Name (VarLen): Room name to create.
         PacketType_LeaveChatRoom:
-            RoomID (4 ubytes) : The ID of the chat room to join.
+            RoomID (4 ubytes) :
         PacketType_SendMessage:
-            RoomID (4 ubytes) : The ID of the chat room to send the message to.
-            Message (VarLen)  : The message to send. ASCII for now.
+            RoomID (4 ubytes) :
+            Message (VarLen)  :
         PacketType_RoomUpdate_MSG :
-            RoomID (4 ubytes) : The ID of the chat room that the update is for.
-            Message (VarLen)  : The message that was sent to the chat room. ASCII for now.
-            PeerID (4 ubytes) : Who sent the message (This is last, so we can write it last and minimize rewrite of data)
+            RoomID (4 ubytes) :
+            Message (VarLen)  :
+            PeerID (4 ubytes) : Sender
         PacketType_RoomUpdate_MSG_FULL :
-            RoomID (4 ubytes) : The ID of the chat room that the update is for.
-            ARRAY Message (VarLen)  : History of all messages in chat room.
+            RoomID (4 ubytes) :
+            ARRAY Message (VarLen):
         PacketType_RoomUpdate_UserJoined:
-            RoomID (4 ubytes) : The ID of the chat room that the update is for.
-            PeerID (4 ubytes) : The ID of the user that joined.
-            Message (VarLen)  : Username of the new user.
+            RoomID (4 ubytes) :
+            PeerID (4 ubytes) :
+            Username (VarLen) :
         PacketType_RoomUpdate_UserLeft:
-            RoomID (4 ubytes) : The ID of the chat room that the update is for.
-            PeerID (4 ubytes) : The ID of the user that left.
+            RoomID (4 ubytes) :
+            PeerID (4 ubytes) :
         PacketType_Response   :
             Success (1 uByte) : 0 for failure, 1 for success.
 */
