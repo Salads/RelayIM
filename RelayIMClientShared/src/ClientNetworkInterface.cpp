@@ -73,8 +73,6 @@ bool ClientNetworkInterface::Initialize()
     return true;
 }
 
-
-
 void ClientNetworkInterface::ReceiveLoop()
 {
     uint8_t receiveBuffer[NETWORK_BUFLEN];

@@ -21,6 +21,9 @@
     <ClInclude Include="include\RelayIMClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ClientChatRoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClientNetworkInterface.cpp">

@@ -6,6 +6,7 @@
 
 #include "Types.h"
 #include "ClientNetworkInterface.h"
+#include "ClientChatRoom.h"
 
 class RelayIMClient
 {
@@ -14,9 +15,10 @@ public:
     bool Start();
     void Shutdown();
     
+    void Connect(std::string desiredUsername);
     void JoinChatRoom(RoomID roomID);
     void CreateChatRoom(std::string roomName);
-
+    void LeaveChatRoom(RoomID roomID);
     void SendMessageToRoom(RoomID roomID, std::string message);
 
 private:
@@ -26,9 +28,8 @@ private:
 
     ClientNetworkInterface m_clientNetwork;
 
-    RoomID m_currentRoomID;
-    std::vector<std::string> m_messages;
+    std::unordered_map<RoomID, ClientChatRoom> m_chatRooms;
 
     // TODO(Salads): Should we use PeerID for this? It's internal to server...
-    std::unordered_map<PeerID, std::string> m_roomUsers; // PeerID -> Username
+    std::unordered_map<PeerID, std::string> m_usernames; // PeerID -> Username
 };
