@@ -65,6 +65,7 @@ bool RelayIMServer::Start()
 void RelayIMServer::Stop()
 {
     m_running = false;
+    m_incomingPacketsCV.notify_one();
 
     std::cout << "Shutting down server network interface..." << std::endl;
     m_serverNetwork.Shutdown();
@@ -74,6 +75,8 @@ void RelayIMServer::Stop()
     {
         m_packetHandlerThread.join();
     }
+
+    std::cout << "Stopped RelayIMServer" << std::endl;
 }
 
 void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
