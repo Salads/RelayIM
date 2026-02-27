@@ -53,11 +53,11 @@ bool RelayIMServer::Start()
     }
 
     std::cout << "Starting Server..." << std::endl;
+    std::cout << "\tStarting Packet Handler Thread" << std::endl;
     
     m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
-
-    std::cout << "\tStarting Packet Handler Thread" << std::endl;
-
+    
+    std::cout << "Server started!" << std::endl;
     return true;
 }
 
