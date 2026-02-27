@@ -169,13 +169,14 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
             if (receivedDataSize >= packetSize) // We have a full packet in the buffer
             {
                 // Insert to packet, then remove from receive buffer.
-                std::vector<uint8_t> packet;
-                packet.insert(packet.end(), client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
+                std::unique_ptr<PacketData> newPacketData = std::make_unique<PacketData>();
+                newPacketData->insert(newPacketData->end(), client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
                 client->m_receiveBuffer.erase(client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
 
                 if (OnPacketReceived)
                 {
-                    OnPacketReceived(client->m_peerID, &packet);
+                    std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(client->m_peerID, std::move(newPacketData));
+                    OnPacketReceived(client->m_peerID, std::move(newPacket));
                 }
             }
             else

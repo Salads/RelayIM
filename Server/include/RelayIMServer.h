@@ -6,11 +6,13 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <queue>
 
 #include "Types.h"
 #include "ChatRoom.h"
 #include "ChatClient.h"
 #include "ServerNetworkInterface.h"
+#include "NetworkPacket.h"
 
 class RelayIMServer
 {
@@ -23,7 +25,8 @@ public:
     void HandleNewClient(PeerID newPeerID);
 
 private:
-    void HandleClientPacket(PeerID peerID, std::vector<uint8_t>* packet);
+    void AddPacketToQueue(std::unique_ptr<NetworkPacket> newPacket);
+    void ProcessClientPackets();
 
     bool IsUsernameTaken(std::string &newUsername);
     bool IsRoomnameTaken(std::string& newRoomname);
@@ -44,4 +47,10 @@ private:
 
     std::unordered_map<RoomID, std::unique_ptr<ChatRoom>> m_chatRooms;
     std::mutex m_chatRoomsMutex;
+
+    std::queue<std::unique_ptr<NetworkPacket>> m_incomingPackets;
+    std::mutex m_incomingPacketsMutex;
+    std::condition_variable m_incomingPacketsCV;
+
+    std::thread m_packetHandlerThread;
 };

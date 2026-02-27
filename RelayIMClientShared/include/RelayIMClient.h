@@ -22,7 +22,7 @@ public:
     void SendMessageToRoom(RoomID roomID, std::string message);
 
 private:
-    void HandleServerPacket(std::vector<uint8_t>* serverPacket);
+    void HandleServerPacket(std::unique_ptr<NetworkPacket> serverPacket);
 
 private:
 

@@ -13,6 +13,7 @@
 #include "Types.h"
 #include "ChatClient.h"
 #include "PeerClient.h"
+#include "NetworkPacket.h"
 
 class ServerNetworkInterface : public NetworkInterface
 {
@@ -27,7 +28,7 @@ public:
     void SendToClient(PeerID, std::vector<uint8_t>* packet);
 
     std::function<void(PeerID)> OnNewClient;
-    std::function<void(PeerID, std::vector<uint8_t> *packet)> OnPacketReceived;
+    std::function<void(PeerID, std::unique_ptr<NetworkPacket> newPacket)> OnPacketReceived;
     std::function<void(PeerID)> OnClientDisconnected;
 
 private:

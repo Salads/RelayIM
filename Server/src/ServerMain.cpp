@@ -1,4 +1,6 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "RelayIMServer.h"
 
 int main()
@@ -13,7 +15,10 @@ int main()
 
     server.Start();
 
-    while (true) {};
+    while (true) 
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    };
 
     std::cout << "Stopping server..." << std::endl;
     server.Stop();

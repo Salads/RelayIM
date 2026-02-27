@@ -161,10 +161,12 @@
     <ClInclude Include="include\Util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\NetworkPacket.h" />
     <ClCompile Include="src\ChatMessage.cpp" />
     <ClCompile Include="src\NetworkPacker.cpp" />
     <ClCompile Include="src\BinaryReader.cpp" />
     <ClCompile Include="src\BinaryWriter.cpp" />
+    <ClCompile Include="src\NetworkPacket.cpp" />
     <ClCompile Include="src\PacketType.cpp" />
     <ClCompile Include="src\Util.cpp" />
   </ItemGroup>

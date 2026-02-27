@@ -7,6 +7,7 @@
 #include <mutex>
 
 #include "NetworkInterface.h"
+#include "NetworkPacket.h"
 
 class ClientNetworkInterface : public NetworkInterface
 {
@@ -16,10 +17,10 @@ public:
 
     void ReceiveLoop();
 
-    void Send(std::vector<uint8_t> &data);
+    void Send(PacketData &data);
 
     std::function<void()> OnServerDisconnected;
-    std::function<void(std::vector<uint8_t>*)> OnPacketReceived;
+    std::function<void(std::unique_ptr<NetworkPacket>)> OnPacketReceived;
 
 private:
     SOCKET m_clientSocket = INVALID_SOCKET;

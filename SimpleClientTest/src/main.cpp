@@ -8,9 +8,9 @@
 #include "Types.h"
 #include "PacketType.h"
 
-void HandlePacket(std::vector<uint8_t>* serverPacket)
+void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
 {
-    BinaryReader reader(serverPacket);
+    BinaryReader reader(serverPacket.get());
     PacketHeader header; reader.ReadHeader(header);
 
     std::cout << "Received serverPacket - PassCode: " << std::hex << header.m_passCode << ", Version: " << (int)header.m_version << ", PacketType: " << PacketTypeToString(header.m_packetType) << std::endl;
@@ -52,11 +52,9 @@ int main()
     // Header
     writer.WriteUInt32(0xDEADBEEF); // PassCode
     writer.WriteUInt8(1); // Version
-    writer.WriteUInt8(PacketType_JoinChatRoom);
+    writer.WriteUInt8(PacketType_CreateChatRoom);
 
     // Payload
-    writer.WriteUInt32(0); // RoomID, 0 for new room.
-    writer.WriteUInt8(1); // Create room if it doesn't exist.
     writer.WriteString(testRoomName);
     writer.Finalize();
 

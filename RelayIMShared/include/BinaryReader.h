@@ -5,11 +5,12 @@
 
 #include "NetworkTypes.h"
 #include "PacketHeader.h"
+#include "NetworkPacket.h"
 
 class BinaryReader
 {
 public:
-    BinaryReader(const std::vector<uint8_t> *data);
+    BinaryReader(const NetworkPacket *data);
 
     bool ReadUInt8(uint8_t& outValue);
     bool ReadUInt16(uint16_t& outValue);

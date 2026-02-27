@@ -120,13 +120,16 @@ void ClientNetworkInterface::ReceiveLoop()
             if (receivedDataSize >= packetSize) // We have a full packet in the buffer
             {
                 // Insert to packet, then remove from receive buffer.
-                std::vector<uint8_t> packet;
-                packet.insert(packet.end(), m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
+                std::unique_ptr<PacketData> newPacketData = std::make_unique<PacketData>();
+                newPacketData->insert(newPacketData->end(), m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
                 m_receiveBuffer.erase(m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
 
                 if (OnPacketReceived)
                 {
-                    OnPacketReceived(&packet);
+                    // Clients don't need to know the peer id, since we know incoming traffic is from the server.
+                    // We're just reusing the NetworkPacket class here in the client, with a junk peer id.
+                    std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(INVALID_PEER_ID, std::move(newPacketData));
+                    OnPacketReceived(std::move(newPacket));
                 }
             }
             else
@@ -149,7 +152,7 @@ void ClientNetworkInterface::Shutdown()
     m_isInitialized = false;
 }
 
-void ClientNetworkInterface::Send(std::vector<uint8_t> &data)
+void ClientNetworkInterface::Send(PacketData& data)
 {
     if (!m_isInitialized)
     {

@@ -1,7 +1,7 @@
 #include "BinaryReader.h"
 
-BinaryReader::BinaryReader(const std::vector<uint8_t>* data)
-    : m_data(data), m_cursor(m_data->data()), m_end(m_data->data() + m_data->size())
+BinaryReader::BinaryReader(const NetworkPacket* data)
+    : m_data(data->m_data.get()), m_cursor(m_data->data()), m_end(m_data->data() + m_data->size())
 {}
 
 bool BinaryReader::ReadUInt8(uint8_t& outValue)

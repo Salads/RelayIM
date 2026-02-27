@@ -30,9 +30,9 @@ bool RelayIMServer::Initialize()
         m_clients.erase(peerID);
     };
 
-    m_serverNetwork.OnPacketReceived = [this](PeerID peerID, std::vector<uint8_t>* packet)
+    m_serverNetwork.OnPacketReceived = [this](PeerID peerID, std::unique_ptr<NetworkPacket> packet)
     {
-        HandleClientPacket(peerID, packet);
+        this->AddPacketToQueue(std::move(packet));
     };
 
     std::cout << "Server Initialized" << std::endl;
@@ -53,25 +53,35 @@ void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
     m_serverNetwork.SendToClient(peerID, &responsePacket);
 }
 
-void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* packet)
+void RelayIMServer::ProcessClientPackets()
 {
-    // TODO(Salads): Process packet and respond accordingly
-
-    BinaryReader reader(packet);
-
-    // Read Packet Header
-    uint16_t packetSize = 0; reader.ReadUInt16(packetSize);
-    uint32_t passCode = 0; reader.ReadUInt32(passCode);
-    uint8_t version = 0; reader.ReadUInt8(version);
-    uint8_t packetType = 0; reader.ReadUInt8(packetType);
-
-    // Read Packet Payload
-    switch (packetType)
+    while (true)
     {
+        std::unique_lock cvLock(m_incomingPacketsMutex);
+        m_incomingPacketsCV.wait(cvLock, [this]() {
+            return !m_incomingPackets.empty();
+        });
+
+        std::unique_ptr<NetworkPacket> packet = std::move(m_incomingPackets.front());
+        m_incomingPackets.pop();
+        cvLock.unlock();
+
+        BinaryReader reader(packet.get());
+
+        PeerID peerID = packet.get()->m_peerID;
+        PacketHeader header;
+        if (!reader.ReadHeader(header))
+        {
+            SendSimpleResponsePacket(peerID, false);
+        }
+
+        // Read Packet Payload
+        switch (header.m_packetType)
+        {
         case PacketType_Connect:
         {
             std::string newUsername;
-            if (!reader.ReadString(newUsername)) 
+            if (!reader.ReadString(newUsername))
             {
                 SendSimpleResponsePacket(peerID, false);
                 break;
@@ -163,6 +173,7 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
             std::string roomName;
             if (!reader.ReadString(roomName))
             {
+                std::cout << "PacketType_CreateChatRoom -> ReadString failed" << std::endl;
                 SendSimpleResponsePacket(peerID, false);
                 break;
             }
@@ -176,6 +187,8 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
                     m_chatRooms[newRoomID] = std::move(newChatRoom);
                     m_chatRooms[newRoomID]->AddClient(peerID);
                 }
+
+                std::cout << "Client created roomname: " << roomName << std::endl;
 
                 SendSimpleResponsePacket(peerID, true);
             }
@@ -278,7 +291,7 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
                 writer.WriteString(message);
                 writer.WriteUInt32(peerID);
                 writer.Finalize();
-                
+
                 for (PeerID chatRoomClientID : chatRoomClients)
                 {
                     m_serverNetwork.SendToClient(chatRoomClientID, &messagePacket);
@@ -293,10 +306,18 @@ void RelayIMServer::HandleClientPacket(PeerID peerID, std::vector<uint8_t>* pack
         }
         default:
         {
-            std::cout << "Client " << peerID << " sent unknown packet type: " << (int)packetType << std::endl;
+            std::cout << "Client " << peerID << " sent unknown packet type: " << (int)header.m_packetType << std::endl;
             break;
         }
+        }
     }
+}
+
+void RelayIMServer::AddPacketToQueue(std::unique_ptr<NetworkPacket> newPacket)
+{
+    std::lock_guard lock(m_incomingPacketsMutex);
+    m_incomingPackets.push(std::move(newPacket));
+    m_incomingPacketsCV.notify_one();
 }
 
 bool RelayIMServer::IsRoomnameTaken(std::string& newRoomname)
@@ -306,11 +327,11 @@ bool RelayIMServer::IsRoomnameTaken(std::string& newRoomname)
     {
         if (chatRoom->GetRoomName() == newRoomname)
         {
-            return false;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 bool RelayIMServer::IsUsernameTaken(std::string &newUsername)
@@ -339,6 +360,11 @@ void RelayIMServer::HandleNewClient(PeerID newPeerID)
 void RelayIMServer::Stop()
 {
     m_serverNetwork.Shutdown();
+
+    if (m_packetHandlerThread.joinable())
+    {
+        m_packetHandlerThread.join();
+    }
 }
 
 bool RelayIMServer::IsInitialized() const
@@ -359,7 +385,7 @@ bool RelayIMServer::Start()
         }
     }
     
-    // TODO(Salads): Receive data from clients and handle it.
+    //m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
 
     return true;
 }

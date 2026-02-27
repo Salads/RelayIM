@@ -10,17 +10,17 @@ bool RelayIMClient::Start()
         return false;
     }
 
-    m_clientNetwork.OnPacketReceived = [this](std::vector<uint8_t>* packet)
+    m_clientNetwork.OnPacketReceived = [this](std::unique_ptr<NetworkPacket> packet)
     {
-        HandleServerPacket(packet);
+        HandleServerPacket(std::move(packet));
     };
 
     return true;
 }
 
-void RelayIMClient::HandleServerPacket(std::vector<uint8_t>* serverPacket)
+void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPacket)
 {
-    BinaryReader reader(serverPacket);
+    BinaryReader reader(serverPacket.get());
     PacketHeader header; reader.ReadHeader(header);
 
     switch(header.m_packetType)
