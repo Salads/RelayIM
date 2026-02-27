@@ -155,9 +155,14 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
 
             break;
         }
-        else if(recvResult == SOCKET_ERROR)
+        else if(recvResult == SOCKET_ERROR) // Client disconnected forcibly, or some Winsock2 error. Either way, client should be disconnected.
         {
             PrintWSAError("recv failed");
+
+            if (OnClientDisconnected) {
+                OnClientDisconnected(client->m_peerID);
+            }
+
             break;
         }
 
