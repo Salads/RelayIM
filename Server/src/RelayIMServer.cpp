@@ -385,7 +385,7 @@ bool RelayIMServer::Start()
         }
     }
     
-    //m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
+    m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
 
     return true;
 }
