@@ -15,7 +15,7 @@ bool RelayIMServer::Initialize()
 
     if (!m_serverNetwork.Initialize())
     {
-        std::cerr << "Failed to initialize server peer" << std::endl;
+        std::cerr << "Failed to initialize server network interface..." << std::endl;
         return false;
     }
 
@@ -38,6 +38,39 @@ bool RelayIMServer::Initialize()
     std::cout << "Server Initialized" << std::endl;
     m_isInitialized = true;
     return true;
+}
+
+bool RelayIMServer::Start()
+{
+    if (!GetIsInitialized())
+    {
+        Initialize();
+
+        if (!GetIsInitialized())
+        {
+            return false;
+        }
+    }
+
+    std::cout << "Starting Server..." << std::endl;
+    
+    m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
+
+    std::cout << "\tStarting Packet Handler Thread" << std::endl;
+
+    return true;
+}
+
+void RelayIMServer::Stop()
+{
+    std::cout << "Shutting down server network interface..." << std::endl;
+    m_serverNetwork.Shutdown();
+
+    std::cout << "Joining packet handler thread..." << std::endl;
+    if (m_packetHandlerThread.joinable())
+    {
+        m_packetHandlerThread.join();
+    }
 }
 
 void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
@@ -357,35 +390,8 @@ void RelayIMServer::HandleNewClient(PeerID newPeerID)
     }
 }
 
-void RelayIMServer::Stop()
-{
-    m_serverNetwork.Shutdown();
-
-    if (m_packetHandlerThread.joinable())
-    {
-        m_packetHandlerThread.join();
-    }
-}
-
-bool RelayIMServer::IsInitialized() const
+bool RelayIMServer::GetIsInitialized() const
 {
     return m_isInitialized;
 }
 
-bool RelayIMServer::Start()
-{
-    if (!IsInitialized()) 
-    { 
-        Initialize();
-
-        if (!IsInitialized())
-        {
-            std::cerr << "Failed to initialize server" << std::endl;
-            return false;
-        }
-    }
-    
-    m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
-
-    return true;
-}

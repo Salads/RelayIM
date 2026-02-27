@@ -21,7 +21,7 @@ public:
     bool Start();
     void Stop();
 
-    bool IsInitialized() const;
+    bool GetIsInitialized() const;
     void HandleNewClient(PeerID newPeerID);
 
 private:
