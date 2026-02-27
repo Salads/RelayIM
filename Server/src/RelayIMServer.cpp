@@ -56,13 +56,16 @@ bool RelayIMServer::Start()
     std::cout << "\tStarting Packet Handler Thread" << std::endl;
     
     m_packetHandlerThread = std::thread(&RelayIMServer::ProcessClientPackets, this);
-    
+    m_running = true;
+
     std::cout << "Server started!" << std::endl;
     return true;
 }
 
 void RelayIMServer::Stop()
 {
+    m_running = false;
+
     std::cout << "Shutting down server network interface..." << std::endl;
     m_serverNetwork.Shutdown();
 
@@ -88,12 +91,18 @@ void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
 
 void RelayIMServer::ProcessClientPackets()
 {
-    while (true)
+    while (m_running)
     {
         std::unique_lock cvLock(m_incomingPacketsMutex);
         m_incomingPacketsCV.wait(cvLock, [this]() {
-            return !m_incomingPackets.empty();
+            return !m_running || !m_incomingPackets.empty();
         });
+
+        if (!m_running)
+        {
+            cvLock.unlock();
+            break;
+        }
 
         std::unique_ptr<NetworkPacket> packet = std::move(m_incomingPackets.front());
         m_incomingPackets.pop();

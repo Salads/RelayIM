@@ -28,13 +28,15 @@ private:
     void AddPacketToQueue(std::unique_ptr<NetworkPacket> newPacket);
     void ProcessClientPackets();
 
-    bool IsUsernameTaken(std::string &newUsername);
+    bool IsUsernameTaken(std::string& newUsername);
     bool IsRoomnameTaken(std::string& newRoomname);
 
     void SendSimpleResponsePacket(PeerID peerID, bool success);
 
 private:
     bool m_isInitialized = false;
+
+    std::atomic_bool m_running = false;
 
     ServerNetworkInterface m_serverNetwork;
 
