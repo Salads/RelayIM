@@ -13,7 +13,7 @@ struct PeerClient
     PeerClient(PeerID clientID, SOCKET clientSocket)
         : m_peerID(clientID), m_clientSocket(clientSocket) {}
 
-    void Send(std::vector<uint8_t>* packet);
+    void Send(PacketData *packet);
 
     PeerID m_peerID = INVALID_PEER_ID;
     SOCKET m_clientSocket;
@@ -22,7 +22,6 @@ struct PeerClient
 
     std::thread m_sendThread;
     std::condition_variable m_sendThreadCV;
-    std::mutex m_sendThreadCVMutex;
 
     std::vector<uint8_t> m_sendBuffer;
     std::mutex m_sendBufferMutex;

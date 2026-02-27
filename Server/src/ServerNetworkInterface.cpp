@@ -1,5 +1,6 @@
 #include <iostream>
 #include "ServerNetworkInterface.h"
+#include "Util.h"
 
 using std::cout;
 using std::endl;
@@ -68,10 +69,17 @@ bool ServerNetworkInterface::Initialize()
 
 void ServerNetworkInterface::Shutdown()
 {
+    m_running = false;
+
     if (m_listenSocket != INVALID_SOCKET)
     {
         closesocket(m_listenSocket);
         m_listenSocket = INVALID_SOCKET;
+    }
+
+    if (m_listenThread.joinable())
+    {
+        m_listenThread.join();
     }
     
     if (m_listenSocketInfo)
@@ -80,15 +88,21 @@ void ServerNetworkInterface::Shutdown()
         m_listenSocketInfo = nullptr;
     }
 
+    // This is proper, but OS cleans things up for us... are we slowing things down for no reason?
     for (auto &[peerID, peerClient] : m_peerClients)
     {
+        shutdown(peerClient->m_clientSocket, SD_BOTH);
+        closesocket(peerClient->m_clientSocket);
+
         if (peerClient->m_receiveThread.joinable())
         {
             peerClient->m_receiveThread.join();
         }
 
-        shutdown(peerClient->m_clientSocket, SD_BOTH);
-        closesocket(peerClient->m_clientSocket);
+        if (peerClient->m_sendThread.joinable())
+        {
+            peerClient->m_sendThread.join();
+        }
     }
 
     WSACleanup();
@@ -96,7 +110,7 @@ void ServerNetworkInterface::Shutdown()
 
 void ServerNetworkInterface::ListenForClients()
 {
-    while (true)
+    while (m_running)
     {
         SOCKET newClientSocket = INVALID_SOCKET;
         newClientSocket = accept(m_listenSocket, NULL, NULL); // blocking
@@ -193,30 +207,45 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
     while (m_running)
     {
         // Wait untill we have data to send
-        std::unique_lock<std::mutex> lock(client->m_sendThreadCVMutex);
+        std::unique_lock<std::mutex> lock(client->m_sendBufferMutex);
         client->m_sendThreadCV.wait(lock, [this, client]() {
-            std::lock_guard<std::mutex> sendBufferLock(client->m_sendBufferMutex);
-            return !client->m_sendBuffer.empty();
+            return !m_running || !client->m_sendBuffer.empty();
         });
 
+        if (!m_running)
         {
-            std::lock_guard<std::mutex> sendBufferLock(client->m_sendBufferMutex);
-            int sendResult = send(peerSocket, (char*)client->m_sendBuffer.data(), (int)client->m_sendBuffer.size(), 0);
-            if (sendResult == SOCKET_ERROR)
-            {
-                PrintWSAError("send failed");
-            }
-            else
-            {
-                std::cout << "Sent data to client " << client->m_peerID << ": " << sendResult << " bytes" << std::endl;
-                client->m_sendBuffer.erase(client->m_sendBuffer.begin(), client->m_sendBuffer.begin() + sendResult);
-            }
+            lock.unlock();
+            break;
+        }
+
+        int sendResult = send(peerSocket, (char*)client->m_sendBuffer.data(), (int)client->m_sendBuffer.size(), 0);
+        if (sendResult == SOCKET_ERROR)
+        {
+            PrintWSAError("send failed");
+        }
+        else
+        {
+            std::cout << "Sent data to client " << client->m_peerID << ": " << sendResult << " bytes" << std::endl;
+            client->m_sendBuffer.erase(client->m_sendBuffer.begin(), client->m_sendBuffer.begin() + sendResult);
         }
     }
 }
 
-void ServerNetworkInterface::SendToClient(PeerID clientPeerID, std::vector<uint8_t>* packet)
+void ServerNetworkInterface::SendToClient(PeerID clientPeerID, PacketData* packet)
 {
-    std::lock_guard<std::mutex> lock(m_peerClientsMutex);
-    m_peerClients[clientPeerID]->Send(packet);
+    PeerClient* client;
+    {
+        std::lock_guard<std::mutex> lock(m_peerClientsMutex);
+        client = m_peerClients[clientPeerID].get();
+    }
+
+    if (client)
+    {
+        client->Send(packet);
+    }
+    else
+    {
+        std::cout << "SendToClient could not find client " << clientPeerID << std::endl;
+    }
 }
+

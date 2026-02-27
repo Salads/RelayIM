@@ -25,11 +25,11 @@ public:
     void ReceiveLoopForClient(PeerClient* client, SOCKET peerSocket);
     void SendLoopForClient(PeerClient* client, SOCKET peerSocket);
 
-    void SendToClient(PeerID, std::vector<uint8_t>* packet);
+    void SendToClient(PeerID, PacketData* packet);
 
-    std::function<void(PeerID)> OnNewClient;
-    std::function<void(PeerID, std::unique_ptr<NetworkPacket> newPacket)> OnPacketReceived;
-    std::function<void(PeerID)> OnClientDisconnected;
+    std::function<void(PeerID)> OnNewClient; // New client connected (socket, no data received)
+    std::function<void(PeerID, std::unique_ptr<NetworkPacket> newPacket)> OnPacketReceived; // client receive thread has constructed a new packet
+    std::function<void(PeerID)> OnClientDisconnected; // socket received 0, client disconnected (socket)
 
 private:
     addrinfo* m_listenSocketInfo = nullptr;
