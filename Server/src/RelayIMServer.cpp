@@ -152,6 +152,32 @@ void RelayIMServer::ProcessClientPackets()
 
             break;
         }
+        case PacketType_ListChatRooms:
+        {
+            // TODO(Salads): Server Packet
+
+            // Send PacketType_ListChatRooms_Result -> ARRAY[RoomID, RoomName]
+            PacketData response;
+            BinaryWriter writer(response);
+            writer.WriteHeader(PacketType_ListChatRooms_Result);
+
+            {
+                std::lock_guard lock(m_chatRoomsMutex);
+                writer.WriteUInt16(static_cast<uint16_t>(m_chatRooms.size()));
+
+                for (const auto& [roomID, chatRoom] : m_chatRooms)
+                {
+                    writer.WriteUInt32(roomID);
+
+                    std::string roomName = chatRoom->GetRoomName();
+                    writer.WriteString(roomName);
+                }
+            }
+
+            m_serverNetwork.SendToClient(peerID, &response);
+
+            break;
+        } 
         case PacketType_JoinChatRoom:
         {
             uint32_t roomID = 0;
