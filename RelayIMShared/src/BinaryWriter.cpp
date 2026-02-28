@@ -1,6 +1,6 @@
 #include "BinaryWriter.h"
 
-BinaryWriter::BinaryWriter(std::vector<uint8_t>& buffer)
+BinaryWriter::BinaryWriter(PacketData& buffer)
     : m_buffer(&buffer)
 {
     WriteUInt16(0); // Placeholder for packet size, will be updated later.
@@ -53,4 +53,11 @@ void BinaryWriter::RewindBytes(uint32_t numBytes)
     {
         m_buffer->pop_back();
     }
+}
+
+void BinaryWriter::WriteHeader(PacketType packetType)
+{
+    WriteUInt32(NETWORK_PASSCODE);
+    WriteUInt8(NETWORK_VERSION);
+    WriteUInt8(packetType);
 }
