@@ -1,0 +1,74 @@
+#include "ClientPacketBuilder.h"
+#include "BinaryWriter.h"
+
+PacketData ClientPacketBuilder::BuildConnectPacket(std::string userName)
+{
+    PacketData result;
+    BinaryWriter writer(result);
+
+    writer.WriteHeader(PacketType_Connect);
+    writer.WriteString(userName);
+    writer.Finalize();
+
+    return result;
+}
+
+PacketData ClientPacketBuilder::BuildListChatRoomsPacket()
+{
+    PacketData result;
+    BinaryWriter writer(result);
+
+    writer.WriteHeader(PacketType_ListChatRooms);
+    writer.Finalize();
+
+    return result;
+}
+
+PacketData ClientPacketBuilder::BuildJoinChatRoomPacket(RoomID roomID)
+{
+    PacketData result;
+    BinaryWriter writer(result);
+
+    writer.WriteHeader(PacketType_JoinChatRoom);
+    writer.WriteUInt32(roomID);
+    writer.Finalize();
+
+    return result;
+}
+
+PacketData ClientPacketBuilder::BuildCreateChatRoomPacket(std::string roomName)
+{
+    PacketData result;
+    BinaryWriter writer(result);
+
+    writer.WriteHeader(PacketType_CreateChatRoom);
+    writer.WriteString(roomName);
+    writer.Finalize();
+
+    return result;
+}
+
+PacketData ClientPacketBuilder::BuildLeaveChatRoomPacket(RoomID roomID)
+{
+    PacketData result;
+    BinaryWriter writer(result);
+
+    writer.WriteHeader(PacketType_LeaveChatRoom);
+    writer.WriteUInt32(roomID);
+    writer.Finalize();
+
+    return result;
+}
+
+PacketData ClientPacketBuilder::BuildSendMessagePacket(RoomID roomID, std::string message)
+{
+    PacketData result;
+    BinaryWriter writer(result);
+
+    writer.WriteHeader(PacketType_SendMessage);
+    writer.WriteUInt32(roomID);
+    writer.WriteString(message);
+    writer.Finalize();
+
+    return result;
+}

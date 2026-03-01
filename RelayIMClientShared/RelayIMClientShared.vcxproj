@@ -155,10 +155,12 @@
   <ItemGroup>
     <ClInclude Include="include\ClientChatRoom.h" />
     <ClInclude Include="include\ClientNetworkInterface.h" />
+    <ClInclude Include="include\ClientPacketBuilder.h" />
     <ClInclude Include="include\RelayIMClient.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClientNetworkInterface.cpp" />
+    <ClCompile Include="src\ClientPacketBuilder.cpp" />
     <ClCompile Include="src\RelayIMClient.cpp" />
   </ItemGroup>
   <ItemGroup>

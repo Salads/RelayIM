@@ -7,23 +7,67 @@
 #include "NetworkTypes.h"
 #include "Types.h"
 #include "PacketType.h"
+#include "ClientPacketBuilder.h"
+#include "Util.h"
 
 void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
 {
-    BinaryReader reader(serverPacket.get());
+    std::unique_ptr<NetworkPacket> packet = std::move(serverPacket);
+    BinaryReader reader(packet.get());
     PacketHeader header; reader.ReadHeader(header);
 
-    std::cout << "Received serverPacket - PassCode: " << std::hex << header.m_passCode << ", Version: " << (int)header.m_version << ", PacketType: " << PacketTypeToString(header.m_packetType) << std::endl;
-    // Handle different packet types here based on packetType.
+    LogDepth(0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
 
     switch (header.m_packetType) 
     {
+        case PacketType_ListChatRooms_Result:
+        {
+            uint16_t nRooms = 0; reader.ReadUInt16(nRooms);
+            for (int i = 0; i < nRooms; i++)
+            {
+                uint32_t roomID = 0; reader.ReadUInt32(roomID);
+                std::string roomName; reader.ReadString(roomName);
+                LogDepth(1, "Room %u: %s\n", roomID, roomName.c_str());
+            }
+        } break;
         case PacketType_RoomUpdate_MSG:
         {
             RoomID roomID = 0;   reader.ReadUInt32(roomID);
             std::string message; reader.ReadString(message);
-            std::cout << "Received RoomUpdate serverPacket. (Room ID: " << roomID << ", Message: '" << message << "'" << std::endl;
-        }
+            LogDepth(1, "New Message (Room %u): '%s'\n", roomID, message.c_str());
+        } break;
+        case PacketType_RoomUpdate_MSG_FULL:
+        {
+            RoomID roomID = 0;   reader.ReadUInt32(roomID);
+            uint16_t nMessages = 0; reader.ReadUInt16(nMessages);
+            for (int i = 0; i < nMessages; i++)
+            {
+                std::string message; reader.ReadString(message);
+                LogDepth(1, "Message %d: '%s'\n", i, message.c_str());
+            }
+        } break;
+        case PacketType_RoomUpdate_UserLeft:
+        {
+            RoomID roomID = 0; reader.ReadUInt32(roomID);
+            PeerID peerID = 0; reader.ReadUInt32(peerID);
+            LogDepth(1, "User id %u left room %u\n", peerID, roomID);
+        } break;
+        case PacketType_RoomUpdate_UserJoined:
+        {
+            RoomID roomID = 0; reader.ReadUInt32(roomID);
+            PeerID peerID = 0; reader.ReadUInt32(peerID);
+            std::string userName; reader.ReadString(userName);
+            LogDepth(1, "User '%s' (id %u) joined room %u\n", userName.c_str(), peerID, roomID);
+        } break;
+        case PacketType_Response:
+        {
+            uint8_t success = 0; reader.ReadUInt8(success);
+            LogDepth(1, "Success: %u\n", success);
+        } break;
+        default:
+        {
+
+        } break;
     }
 }
 
@@ -46,18 +90,23 @@ int main()
     std::string testRoomName = "Hello Test Room";
     std::string testMessage = "We're doing it!";
 
-    std::vector<uint8_t> testPacket;
-    BinaryWriter writer(testPacket);
+    ClientPacketBuilder packetBuilder;
+    PacketData testPacket = packetBuilder.BuildConnectPacket("Test Username");
+    clientNetwork.Send(testPacket);
 
-    // Header
-    writer.WriteUInt32(0xDEADBEEF); // PassCode
-    writer.WriteUInt8(1); // Version
-    writer.WriteUInt8(PacketType_CreateChatRoom);
+    testPacket = packetBuilder.BuildListChatRoomsPacket();
+    clientNetwork.Send(testPacket);
 
-    // Payload
-    writer.WriteString(testRoomName);
-    writer.Finalize();
+    testPacket = packetBuilder.BuildCreateChatRoomPacket("Cool Room");
+    clientNetwork.Send(testPacket);
 
+    testPacket = packetBuilder.BuildJoinChatRoomPacket(0);
+    clientNetwork.Send(testPacket);
+
+    testPacket = packetBuilder.BuildSendMessagePacket(0, "Hello, cool message!");
+    clientNetwork.Send(testPacket);
+
+    testPacket = packetBuilder.BuildLeaveChatRoomPacket(0);
     clientNetwork.Send(testPacket);
 
     while (true) {}

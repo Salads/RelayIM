@@ -8,6 +8,7 @@
 #include "NetworkTypes.h"
 #include "BinaryReader.h"
 #include "BinaryWriter.h"
+#include "Logging.h"
 
 bool RelayIMServer::Initialize()
 {
@@ -83,9 +84,7 @@ void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
 {
     std::vector<uint8_t> responsePacket;
     BinaryWriter writer(responsePacket);
-    writer.WriteUInt32(NETWORK_PASSCODE);
-    writer.WriteUInt8(NETWORK_VERSION);
-    writer.WriteUInt8(PacketType_Response);
+    writer.WriteHeader(PacketType_Response);
     writer.WriteUInt8(success);
     writer.Finalize();
 
@@ -118,7 +117,10 @@ void RelayIMServer::ProcessClientPackets()
         if (!reader.ReadHeader(header))
         {
             SendSimpleResponsePacket(peerID, false);
+            continue;
         }
+
+        LogDepth(0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
 
         // Read Packet Payload
         switch (header.m_packetType)
@@ -137,13 +139,14 @@ void RelayIMServer::ProcessClientPackets()
                 {
                     std::lock_guard<std::mutex> lock(m_clientsMutex);
 
-                    std::unique_ptr<ChatClient> newChatClient;
+                    std::unique_ptr<ChatClient> newChatClient = std::make_unique<ChatClient>(peerID);
                     newChatClient.get()->m_username = newUsername;
                     newChatClient.get()->m_status = ChatClientStatus_Connected;
                     m_clients[peerID] = std::move(newChatClient);
                 }
 
                 SendSimpleResponsePacket(peerID, true);
+                LogDepth(1, "New client %u registered as '%s'\n", peerID, newUsername.c_str());
             }
             else
             {
@@ -174,6 +177,8 @@ void RelayIMServer::ProcessClientPackets()
                 }
             }
 
+            writer.Finalize();
+
             m_serverNetwork.SendToClient(peerID, &response);
 
             break;
@@ -198,6 +203,8 @@ void RelayIMServer::ProcessClientPackets()
                 m_chatRooms[roomID]->AddClient(peerID);
                 SendSimpleResponsePacket(peerID, true);
 
+                LogDepth(1, "Client %u joined room %u\n", peerID, roomID);
+
                 std::string joiningUsername;
                 {
                     std::lock_guard<std::mutex> lock(m_clientsMutex);
@@ -207,9 +214,7 @@ void RelayIMServer::ProcessClientPackets()
                 // Notify all clients of this chat room of the new client
                 std::vector<uint8_t> responsePacket;
                 BinaryWriter writer(responsePacket);
-                writer.WriteUInt32(NETWORK_PASSCODE);
-                writer.WriteUInt8(NETWORK_VERSION);
-                writer.WriteUInt8(PacketType_RoomUpdate_UserJoined);
+                writer.WriteHeader(PacketType_RoomUpdate_UserJoined);
                 writer.WriteUInt32(roomID);
                 writer.WriteUInt32(peerID);
                 writer.WriteString(joiningUsername);
@@ -244,7 +249,6 @@ void RelayIMServer::ProcessClientPackets()
             std::string roomName;
             if (!reader.ReadString(roomName))
             {
-                std::cout << "PacketType_CreateChatRoom -> ReadString failed" << std::endl;
                 SendSimpleResponsePacket(peerID, false);
                 break;
             }
@@ -259,7 +263,7 @@ void RelayIMServer::ProcessClientPackets()
                     m_chatRooms[newRoomID]->AddClient(peerID);
                 }
 
-                std::cout << "Client created roomname: " << roomName << std::endl;
+                LogDepth(1, "Client created roomname: '%s'\n", roomName.c_str());
 
                 SendSimpleResponsePacket(peerID, true);
             }
@@ -290,12 +294,12 @@ void RelayIMServer::ProcessClientPackets()
                 m_chatRooms[roomID]->RemoveClient(peerID);
                 SendSimpleResponsePacket(peerID, true);
 
+                LogDepth(1, "Client %u left room %u\n", peerID, roomID);
+
                 // Notify chat room members of leaving user
                 std::vector<uint8_t> responsePacket;
                 BinaryWriter writer(responsePacket);
-                writer.WriteUInt32(NETWORK_PASSCODE);
-                writer.WriteUInt8(NETWORK_VERSION);
-                writer.WriteUInt8(PacketType_RoomUpdate_UserLeft);
+                writer.WriteHeader(PacketType_RoomUpdate_UserLeft);
                 writer.WriteUInt32(roomID);
                 writer.WriteUInt32(peerID);
                 writer.Finalize();
@@ -345,6 +349,8 @@ void RelayIMServer::ProcessClientPackets()
                 ChatMessage newMessage(peerID, message);
                 std::vector<PeerID> chatRoomClients;
 
+                LogDepth(1, "Client %u sent message '%s' to room %u\n", peerID, message.c_str(), roomID);
+
                 // Add message to chat room, get all clients in chat room
                 {
                     std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
@@ -355,9 +361,7 @@ void RelayIMServer::ProcessClientPackets()
                 // Notify all clients in chat room about the message
                 std::vector<uint8_t> messagePacket;
                 BinaryWriter writer(messagePacket);
-                writer.WriteUInt32(NETWORK_PASSCODE);
-                writer.WriteUInt8(NETWORK_VERSION);
-                writer.WriteUInt8(PacketType_RoomUpdate_MSG);
+                writer.WriteHeader(PacketType_RoomUpdate_MSG);
                 writer.WriteUInt32(roomID);
                 writer.WriteString(message);
                 writer.WriteUInt32(peerID);
@@ -377,7 +381,7 @@ void RelayIMServer::ProcessClientPackets()
         }
         default:
         {
-            std::cout << "Client " << peerID << " sent unknown packet type: " << (int)header.m_packetType << std::endl;
+            LogDepth(0, "Client %u sent unknown packet type: %s\n", peerID, PacketTypeToString(header.m_packetType));
             break;
         }
         }

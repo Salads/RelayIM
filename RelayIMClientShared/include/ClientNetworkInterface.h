@@ -27,5 +27,4 @@ private:
     std::atomic_bool m_running = false;
 
     std::vector<uint8_t> m_receiveBuffer;
-    std::mutex m_receiveBufferMutex;
 };

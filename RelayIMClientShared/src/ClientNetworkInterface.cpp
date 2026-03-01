@@ -98,7 +98,7 @@ void ClientNetworkInterface::ReceiveLoop()
             break;
         }
 
-        std::cout << "Received data from server: " << recvResult << " bytes" << std::endl;
+        LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Received data from server: %u bytes\n", recvResult);
         m_receiveBuffer.insert(m_receiveBuffer.end(), receiveBuffer, receiveBuffer + recvResult);
 
         /////////////////////////////////////////////
@@ -165,5 +165,5 @@ void ClientNetworkInterface::Send(PacketData& data)
         printf("send failed: %d\n", WSAGetLastError());
     }
 
-    printf("Bytes Sent: %ld\n", iResult);
+    LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Sent data to server: %u bytes\n", iResult);
 }

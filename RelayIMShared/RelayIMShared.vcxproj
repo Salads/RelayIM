@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="include\ChatClientStatus.h" />
     <ClInclude Include="include\ChatMessage.h" />
+    <ClInclude Include="include\Logging.h" />
     <ClInclude Include="include\NetworkInterface.h" />
     <ClInclude Include="include\NetworkPacker.h" />
     <ClInclude Include="include\NetworkTypes.h" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClCompile Include="include\NetworkPacket.h" />
     <ClCompile Include="src\ChatMessage.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\NetworkPacker.cpp" />
     <ClCompile Include="src\BinaryReader.cpp" />
     <ClCompile Include="src\BinaryWriter.cpp" />

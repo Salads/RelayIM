@@ -2,9 +2,7 @@
 
 BinaryWriter::BinaryWriter(PacketData& buffer)
     : m_buffer(&buffer)
-{
-    WriteUInt16(0); // Placeholder for packet size, will be updated later.
-}
+{}
 
 void BinaryWriter::WriteUInt8(uint8_t value)
 {
@@ -57,6 +55,7 @@ void BinaryWriter::RewindBytes(uint32_t numBytes)
 
 void BinaryWriter::WriteHeader(PacketType packetType)
 {
+    WriteUInt16(0); // Temporary packet size
     WriteUInt32(NETWORK_PASSCODE);
     WriteUInt8(NETWORK_VERSION);
     WriteUInt8(packetType);

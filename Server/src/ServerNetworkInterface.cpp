@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ServerNetworkInterface.h"
 #include "Util.h"
+#include "Logging.h"
 
 using std::cout;
 using std::endl;
@@ -119,7 +120,7 @@ void ServerNetworkInterface::ListenForClients()
             return;
         }
 
-        std::cout << "New client connected: " << m_nextClientID << std::endl;
+        LogDepth(0, "New client socket connected: %u\n", m_nextClientID.load());
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
         newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::ReceiveLoopForClient, this, newPeerClient.get(), newClientSocket);
         newPeerClient->m_sendThread = std::thread(&ServerNetworkInterface::SendLoopForClient, this, newPeerClient.get(), newClientSocket);
@@ -147,7 +148,7 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
         int recvResult = recv(peerSocket, (char*)receiveBuffer, NETWORK_BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
         if (recvResult == 0)
         {
-            std::cout << "Client " << client->m_peerID << " disconnected" << std::endl;
+            LogDepth(0, "Client %u disconnected\n", client->m_peerID);
 
             if (OnClientDisconnected) {
                 OnClientDisconnected(client->m_peerID);
@@ -166,7 +167,7 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
             break;
         }
 
-        std::cout << "Received data from client " << client->m_peerID << ": " << recvResult << " bytes" << std::endl;
+        LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Received data from client %u: %u bytes\n", client->m_peerID, recvResult);
         client->m_receiveBuffer.insert(client->m_receiveBuffer.end(), receiveBuffer, receiveBuffer + recvResult);
 
         /////////////////////////////////////////////
@@ -230,7 +231,7 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
         }
         else
         {
-            std::cout << "Sent data to client " << client->m_peerID << ": " << sendResult << " bytes" << std::endl;
+            LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Sent data to client %u: %u bytes\n", client->m_peerID, sendResult);
             client->m_sendBuffer.erase(client->m_sendBuffer.begin(), client->m_sendBuffer.begin() + sendResult);
         }
     }
@@ -250,7 +251,7 @@ void ServerNetworkInterface::SendToClient(PeerID clientPeerID, PacketData* packe
     }
     else
     {
-        std::cout << "SendToClient could not find client " << clientPeerID << std::endl;
+        LogDepth(0, "SendToCLient could not find client %u\n", clientPeerID);
     }
 }
 
