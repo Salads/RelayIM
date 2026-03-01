@@ -27,14 +27,20 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             {
                 uint32_t roomID = 0; reader.ReadUInt32(roomID);
                 std::string roomName; reader.ReadString(roomName);
-                LogDepth(1, "Room %u: %s\n", roomID, roomName.c_str());
+                LogDepth(1, "Room %u: %s\n", roomID, roomName);
             }
+
+            if (!nRooms)
+            {
+                LogDepth(1, "No chat rooms exist yet!\n");
+            }
+
         } break;
         case PacketType_RoomUpdate_MSG:
         {
             RoomID roomID = 0;   reader.ReadUInt32(roomID);
             std::string message; reader.ReadString(message);
-            LogDepth(1, "New Message (Room %u): '%s'\n", roomID, message.c_str());
+            LogDepth(1, "New Message (Room %u): '%s'\n", roomID, message);
         } break;
         case PacketType_RoomUpdate_MSG_FULL:
         {
@@ -43,7 +49,7 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             for (int i = 0; i < nMessages; i++)
             {
                 std::string message; reader.ReadString(message);
-                LogDepth(1, "Message %d: '%s'\n", i, message.c_str());
+                LogDepth(1, "Message %d: '%s'\n", i, message);
             }
         } break;
         case PacketType_RoomUpdate_UserLeft:
@@ -57,7 +63,7 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             RoomID roomID = 0; reader.ReadUInt32(roomID);
             PeerID peerID = 0; reader.ReadUInt32(peerID);
             std::string userName; reader.ReadString(userName);
-            LogDepth(1, "User '%s' (id %u) joined room %u\n", userName.c_str(), peerID, roomID);
+            LogDepth(1, "User '%s' (id %u) joined room %u\n", userName, peerID, roomID);
         } break;
         case PacketType_Response:
         {

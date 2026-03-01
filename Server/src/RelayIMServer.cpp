@@ -146,7 +146,7 @@ void RelayIMServer::ProcessClientPackets()
                 }
 
                 SendSimpleResponsePacket(peerID, true);
-                LogDepth(1, "New client %u registered as '%s'\n", peerID, newUsername.c_str());
+                LogDepth(1, "New client %u registered as '%s'\n", peerID, newUsername);
             }
             else
             {
@@ -263,7 +263,7 @@ void RelayIMServer::ProcessClientPackets()
                     m_chatRooms[newRoomID]->AddClient(peerID);
                 }
 
-                LogDepth(1, "Client created roomname: '%s'\n", roomName.c_str());
+                LogDepth(1, "Client created roomname: '%s'\n", roomName);
 
                 SendSimpleResponsePacket(peerID, true);
             }
@@ -349,7 +349,7 @@ void RelayIMServer::ProcessClientPackets()
                 ChatMessage newMessage(peerID, message);
                 std::vector<PeerID> chatRoomClients;
 
-                LogDepth(1, "Client %u sent message '%s' to room %u\n", peerID, message.c_str(), roomID);
+                LogDepth(1, "Client %u sent message '%s' to room %u\n", peerID, message, roomID);
 
                 // Add message to chat room, get all clients in chat room
                 {
