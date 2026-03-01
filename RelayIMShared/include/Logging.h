@@ -6,6 +6,8 @@
 
 #define LOGGING_SPACES_PER_DEPTH 2
 
+#define LOG_NETWORK_PACKETS true
+#define LOG_NETOWRK_PACKETS_DATA true
 #define LOG_NETWORK_BYTESTREAM false
 
 extern std::mutex g_loggingMutex;

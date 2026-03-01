@@ -16,7 +16,7 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
     BinaryReader reader(packet.get());
     PacketHeader header; reader.ReadHeader(header);
 
-    LogDepth(0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
 
     switch (header.m_packetType) 
     {
@@ -27,12 +27,12 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             {
                 uint32_t roomID = 0; reader.ReadUInt32(roomID);
                 std::string roomName; reader.ReadString(roomName);
-                LogDepth(1, "Room %u: %s\n", roomID, roomName);
+                LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "Room %u: %s\n", roomID, roomName);
             }
 
             if (!nRooms)
             {
-                LogDepth(1, "No chat rooms exist yet!\n");
+                LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "No chat rooms exist yet!\n");
             }
 
         } break;
@@ -40,7 +40,7 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
         {
             RoomID roomID = 0;   reader.ReadUInt32(roomID);
             std::string message; reader.ReadString(message);
-            LogDepth(1, "New Message (Room %u): '%s'\n", roomID, message);
+            LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "New Message (Room %u): '%s'\n", roomID, message);
         } break;
         case PacketType_RoomUpdate_MSG_FULL:
         {
@@ -49,28 +49,28 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             for (int i = 0; i < nMessages; i++)
             {
                 std::string message; reader.ReadString(message);
-                LogDepth(1, "Message %d: '%s'\n", i, message);
+                LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "Message %d: '%s'\n", i, message);
             }
         } break;
         case PacketType_RoomUpdate_UserLeft:
         {
             RoomID roomID = 0; reader.ReadUInt32(roomID);
             PeerID peerID = 0; reader.ReadUInt32(peerID);
-            LogDepth(1, "User id %u left room %u\n", peerID, roomID);
+            LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "User id %u left room %u\n", peerID, roomID);
         } break;
         case PacketType_RoomUpdate_UserJoined:
         {
             RoomID roomID = 0; reader.ReadUInt32(roomID);
             PeerID peerID = 0; reader.ReadUInt32(peerID);
             std::string userName; reader.ReadString(userName);
-            LogDepth(1, "User '%s' (id %u) joined room %u\n", userName, peerID, roomID);
+            LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "User '%s' (id %u) joined room %u\n", userName, peerID, roomID);
         } break;
         case PacketType_Response:
         {
             uint8_t packetType; reader.ReadUInt8(packetType);
             uint8_t success = 0; reader.ReadUInt8(success);
             
-            LogDepth(1, "%s -> Success: %u\n", PacketTypeToString(packetType), success);
+            LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "%s -> Success: %u\n", PacketTypeToString(packetType), success);
         } break;
         default:
         {
@@ -101,21 +101,27 @@ int main()
     ClientPacketBuilder packetBuilder;
     PacketData testPacket = packetBuilder.BuildConnectPacket("Test Username");
     clientNetwork.Send(testPacket);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_Connect));
 
     testPacket = packetBuilder.BuildListChatRoomsPacket();
     clientNetwork.Send(testPacket);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_ListChatRooms));
 
     testPacket = packetBuilder.BuildCreateChatRoomPacket("Cool Room");
     clientNetwork.Send(testPacket);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_CreateChatRoom));
 
     testPacket = packetBuilder.BuildJoinChatRoomPacket(0);
     clientNetwork.Send(testPacket);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_JoinChatRoom));
 
     testPacket = packetBuilder.BuildSendMessagePacket(0, "Hello, cool message!");
     clientNetwork.Send(testPacket);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_SendMessage));
 
     testPacket = packetBuilder.BuildLeaveChatRoomPacket(0);
     clientNetwork.Send(testPacket);
+    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_LeaveChatRoom));
 
     while (true) {}
 
