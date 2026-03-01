@@ -67,8 +67,10 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
         } break;
         case PacketType_Response:
         {
+            uint8_t packetType; reader.ReadUInt8(packetType);
             uint8_t success = 0; reader.ReadUInt8(success);
-            LogDepth(1, "Success: %u\n", success);
+            
+            LogDepth(1, "%s -> Success: %u\n", PacketTypeToString(packetType), success);
         } break;
         default:
         {

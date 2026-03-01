@@ -80,11 +80,12 @@ void RelayIMServer::Stop()
     std::cout << "Stopped RelayIMServer" << std::endl;
 }
 
-void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, bool success)
+void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, PacketType packetType, bool success)
 {
     std::vector<uint8_t> responsePacket;
     BinaryWriter writer(responsePacket);
     writer.WriteHeader(PacketType_Response);
+    writer.WriteUInt8(packetType);
     writer.WriteUInt8(success);
     writer.Finalize();
 
@@ -116,7 +117,6 @@ void RelayIMServer::ProcessClientPackets()
         PacketHeader header;
         if (!reader.ReadHeader(header))
         {
-            SendSimpleResponsePacket(peerID, false);
             continue;
         }
 
@@ -130,7 +130,7 @@ void RelayIMServer::ProcessClientPackets()
             std::string newUsername;
             if (!reader.ReadString(newUsername))
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -145,12 +145,12 @@ void RelayIMServer::ProcessClientPackets()
                     m_clients[peerID] = std::move(newChatClient);
                 }
 
-                SendSimpleResponsePacket(peerID, true);
+                SendSimpleResponsePacket(peerID, header.m_packetType, true);
                 LogDepth(1, "New client %u registered as '%s'\n", peerID, newUsername);
             }
             else
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
@@ -188,7 +188,7 @@ void RelayIMServer::ProcessClientPackets()
             uint32_t roomID = 0;
             if (!reader.ReadUInt32(roomID))
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -201,7 +201,7 @@ void RelayIMServer::ProcessClientPackets()
             if (roomExists)
             {
                 m_chatRooms[roomID]->AddClient(peerID);
-                SendSimpleResponsePacket(peerID, true);
+                SendSimpleResponsePacket(peerID, header.m_packetType, true);
 
                 LogDepth(1, "Client %u joined room %u\n", peerID, roomID);
 
@@ -239,7 +239,7 @@ void RelayIMServer::ProcessClientPackets()
             }
             else
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
@@ -249,7 +249,7 @@ void RelayIMServer::ProcessClientPackets()
             std::string roomName;
             if (!reader.ReadString(roomName))
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -265,11 +265,11 @@ void RelayIMServer::ProcessClientPackets()
 
                 LogDepth(1, "Client created roomname: '%s'\n", roomName);
 
-                SendSimpleResponsePacket(peerID, true);
+                SendSimpleResponsePacket(peerID, header.m_packetType, true);
             }
             else
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
@@ -279,7 +279,7 @@ void RelayIMServer::ProcessClientPackets()
             uint32_t roomID = 0;
             if (!reader.ReadUInt32(roomID))
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -292,7 +292,7 @@ void RelayIMServer::ProcessClientPackets()
             if (roomExists)
             {
                 m_chatRooms[roomID]->RemoveClient(peerID);
-                SendSimpleResponsePacket(peerID, true);
+                SendSimpleResponsePacket(peerID, header.m_packetType, true);
 
                 LogDepth(1, "Client %u left room %u\n", peerID, roomID);
 
@@ -317,7 +317,7 @@ void RelayIMServer::ProcessClientPackets()
             }
             else
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
@@ -327,14 +327,14 @@ void RelayIMServer::ProcessClientPackets()
             uint32_t roomID = 0;
             if (!reader.ReadUInt32(roomID))
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
             std::string message;
             if (!reader.ReadString(message))
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -374,7 +374,7 @@ void RelayIMServer::ProcessClientPackets()
             }
             else
             {
-                SendSimpleResponsePacket(peerID, false);
+                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
