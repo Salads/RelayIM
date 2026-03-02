@@ -8,8 +8,9 @@
 #include "Types.h"
 #include "NetworkTypes.h"
 
-struct PeerClient
+class PeerClient
 {
+public:
     PeerClient(PeerID clientID, SOCKET clientSocket)
         : m_peerID(clientID), m_clientSocket(clientSocket) {}
 
@@ -18,6 +19,9 @@ struct PeerClient
     void Send(PacketData *packet);
     bool GetMarkedForDeletion();
     void MarkForDeletion(bool mark);
+
+private:
+    void ClearSendBuffer();
 
 public:
     std::atomic_bool m_delete = false;

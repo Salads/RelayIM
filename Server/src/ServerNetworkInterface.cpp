@@ -212,9 +212,12 @@ void ServerNetworkInterface::DeleteDisconnectedClients()
         int nDeleted = 0;
         while (!m_deletedPeerClients.empty())
         {
-            LogDepth(0, "Removing deleted peer client %u", nDeleted);
+            LogDepth(0, "Removing deleted peer client %u\n", nDeleted++);
+            std::move(m_deletedPeerClients.front());
             m_deletedPeerClients.pop();
         }
+
+        LogDepthConditional(nDeleted > 0, 0, "Finished removing %u clients\n", nDeleted);
     }
 }
 
@@ -222,7 +225,12 @@ void ServerNetworkInterface::MarkPeerClientForDeletion(PeerID peerID)
 {
     {
         std::lock(m_deletedPeerClientsMutex, m_peerClientsMutex);
+        std::lock_guard lk1(m_deletedPeerClientsMutex, std::adopt_lock);
+        std::lock_guard lk2(m_peerClientsMutex, std::adopt_lock);
+
         std::unique_ptr<PeerClient> deletedClient = std::move(m_peerClients[peerID]);
+        deletedClient->MarkForDeletion(true);
+        deletedClient->m_sendThreadCV.notify_one();
         m_peerClients.erase(peerID);
         m_deletedPeerClients.push(std::move(deletedClient));
     }
@@ -230,7 +238,7 @@ void ServerNetworkInterface::MarkPeerClientForDeletion(PeerID peerID)
 
 void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSocket)
 {
-    while (m_running)
+    while (m_running && !client->GetMarkedForDeletion())
     {
         // Wait untill we have data to send
         std::unique_lock<std::mutex> lock(client->m_sendBufferMutex);
