@@ -7,6 +7,7 @@
 #include <atomic>
 #include <functional>
 #include <mutex>
+#include <queue>
 
 #include "Util.h"
 #include "NetworkInterface.h"
@@ -26,10 +27,14 @@ public:
     void SendLoopForClient(PeerClient* client, SOCKET peerSocket);
 
     void SendToClient(PeerID, PacketData* packet);
+    void DeleteDisconnectedClients();
 
     std::function<void(PeerID)> OnNewClient; // New client connected (socket, no data received)
     std::function<void(PeerID, std::unique_ptr<NetworkPacket> newPacket)> OnPacketReceived; // client receive thread has constructed a new packet
     std::function<void(PeerID)> OnClientDisconnected; // socket received 0, client disconnected (socket)
+
+private:
+    void MarkPeerClientForDeletion(PeerID peerID);
 
 private:
     addrinfo* m_listenSocketInfo = nullptr;
@@ -42,4 +47,7 @@ private:
     std::atomic_uint32_t m_nextClientID{ 0 };
     std::unordered_map<PeerID, std::unique_ptr<PeerClient>> m_peerClients;
     std::mutex m_peerClientsMutex;
+
+    std::queue<std::unique_ptr<PeerClient>> m_deletedPeerClients;
+    std::mutex m_deletedPeerClientsMutex;
 };

@@ -21,6 +21,9 @@ public:
     bool Start();
     void Stop();
 
+    // Things that should happen on the main thread, go here.
+    void Update();
+
     bool GetIsInitialized() const;
     void HandleNewClient(PeerID newPeerID);
 

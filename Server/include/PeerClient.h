@@ -13,7 +13,14 @@ struct PeerClient
     PeerClient(PeerID clientID, SOCKET clientSocket)
         : m_peerID(clientID), m_clientSocket(clientSocket) {}
 
+    ~PeerClient();
+
     void Send(PacketData *packet);
+    bool GetMarkedForDeletion();
+    void MarkForDeletion(bool mark);
+
+public:
+    std::atomic_bool m_delete = false;
 
     PeerID m_peerID = INVALID_PEER_ID;
     SOCKET m_clientSocket;

@@ -71,6 +71,9 @@ void RelayIMServer::Stop()
     std::cout << "Shutting down server network interface..." << std::endl;
     m_serverNetwork.Shutdown();
 
+    std::cout << "Cleaning up already disconnected clients" << std::endl;
+    m_serverNetwork.DeleteDisconnectedClients();
+
     std::cout << "Joining packet handler thread..." << std::endl;
     if (m_packetHandlerThread.joinable())
     {
@@ -78,6 +81,11 @@ void RelayIMServer::Stop()
     }
 
     std::cout << "Stopped RelayIMServer" << std::endl;
+}
+
+void RelayIMServer::Update()
+{
+    m_serverNetwork.DeleteDisconnectedClients();
 }
 
 void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, PacketType packetType, bool success)

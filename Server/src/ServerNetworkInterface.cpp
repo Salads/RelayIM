@@ -74,6 +74,7 @@ void ServerNetworkInterface::Shutdown()
 
     if (m_listenSocket != INVALID_SOCKET)
     {
+        shutdown(m_listenSocket, SD_BOTH);
         closesocket(m_listenSocket);
         m_listenSocket = INVALID_SOCKET;
     }
@@ -89,22 +90,7 @@ void ServerNetworkInterface::Shutdown()
         m_listenSocketInfo = nullptr;
     }
 
-    // This is proper, but OS cleans things up for us... are we slowing things down for no reason?
-    for (auto &[peerID, peerClient] : m_peerClients)
-    {
-        shutdown(peerClient->m_clientSocket, SD_BOTH);
-        closesocket(peerClient->m_clientSocket);
-
-        if (peerClient->m_receiveThread.joinable())
-        {
-            peerClient->m_receiveThread.join();
-        }
-
-        if (peerClient->m_sendThread.joinable())
-        {
-            peerClient->m_sendThread.join();
-        }
-    }
+    m_peerClients.clear();
 
     WSACleanup();
 }
@@ -143,6 +129,11 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
 
     while (m_running)
     {
+        if (client->GetMarkedForDeletion())
+        {
+            break;
+        }
+
         memset(receiveBuffer, 0, NETWORK_BUFLEN);
 
         int recvResult = recv(peerSocket, (char*)receiveBuffer, NETWORK_BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
@@ -150,7 +141,10 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
         {
             LogDepth(0, "Client %u disconnected\n", client->m_peerID);
 
-            if (OnClientDisconnected) {
+            MarkPeerClientForDeletion(client->m_peerID);
+
+            if (OnClientDisconnected) 
+            {
                 OnClientDisconnected(client->m_peerID);
             }
 
@@ -160,7 +154,10 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
         {
             PrintWSAError("recv failed");
 
-            if (OnClientDisconnected) {
+            MarkPeerClientForDeletion(client->m_peerID);
+
+            if (OnClientDisconnected) 
+            {
                 OnClientDisconnected(client->m_peerID);
             }
 
@@ -208,6 +205,29 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
     } // while(m_running)
 }
 
+void ServerNetworkInterface::DeleteDisconnectedClients()
+{
+    {
+        std::lock_guard lock(m_deletedPeerClientsMutex);
+        int nDeleted = 0;
+        while (!m_deletedPeerClients.empty())
+        {
+            LogDepth(0, "Removing deleted peer client %u", nDeleted);
+            m_deletedPeerClients.pop();
+        }
+    }
+}
+
+void ServerNetworkInterface::MarkPeerClientForDeletion(PeerID peerID)
+{
+    {
+        std::lock(m_deletedPeerClientsMutex, m_peerClientsMutex);
+        std::unique_ptr<PeerClient> deletedClient = std::move(m_peerClients[peerID]);
+        m_peerClients.erase(peerID);
+        m_deletedPeerClients.push(std::move(deletedClient));
+    }
+}
+
 void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSocket)
 {
     while (m_running)
@@ -215,12 +235,11 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
         // Wait untill we have data to send
         std::unique_lock<std::mutex> lock(client->m_sendBufferMutex);
         client->m_sendThreadCV.wait(lock, [this, client]() {
-            return !m_running || !client->m_sendBuffer.empty();
+            return !m_running || !client->m_sendBuffer.empty() || client->GetMarkedForDeletion();
         });
 
-        if (!m_running)
+        if (!m_running || client->GetMarkedForDeletion())
         {
-            lock.unlock();
             break;
         }
 
