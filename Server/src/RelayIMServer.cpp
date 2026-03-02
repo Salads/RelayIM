@@ -106,7 +106,7 @@ void RelayIMServer::ProcessClientPackets()
     {
         std::unique_lock cvLock(m_incomingPacketsMutex);
         m_incomingPacketsCV.wait(cvLock, [this]() {
-            return !m_running || !m_incomingPackets.empty();
+            return !m_running.load() || !m_incomingPackets.empty();
         });
 
         if (!m_running)
@@ -128,7 +128,7 @@ void RelayIMServer::ProcessClientPackets()
             continue;
         }
 
-        LogDepth(0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
+        LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
 
         // Read Packet Payload
         switch (header.m_packetType)
@@ -154,7 +154,7 @@ void RelayIMServer::ProcessClientPackets()
                 }
 
                 SendSimpleResponsePacket(peerID, header.m_packetType, true);
-                LogDepth(1, "New client %u registered as '%s'\n", peerID, newUsername);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "New client %u registered as '%s'\n", peerID, newUsername);
             }
             else
             {
@@ -211,7 +211,7 @@ void RelayIMServer::ProcessClientPackets()
                 m_chatRooms[roomID]->AddClient(peerID);
                 SendSimpleResponsePacket(peerID, header.m_packetType, true);
 
-                LogDepth(1, "Client %u joined room %u\n", peerID, roomID);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u joined room %u\n", peerID, roomID);
 
                 std::string joiningUsername;
                 {
@@ -271,7 +271,7 @@ void RelayIMServer::ProcessClientPackets()
                     m_chatRooms[newRoomID]->AddClient(peerID);
                 }
 
-                LogDepth(1, "Client created roomname: '%s'\n", roomName);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client created roomname: '%s'\n", roomName);
 
                 SendSimpleResponsePacket(peerID, header.m_packetType, true);
             }
@@ -302,7 +302,7 @@ void RelayIMServer::ProcessClientPackets()
                 m_chatRooms[roomID]->RemoveClient(peerID);
                 SendSimpleResponsePacket(peerID, header.m_packetType, true);
 
-                LogDepth(1, "Client %u left room %u\n", peerID, roomID);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u left room %u\n", peerID, roomID);
 
                 // Notify chat room members of leaving user
                 std::vector<uint8_t> responsePacket;
@@ -357,7 +357,7 @@ void RelayIMServer::ProcessClientPackets()
                 ChatMessage newMessage(peerID, message);
                 std::vector<PeerID> chatRoomClients;
 
-                LogDepth(1, "Client %u sent message '%s' to room %u\n", peerID, message, roomID);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u sent message '%s' to room %u\n", peerID, message, roomID);
 
                 // Add message to chat room, get all clients in chat room
                 {
@@ -389,7 +389,7 @@ void RelayIMServer::ProcessClientPackets()
         }
         default:
         {
-            LogDepth(0, "Client %u sent unknown packet type: %s\n", peerID, PacketTypeToString(header.m_packetType));
+            LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Client %u sent unknown packet type: %s\n", peerID, PacketTypeToString(header.m_packetType));
             break;
         }
         }
