@@ -74,16 +74,15 @@ enum PacketResponseReason : uint8_t
             RoomID:4u - room id to join
 
         PacketType_JoinChatRoomResponse:
-            Reason:1u - Success/ErrorReason
+            Reason:1u - ErrorReason (Success means client gets room update packet)
             
         PacketType_CreateChatRoom:
             Room Name:str - name of room to create
 
         PacketType_CreateChatRoomResponse:
-            Reason:1u - Success/ErrorReason
-              (IF Reason == Success)
-                RoomID:4u     - room id of new chat room
-                Room Name:str - room name of new chat room
+            Reason:1u     - Success/ErrorReason
+            RoomID:4u     - room id of new chat room
+            Room Name:str - room name of new chat room
             
         PacketType_LeaveChatRoom:
             RoomID:4u - id of room to leave
@@ -99,6 +98,9 @@ enum PacketResponseReason : uint8_t
 
         PacketType_RoomUpdate_FULL :
             RoomID:4u - room id this update is for
+            ARRAY
+                PeerID:4u    - users in the chat room
+                Username:str - usernames in the chat room
             ARRAY
                 PeerID:4u   - user id that sent the message
                 Message:str - message that user sent

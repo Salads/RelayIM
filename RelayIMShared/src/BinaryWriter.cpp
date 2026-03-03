@@ -28,7 +28,7 @@ void BinaryWriter::WriteUInt32(uint32_t value)
     }
 }
 
-void BinaryWriter::WriteString(std::string& string)
+void BinaryWriter::WriteString(const std::string& string)
 {
     WriteUInt16(static_cast<uint16_t>(string.size()));
     m_buffer->insert(m_buffer->end(), string.begin(), string.end());

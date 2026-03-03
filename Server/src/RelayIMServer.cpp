@@ -140,7 +140,27 @@ void RelayIMServer::ProcessClientPackets()
                     m_clients[peerID] = std::move(newChatClient);
                 }
 
+                PacketData response;
+                BinaryWriter writer(response);
+                writer.WriteHeader(PacketType_ConnectResponse);
+                writer.WriteUInt8(PacketResponseReason::Success);
+                writer.WriteUInt32(peerID);
+                writer.WriteString(newUsername);
+                writer.Finalize();
+                m_serverNetwork.SendToClient(peerID, &response);
+
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "New client %u registered as '%s'\n", peerID, newUsername);
+            }
+            else
+            {
+                PacketData response;
+                BinaryWriter writer(response);
+                writer.WriteHeader(PacketType_ConnectResponse);
+                writer.WriteUInt8(PacketResponseReason::UsernameTaken);
+                writer.WriteUInt32(INVALID_PEER_ID);
+                writer.WriteString("");
+                writer.Finalize();
+                m_serverNetwork.SendToClient(peerID, &response);
             }
 
             break;
@@ -189,41 +209,73 @@ void RelayIMServer::ProcessClientPackets()
 
             if (roomExists)
             {
-                m_chatRooms[roomID]->AddClient(peerID);
-
-                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u joined room %u\n", peerID, roomID);
-
                 std::string joiningUsername;
                 {
                     std::lock_guard<std::mutex> lock(m_clientsMutex);
                     joiningUsername = m_clients[peerID]->m_username;
                 }
 
-                // Notify all clients of this chat room of the new client
-                std::vector<uint8_t> responsePacket;
-                BinaryWriter writer(responsePacket);
-                writer.WriteHeader(PacketType_RoomUpdate_UserJoined);
-                writer.WriteUInt32(roomID);
-                writer.WriteUInt32(peerID);
-                writer.WriteString(joiningUsername);
-                writer.Finalize();
-
-                std::vector<PeerID> roomClients;
                 {
-                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                    roomClients = m_chatRooms[roomID]->GetClients();
-                }
+                    std::lock_guard lock(m_chatRoomsMutex);
+                    m_chatRooms[roomID]->AddClient(peerID);
+                    
+                    // Notify all clients of this chat room of the new client
+                    std::vector<uint8_t> responsePacket;
+                    BinaryWriter writer(responsePacket);
+                    writer.WriteHeader(PacketType_RoomUpdate_UserJoined);
+                    writer.WriteUInt32(roomID);
+                    writer.WriteUInt32(peerID);
+                    writer.WriteString(joiningUsername);
+                    writer.Finalize();
 
-                for (PeerID roomClient : roomClients)
-                {
-                    if (roomClient != peerID)
+                    std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
+                    for (PeerID roomClient : roomClients)
                     {
                         m_serverNetwork.SendToClient(roomClient, &responsePacket);
                     }
+
+                    // Send FULL update to newly joined client (arr users, arr messages)
+                    std::vector<uint8_t> fullResponse;
+                    BinaryWriter fullWriter(fullResponse);
+                    fullWriter.WriteHeader(PacketType_RoomUpdate_FULL);
+                    fullWriter.WriteUInt32(roomID);
+                    fullWriter.WriteUInt16(static_cast<uint16_t>(roomClients.size()));
+
+                    {
+                        std::lock_guard lock(m_clientsMutex);
+                        for (PeerID roomClient : roomClients)
+                        {
+                            fullWriter.WriteUInt32(roomClient);
+                            fullWriter.WriteString(m_clients[peerID].get()->m_username);
+                        }
+                    }
+
+                    ChatRoom* chatRoom = m_chatRooms[roomID].get();
+                    const std::vector<ChatMessage>* messages = chatRoom->GetMessages();
+
+                    fullWriter.WriteUInt16(messages->size());
+
+                    for (int i = 0; i < messages->size(); i++)
+                    {
+                        const ChatMessage& message = messages->at(i);
+                        fullWriter.WriteUInt32(message.m_senderID);
+                        fullWriter.WriteString(message.m_message);
+                    }
+
+                    fullWriter.Finalize();
+                    m_serverNetwork.SendToClient(peerID, &fullResponse);
                 }
 
-                // TODO(Salads): Give the new peer a FULL room update. (users, messages) 
-                // PacketType_RoomUpdate_MSG_FULL
+                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u joined room %u\n", peerID, roomID);
+            }
+            else
+            {
+                PacketData response;
+                BinaryWriter writer(response);
+                writer.WriteHeader(PacketType_JoinChatRoomResponse);
+                writer.WriteUInt8(PacketResponseReason::ChatRoomDoesntExist);
+                writer.Finalize();
+                m_serverNetwork.SendToClient(peerID, &response);
             }
 
             break;
@@ -246,7 +298,27 @@ void RelayIMServer::ProcessClientPackets()
                     m_chatRooms[newRoomID]->AddClient(peerID);
                 }
 
+                PacketData response;
+                BinaryWriter writer(response);
+                writer.WriteHeader(PacketType_CreateChatRoomResponse);
+                writer.WriteUInt8(PacketResponseReason::Success);
+                writer.WriteUInt32(newRoomID);
+                writer.WriteString(roomName);
+                writer.Finalize();
+                m_serverNetwork.SendToClient(peerID, &response);
+
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client created roomname: '%s'\n", roomName);
+            }
+            else
+            {
+                PacketData response;
+                BinaryWriter writer(response);
+                writer.WriteHeader(PacketType_CreateChatRoomResponse);
+                writer.WriteUInt8(PacketResponseReason::ChatRoomNameTaken);
+                writer.WriteUInt32(INVALID_ROOM_ID);
+                writer.WriteString("");
+                writer.Finalize();
+                m_serverNetwork.SendToClient(peerID, &response);
             }
 
             break;
@@ -279,15 +351,14 @@ void RelayIMServer::ProcessClientPackets()
                 writer.WriteUInt32(peerID);
                 writer.Finalize();
 
-                std::vector<PeerID> roomClients;
                 {
                     std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                    roomClients = m_chatRooms[roomID]->GetClients();
-                }
+                    std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
 
-                for (PeerID roomClient : roomClients)
-                {
-                    m_serverNetwork.SendToClient(roomClient, &responsePacket);
+                    for (PeerID roomClient : roomClients)
+                    {
+                        m_serverNetwork.SendToClient(roomClient, &responsePacket);
+                    }
                 }
             }
 
@@ -316,11 +387,12 @@ void RelayIMServer::ProcessClientPackets()
             if (roomExists)
             {
                 ChatMessage newMessage(peerID, message);
-                std::vector<PeerID> chatRoomClients;
+                
 
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u sent message '%s' to room %u\n", peerID, message, roomID);
 
                 // Add message to chat room, get all clients in chat room
+                std::vector<PeerID> chatRoomClients;
                 {
                     std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
                     m_chatRooms[roomID]->AddMessage(newMessage);
@@ -332,8 +404,8 @@ void RelayIMServer::ProcessClientPackets()
                 BinaryWriter writer(messagePacket);
                 writer.WriteHeader(PacketType_RoomUpdate_MSG);
                 writer.WriteUInt32(roomID);
-                writer.WriteString(message);
                 writer.WriteUInt32(peerID);
+                writer.WriteString(message);
                 writer.Finalize();
 
                 for (PeerID chatRoomClientID : chatRoomClients)

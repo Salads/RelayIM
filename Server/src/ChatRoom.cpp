@@ -30,3 +30,8 @@ std::vector<PeerID> ChatRoom::GetClients()
     std::vector<PeerID> result(m_clients.begin(), m_clients.end());
     return result;
 }
+
+const std::vector<ChatMessage>* ChatRoom::GetMessages()
+{
+    return &m_messages;
+}

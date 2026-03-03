@@ -18,6 +18,7 @@ public:
 
     std::string GetRoomName();
     std::vector<PeerID> GetClients();
+    const std::vector<ChatMessage>* GetMessages();
 
 private:
     RoomID m_roomID;
