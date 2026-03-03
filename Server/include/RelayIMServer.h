@@ -34,8 +34,6 @@ private:
     bool IsUsernameTaken(std::string& newUsername);
     bool IsRoomnameTaken(std::string& newRoomname);
 
-    void SendSimpleResponsePacket(PeerID peerID, PacketType packetType, bool success);
-
 private:
     bool m_isInitialized = false;
 

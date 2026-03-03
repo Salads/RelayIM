@@ -6,22 +6,39 @@ const char* PacketTypeToString(uint8_t type);
 
 #define PACKET_TYPES \
     X(PacketType_Connect)               \
+    X(PacketType_ConnectResponse)       \
     X(PacketType_ListChatRooms)         \
     X(PacketType_ListChatRooms_Result)  \
     X(PacketType_JoinChatRoom)          \
+    X(PacketType_JoinChatRoomResponse)  \
     X(PacketType_CreateChatRoom)        \
+    X(PacketType_CreateChatRoomResponse)\
     X(PacketType_LeaveChatRoom)         \
     X(PacketType_SendMessage)           \
     X(PacketType_RoomUpdate_MSG)        \
-    X(PacketType_RoomUpdate_MSG_FULL)   \
+    X(PacketType_RoomUpdate_FULL)       \
     X(PacketType_RoomUpdate_UserJoined) \
-    X(PacketType_RoomUpdate_UserLeft)   \
-    X(PacketType_Response)
+    X(PacketType_RoomUpdate_UserLeft)   
 
 enum PacketType : uint8_t
 {
 #define X(name) name,
     PACKET_TYPES
+#undef X
+};
+
+const char* ResponseTypeToString(uint8_t type);
+
+#define PACKET_RESPONSE_REASONS \
+    X(Success)               \
+    X(UsernameTaken)         \
+    X(ChatRoomDoesntExist)   \
+    X(ChatRoomNameTaken)     
+
+enum PacketResponseReason : uint8_t
+{
+#define X(name) name,
+    PACKET_RESPONSE_REASONS
 #undef X
 };
 
@@ -38,36 +55,60 @@ enum PacketType : uint8_t
 
     PAYLOAD:
         PacketType_Connect:
-            Username (VarLen) : Desired Username
+            Username:str - Username
+
+        PacketType_ConnectResponse:
+            Reason:1u    - Success/Error Reason
+            PeerID:4u    - client's own peer id
+            Username:str - client's requested username
+
         PacketType_ListChatRooms:
-            NOTHING
-        PacketType_ListChatRooms_Result: Sent as a response to PacketType_ListChatRooms
-            ARRAY (VarLen)
-                RoomID (4 ubytes)
-                String (VarLen) : Room Name
+            nothing
+
+        PacketType_ListChatRooms_Result:
+            ARRAY
+                RoomID:4u    - id of room
+                Roomname:str - name of room
+
         PacketType_JoinChatRoom:
-            RoomID (4 ubytes) :
+            RoomID:4u - room id to join
+
+        PacketType_JoinChatRoomResponse:
+            Reason:1u - Success/ErrorReason
+            
         PacketType_CreateChatRoom:
-            Room Name (VarLen): Room name to create.
+            Room Name:str - name of room to create
+
+        PacketType_CreateChatRoomResponse:
+            Reason:1u - Success/ErrorReason
+              (IF Reason == Success)
+                RoomID:4u     - room id of new chat room
+                Room Name:str - room name of new chat room
+            
         PacketType_LeaveChatRoom:
-            RoomID (4 ubytes) :
+            RoomID:4u - id of room to leave
+            
         PacketType_SendMessage:
-            RoomID (4 ubytes) :
-            Message (VarLen)  :
+            RoomID:4u   - id of room to send message to
+            Message:str - message to send
+
         PacketType_RoomUpdate_MSG :
-            RoomID (4 ubytes) :
-            Message (VarLen)  :
-            PeerID (4 ubytes) : Sender
-        PacketType_RoomUpdate_MSG_FULL :
-            RoomID (4 ubytes) :
-            ARRAY Message (VarLen):
+            RoomID:4u   - room id that message was sent to
+            PeerID:4u   - user id that sent the message
+            Message:str - message that user sent
+
+        PacketType_RoomUpdate_FULL :
+            RoomID:4u - room id this update is for
+            ARRAY
+                PeerID:4u   - user id that sent the message
+                Message:str - message that user sent
+
         PacketType_RoomUpdate_UserJoined:
-            RoomID (4 ubytes) :
-            PeerID (4 ubytes) :
-            Username (VarLen) :
+            RoomID:4u    - room this update is for
+            PeerID:4u    - id of user that joined the room
+            Username:str - username of user that joined the room
+
         PacketType_RoomUpdate_UserLeft:
-            RoomID (4 ubytes) :
-            PeerID (4 ubytes) :
-        PacketType_Response   :
-            Success (1 uByte) : 0 for failure, 1 for success.
+            RoomID:4u - room that user left
+            PeerID:4u - user that left the room
 */

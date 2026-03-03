@@ -1,10 +1,10 @@
-#include "BinaryReader.h"
+#include "PacketReader.h"
 
-BinaryReader::BinaryReader(const NetworkPacket* data)
+PacketReader::PacketReader(const NetworkPacket* data)
     : m_data(data->m_data.get()), m_cursor(m_data->data()), m_end(m_data->data() + m_data->size())
 {}
 
-bool BinaryReader::ReadUInt8(uint8_t& outValue)
+bool PacketReader::ReadUInt8(uint8_t& outValue)
 {
     if (m_cursor + sizeof(uint8_t) > m_end)
     {
@@ -16,7 +16,7 @@ bool BinaryReader::ReadUInt8(uint8_t& outValue)
     return true;
 }
 
-bool BinaryReader::ReadUInt16(uint16_t& outValue)
+bool PacketReader::ReadUInt16(uint16_t& outValue)
 {
     if (m_cursor + sizeof(uint16_t) > m_end)
     {
@@ -28,7 +28,7 @@ bool BinaryReader::ReadUInt16(uint16_t& outValue)
     return true;
 }
 
-bool BinaryReader::ReadUInt32(uint32_t& outValue)
+bool PacketReader::ReadUInt32(uint32_t& outValue)
 {
     if (m_cursor + sizeof(uint32_t) > m_end)
     {
@@ -40,7 +40,7 @@ bool BinaryReader::ReadUInt32(uint32_t& outValue)
     return true;
 }
 
-bool BinaryReader::ReadString(std::string& outString)
+bool PacketReader::ReadString(std::string& outString)
 {
     uint16_t stringLength = 0;
     if (!ReadUInt16(stringLength))
@@ -58,7 +58,7 @@ bool BinaryReader::ReadString(std::string& outString)
     return true;
 }
 
-bool BinaryReader::ReadHeader(PacketHeader& outHeader)
+bool PacketReader::ReadHeader(PacketHeader& outHeader)
 {
     if (m_cursor + sizeof(PacketHeader) > m_end)
     {

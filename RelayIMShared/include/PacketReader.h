@@ -7,10 +7,10 @@
 #include "PacketHeader.h"
 #include "NetworkPacket.h"
 
-class BinaryReader
+class PacketReader
 {
 public:
-    BinaryReader(const NetworkPacket *data);
+    PacketReader(const NetworkPacket *data);
 
     bool ReadUInt8(uint8_t& outValue);
     bool ReadUInt16(uint16_t& outValue);

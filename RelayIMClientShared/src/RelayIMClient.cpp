@@ -1,5 +1,5 @@
 #include "RelayIMClient.h"
-#include "BinaryReader.h"
+#include "PacketReader.h"
 
 #include <iostream>
 
@@ -20,7 +20,7 @@ bool RelayIMClient::Start()
 
 void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPacket)
 {
-    BinaryReader reader(serverPacket.get());
+    PacketReader reader(serverPacket.get());
     PacketHeader header; reader.ReadHeader(header);
 
     switch(header.m_packetType)

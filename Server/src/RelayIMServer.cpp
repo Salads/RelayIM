@@ -6,7 +6,7 @@
 #include "Util.h"
 #include "PacketType.h"
 #include "NetworkTypes.h"
-#include "BinaryReader.h"
+#include "PacketReader.h"
 #include "BinaryWriter.h"
 #include "Logging.h"
 
@@ -88,18 +88,6 @@ void RelayIMServer::Update()
     m_serverNetwork.DeleteDisconnectedClients();
 }
 
-void RelayIMServer::SendSimpleResponsePacket(PeerID peerID, PacketType packetType, bool success)
-{
-    std::vector<uint8_t> responsePacket;
-    BinaryWriter writer(responsePacket);
-    writer.WriteHeader(PacketType_Response);
-    writer.WriteUInt8(packetType);
-    writer.WriteUInt8(success);
-    writer.Finalize();
-
-    m_serverNetwork.SendToClient(peerID, &responsePacket);
-}
-
 void RelayIMServer::ProcessClientPackets()
 {
     while (m_running)
@@ -119,7 +107,7 @@ void RelayIMServer::ProcessClientPackets()
         m_incomingPackets.pop();
         cvLock.unlock();
 
-        BinaryReader reader(packet.get());
+        PacketReader reader(packet.get());
 
         PeerID peerID = packet.get()->m_peerID;
         PacketHeader header;
@@ -138,7 +126,6 @@ void RelayIMServer::ProcessClientPackets()
             std::string newUsername;
             if (!reader.ReadString(newUsername))
             {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -153,12 +140,7 @@ void RelayIMServer::ProcessClientPackets()
                     m_clients[peerID] = std::move(newChatClient);
                 }
 
-                SendSimpleResponsePacket(peerID, header.m_packetType, true);
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "New client %u registered as '%s'\n", peerID, newUsername);
-            }
-            else
-            {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
@@ -196,7 +178,6 @@ void RelayIMServer::ProcessClientPackets()
             uint32_t roomID = 0;
             if (!reader.ReadUInt32(roomID))
             {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -209,7 +190,6 @@ void RelayIMServer::ProcessClientPackets()
             if (roomExists)
             {
                 m_chatRooms[roomID]->AddClient(peerID);
-                SendSimpleResponsePacket(peerID, header.m_packetType, true);
 
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u joined room %u\n", peerID, roomID);
 
@@ -245,10 +225,6 @@ void RelayIMServer::ProcessClientPackets()
                 // TODO(Salads): Give the new peer a FULL room update. (users, messages) 
                 // PacketType_RoomUpdate_MSG_FULL
             }
-            else
-            {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
-            }
 
             break;
         }
@@ -257,7 +233,6 @@ void RelayIMServer::ProcessClientPackets()
             std::string roomName;
             if (!reader.ReadString(roomName))
             {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -272,12 +247,6 @@ void RelayIMServer::ProcessClientPackets()
                 }
 
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client created roomname: '%s'\n", roomName);
-
-                SendSimpleResponsePacket(peerID, header.m_packetType, true);
-            }
-            else
-            {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;
@@ -287,7 +256,6 @@ void RelayIMServer::ProcessClientPackets()
             uint32_t roomID = 0;
             if (!reader.ReadUInt32(roomID))
             {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -300,7 +268,6 @@ void RelayIMServer::ProcessClientPackets()
             if (roomExists)
             {
                 m_chatRooms[roomID]->RemoveClient(peerID);
-                SendSimpleResponsePacket(peerID, header.m_packetType, true);
 
                 LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client %u left room %u\n", peerID, roomID);
 
@@ -323,10 +290,6 @@ void RelayIMServer::ProcessClientPackets()
                     m_serverNetwork.SendToClient(roomClient, &responsePacket);
                 }
             }
-            else
-            {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
-            }
 
             break;
         }
@@ -335,14 +298,12 @@ void RelayIMServer::ProcessClientPackets()
             uint32_t roomID = 0;
             if (!reader.ReadUInt32(roomID))
             {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
             std::string message;
             if (!reader.ReadString(message))
             {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
                 break;
             }
 
@@ -379,10 +340,6 @@ void RelayIMServer::ProcessClientPackets()
                 {
                     m_serverNetwork.SendToClient(chatRoomClientID, &messagePacket);
                 }
-            }
-            else
-            {
-                SendSimpleResponsePacket(peerID, header.m_packetType, false);
             }
 
             break;

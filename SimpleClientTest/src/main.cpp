@@ -3,7 +3,7 @@
 
 #include "ClientNetworkInterface.h"
 #include "BinaryWriter.h"
-#include "BinaryReader.h"
+#include "PacketReader.h"
 #include "NetworkTypes.h"
 #include "Types.h"
 #include "PacketType.h"
@@ -13,7 +13,7 @@
 void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
 {
     std::unique_ptr<NetworkPacket> packet = std::move(serverPacket);
-    BinaryReader reader(packet.get());
+    PacketReader reader(packet.get());
     PacketHeader header; reader.ReadHeader(header);
 
     LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
@@ -42,7 +42,7 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             std::string message; reader.ReadString(message);
             LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "New Message (Room %u): '%s'\n", roomID, message);
         } break;
-        case PacketType_RoomUpdate_MSG_FULL:
+        case PacketType_RoomUpdate_FULL:
         {
             RoomID roomID = 0;   reader.ReadUInt32(roomID);
             uint16_t nMessages = 0; reader.ReadUInt16(nMessages);
@@ -64,13 +64,6 @@ void HandlePacket(std::unique_ptr<NetworkPacket> serverPacket)
             PeerID peerID = 0; reader.ReadUInt32(peerID);
             std::string userName; reader.ReadString(userName);
             LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "User '%s' (id %u) joined room %u\n", userName, peerID, roomID);
-        } break;
-        case PacketType_Response:
-        {
-            uint8_t packetType; reader.ReadUInt8(packetType);
-            uint8_t success = 0; reader.ReadUInt8(success);
-            
-            LogDepthConditional(LOG_NETOWRK_PACKETS_DATA, 1, "%s -> Success: %u\n", PacketTypeToString(packetType), success);
         } break;
         default:
         {

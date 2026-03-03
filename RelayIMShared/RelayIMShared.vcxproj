@@ -154,7 +154,7 @@
     <ClInclude Include="include\NetworkInterface.h" />
     <ClInclude Include="include\NetworkPacker.h" />
     <ClInclude Include="include\NetworkTypes.h" />
-    <ClInclude Include="include\BinaryReader.h" />
+    <ClInclude Include="include\PacketReader.h" />
     <ClInclude Include="include\PacketHeader.h" />
     <ClInclude Include="include\PacketType.h" />
     <ClInclude Include="include\BinaryWriter.h" />
@@ -166,7 +166,7 @@
     <ClCompile Include="src\ChatMessage.cpp" />
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\NetworkPacker.cpp" />
-    <ClCompile Include="src\BinaryReader.cpp" />
+    <ClCompile Include="src\PacketReader.cpp" />
     <ClCompile Include="src\BinaryWriter.cpp" />
     <ClCompile Include="src\NetworkPacket.cpp" />
     <ClCompile Include="src\PacketType.cpp" />
