@@ -5,7 +5,7 @@
 #include <WS2tcpip.h>
 #include <iostream>
 
-bool ClientNetworkInterface::Initialize()
+bool ClientNetworkInterface::Start()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -68,6 +68,8 @@ bool ClientNetworkInterface::Initialize()
         return false;
     }
 
+    m_receiveThread = std::thread(&ClientNetworkInterface::ReceiveLoop, this);
+
     m_isInitialized = true;
     m_running = true;
     return true;
@@ -95,6 +97,11 @@ void ClientNetworkInterface::ReceiveLoop()
         else if (recvResult == SOCKET_ERROR)
         {
             PrintWSAError("recv failed");
+
+            if (OnServerDisconnected) {
+                OnServerDisconnected();
+            }
+
             break;
         }
 
@@ -144,8 +151,14 @@ void ClientNetworkInterface::ReceiveLoop()
 void ClientNetworkInterface::Shutdown()
 {
     if (m_clientSocket != INVALID_SOCKET) {
+        shutdown(m_clientSocket, SD_BOTH);
         closesocket(m_clientSocket);
         m_clientSocket = INVALID_SOCKET;
+    }
+
+    if (m_receiveThread.joinable())
+    {
+        m_receiveThread.join();
     }
 
     WSACleanup();

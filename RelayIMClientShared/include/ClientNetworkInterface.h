@@ -12,7 +12,7 @@
 class ClientNetworkInterface : public NetworkInterface
 {
 public:
-    bool Initialize() override;
+    bool Start() override;
     void Shutdown() override;
 
     void ReceiveLoop();
@@ -27,4 +27,6 @@ private:
     std::atomic_bool m_running = false;
 
     std::vector<uint8_t> m_receiveBuffer;
+
+    std::thread m_receiveThread;
 };

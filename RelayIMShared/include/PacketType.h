@@ -74,7 +74,9 @@ enum PacketResponseReason : uint8_t
             RoomID:4u - room id to join
 
         PacketType_JoinChatRoomResponse:
-            Reason:1u - ErrorReason (Success means client gets room update packet)
+            Reason:1u    - ErrorReason (Success means client gets room update packet)
+            RoomID:4u    - Joined chat room id
+            Roomname:str - join chat room name
             
         PacketType_CreateChatRoom:
             Room Name:str - name of room to create
