@@ -33,7 +33,8 @@ const char* ResponseTypeToString(uint8_t type);
     X(Success)               \
     X(UsernameTaken)         \
     X(ChatRoomDoesntExist)   \
-    X(ChatRoomNameTaken)     
+    X(ChatRoomNameTaken)     \
+    X(Unspecified)               
 
 enum PacketResponseReason : uint8_t
 {

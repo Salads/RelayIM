@@ -12,7 +12,8 @@
 class ClientNetworkInterface : public NetworkInterface
 {
 public:
-    bool Start() override;
+    bool Initialize() override;
+    bool Connect();
     void Shutdown() override;
 
     void ReceiveLoop();
@@ -23,6 +24,9 @@ public:
     std::function<void(std::unique_ptr<NetworkPacket>)> OnPacketReceived;
 
 private:
+
+    addrinfo* m_addrInfo;
+
     SOCKET m_clientSocket = INVALID_SOCKET;
     std::atomic_bool m_running = false;
 

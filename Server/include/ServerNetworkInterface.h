@@ -19,7 +19,7 @@
 class ServerNetworkInterface : public NetworkInterface
 {
 public:
-    bool Start() override;
+    bool Initialize() override;
     void Shutdown() override;
 
     void ListenForClients();

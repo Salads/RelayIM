@@ -51,6 +51,9 @@
     <ClInclude Include="include\Logging.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ChatRoomInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NetworkPacker.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChatRoomInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

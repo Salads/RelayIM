@@ -25,6 +25,7 @@ public:
     void Update();
 
     bool GetIsInitialized() const;
+    bool GetIsRunning() const;
     void HandleNewClient(PeerID newPeerID);
 
 private:

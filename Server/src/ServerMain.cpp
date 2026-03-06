@@ -64,11 +64,15 @@ int main()
         return 1;
     }
      
+    if (!g_server.Initialize())
+    {
+        return 1;
+    }
+
     g_server.Start();
 
     while (g_running)
     {
-        LogDepth(0, "g_server.Update()\n");
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
         g_server.Update();
     };

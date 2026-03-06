@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-bool ServerNetworkInterface::Start()
+bool ServerNetworkInterface::Initialize()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
