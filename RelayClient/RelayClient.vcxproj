@@ -60,12 +60,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>..\RelayIMShared\include;..\RelayIM\RelayClient;$(IncludePath)</IncludePath>
+    <IncludePath>..\RelayIMShared\include;..\RelayIM\RelayClient;D:\Git Repositories\RelayIM\RelayIMClientShared\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <IncludePath>..\RelayIMShared\include;..\RelayIM\RelayClient;$(IncludePath)</IncludePath>
+    <IncludePath>..\RelayIMShared\include;..\RelayIM\RelayClient;D:\Git Repositories\RelayIM\RelayIMClientShared\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -101,6 +101,8 @@
     <ClCompile Include="components\QChatInput\QChatInput.cpp" />
     <ClCompile Include="components\QChatRoom\QChatRoom.cpp" />
     <ClCompile Include="components\QMessage\QMessage.cpp" />
+    <ClCompile Include="models\QChatRoomsModel\QChatRoomsModel.cpp" />
+    <ClCompile Include="models\QModelManager\QModelManager.cpp" />
     <ClCompile Include="widgets\QChatHistory\QChatHistory.cpp" />
     <ClCompile Include="widgets\QChatRooms\QChatRooms.cpp" />
     <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp" />
@@ -122,6 +124,12 @@
     <QtMoc Include="components\QMessage\QMessage.h" />
     <QtMoc Include="components\QChatInput\QChatInput.h" />
     <QtMoc Include="components\QChatRoom\QChatRoom.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="models\QModelManager\QModelManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="models\QChatRoomsModel\QChatRoomsModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

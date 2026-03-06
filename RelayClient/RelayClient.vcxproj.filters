@@ -47,6 +47,12 @@
     <ClCompile Include="windows\RelayClient\RelayClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="models\QModelManager\QModelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="models\QChatRoomsModel\QChatRoomsModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="components\QChatInput\QChatInput.h">
@@ -68,6 +74,12 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="components\QChatRoom\QChatRoom.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="models\QModelManager\QModelManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="models\QChatRoomsModel\QChatRoomsModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
