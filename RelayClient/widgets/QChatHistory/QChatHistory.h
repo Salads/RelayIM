@@ -7,7 +7,7 @@
 #include <qscrollarea.h>
 #include <qboxlayout.h>
 #include "ui_QChatHistory.h"
-#include "src/components/QMessage.h"
+#include "components/QMessage/QMessage.h"
 #include <qtimer.h>
 
 class QChatHistory : public QWidget

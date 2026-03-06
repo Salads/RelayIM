@@ -23,88 +23,75 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="RelayClient.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
-    <QtUic Include="RelayClient.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtMoc Include="RelayClient.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClCompile Include="RelayClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\QChatWidget.cpp">
+    <ClCompile Include="components\QChatRoom\QChatRoom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\QChatRooms.cpp">
+    <ClCompile Include="components\QChatInput\QChatInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\QChatHistory.cpp">
+    <ClCompile Include="components\QMessage\QMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\QChatInput.cpp">
+    <ClCompile Include="widgets\QChatHistory\QChatHistory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\QMessage.cpp">
+    <ClCompile Include="widgets\QChatRooms\QChatRooms.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\QChatRoom.cpp">
+    <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\RelayClient\RelayClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="src\components\QChatWidget.h">
+    <QtMoc Include="components\QChatInput\QChatInput.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\components\QChatRooms.h">
+    <QtMoc Include="components\QMessage\QMessage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\components\QChatHistory.h">
+    <QtMoc Include="windows\RelayClient\RelayClient.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\components\QChatInput.h">
+    <QtMoc Include="widgets\QChatWidget\QChatWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\components\QMessage.h">
+    <QtMoc Include="widgets\QChatHistory\QChatHistory.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\components\QChatRoom.h">
+    <QtMoc Include="widgets\QChatRooms\QChatRooms.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="components\QChatRoom\QChatRoom.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="src\components\QChatWidget.ui">
+    <QtUic Include="windows\RelayClient\RelayClient.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="src\components\QChatRooms.ui">
+    <QtUic Include="widgets\QChatHistory\QChatHistory.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="src\components\QChatHistory.ui">
+    <QtUic Include="widgets\QChatRooms\QChatRooms.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="src\components\QChatInput.ui">
+    <QtUic Include="widgets\QChatWidget\QChatWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="src\components\QMessage.ui">
+    <QtUic Include="components\QMessage\QMessage.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="src\components\QChatRoom.ui">
+    <QtUic Include="components\QChatInput\QChatInput.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\NetworkState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ChatRoomInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <QtUic Include="components\QChatRoom\QChatRoom.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
 </Project>

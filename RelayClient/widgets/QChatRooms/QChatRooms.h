@@ -4,7 +4,7 @@
 #include <QButtonGroup>
 #include <qscrollarea.h>
 #include <qboxlayout.h>
-#include "src/components/QChatRoom.h"
+#include "components/QChatRoom/QChatRoom.h"
 #include "ui_QChatRooms.h"
 
 #include <vector>

@@ -1,8 +1,8 @@
 #include "RelayClient.h"
 #include <qboxlayout.h>
 #include <qpushbutton.h>
-#include "src/components/QChatWidget.h"
-#include "src/components/QChatRooms.h"
+#include "widgets/QChatWidget/QChatWidget.h"
+#include "widgets/QChatRooms/QChatRooms.h"
 
 RelayClient::RelayClient(QWidget *parent)
     : QMainWindow(parent)
@@ -19,7 +19,7 @@ RelayClient::RelayClient(QWidget *parent)
     hLayoutMainContent->addWidget(chatWidget, 8);
 
     connect(chatRooms, &QChatRooms::roomSelected, this, [chatWidget](QChatRoom* button) {
-        chatWidget->setRoom(button->getRoomId(), button->GetRoomName());
+        chatWidget->setRoom(0, "Test");
     });
 
     this->setMinimumSize(550, 350);

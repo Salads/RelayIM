@@ -1,8 +1,10 @@
-#include "src/components/QChatWidget.h"
+
 #include <qboxlayout.h>
 #include <qframe.h>
-#include "src/components/QChatHistory.h"
-#include "src/components/QChatInput.h"
+
+#include "widgets/QChatWidget/QChatWidget.h"
+#include "widgets/QChatHistory/QChatHistory.h"
+#include "components/QChatInput/QChatInput.h"
 
 QChatWidget::QChatWidget(QWidget *parent)
     : QWidget(parent)

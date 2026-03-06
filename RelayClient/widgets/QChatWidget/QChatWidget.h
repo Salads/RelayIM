@@ -1,8 +1,9 @@
 #pragma once
 
 #include <QWidget>
-#include "src/components/QChatHistory.h"
-#include "src/components/QChatInput.h"
+
+#include "widgets/QChatHistory/QChatHistory.h"
+#include "components/QChatInput/QChatInput.h"
 #include "ui_QChatWidget.h"
 
 #include <qlabel.h>

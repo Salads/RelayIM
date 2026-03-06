@@ -1,7 +1,8 @@
-#include "RelayClient.h"
 #include <QtWidgets/QApplication>
 #include <QPalette>
 #include <QColor>
+
+#include "windows/RelayClient/RelayClient.h"
 
 int main(int argc, char *argv[])
 {

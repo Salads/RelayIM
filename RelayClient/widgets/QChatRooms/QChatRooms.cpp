@@ -1,6 +1,5 @@
 
 #include "QChatRooms.h"
-#include "QChatRoom.h"
 #include "qboxlayout.h"
 
 QChatRooms::QChatRooms(QWidget *parent)
