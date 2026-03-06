@@ -26,10 +26,8 @@ int main()
     if (!client.Connect())
     {
         std::cout << "Client failed to connect." << std::endl;
+        return 1;
     }
-
-    std::string testRoomName = "Hello Test Room";
-    std::string testMessage = "We're doing it!";
 
     client.SendConnect("Test Username");
     LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_Connect));
