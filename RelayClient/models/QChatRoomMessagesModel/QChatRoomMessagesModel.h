@@ -1,0 +1,43 @@
+#pragma once
+
+#include <QObject>
+#include <QAbstractListModel>
+#include <QVector>
+#include <QMutex>
+
+#include "ChatMessage.h"
+#include "ChatRoomInfo.h"
+
+class QChatRoomMessagesModel  : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+
+    enum Role
+    {
+        PeerIDRole = Qt::UserRole,
+        MessageRole
+    };
+
+    QChatRoomMessagesModel(QObject* parent = nullptr);
+    ~QChatRoomMessagesModel();
+
+    void Initialize(QMap<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info);
+
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    QHash<int, QByteArray> roleNames() const override;
+
+    void AddMessage(PeerID peerID, QString message);
+
+private:
+
+    std::shared_ptr<ChatRoomInfo> m_info;
+
+    QVector<ChatMessage> m_messages;
+    QMap<PeerID, std::string> *m_knownUsers;
+
+    mutable QMutex m_mutex;
+};
+

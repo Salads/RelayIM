@@ -60,15 +60,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>..\RelayIMShared\include;..\RelayIM\RelayClient;D:\Git Repositories\RelayIM\RelayIMClientShared\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)RelayIMShared/include;$(SolutionDir)RelayIM/RelayClient;$(SolutionDir)RelayIMClientShared/include/;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <IncludePath>..\RelayIMShared\include;..\RelayIM\RelayClient;D:\Git Repositories\RelayIM\RelayIMClientShared\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)RelayIMShared/include;$(SolutionDir)RelayIM/RelayClient;$(SolutionDir)RelayIMClientShared/include/;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -101,24 +111,19 @@
     <ClCompile Include="components\QChatInput\QChatInput.cpp" />
     <ClCompile Include="components\QChatRoom\QChatRoom.cpp" />
     <ClCompile Include="components\QMessage\QMessage.cpp" />
+    <ClCompile Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.cpp" />
     <ClCompile Include="models\QChatRoomsModel\QChatRoomsModel.cpp" />
     <ClCompile Include="models\QModelManager\QModelManager.cpp" />
-    <ClCompile Include="widgets\QChatHistory\QChatHistory.cpp" />
-    <ClCompile Include="widgets\QChatRooms\QChatRooms.cpp" />
     <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp" />
     <ClCompile Include="windows\RelayClient\RelayClient.cpp" />
     <ClCompile Include="main.cpp" />
     <QtUic Include="components\QChatInput\QChatInput.ui" />
     <QtUic Include="components\QChatRoom\QChatRoom.ui" />
     <QtUic Include="components\QMessage\QMessage.ui" />
-    <QtUic Include="widgets\QChatHistory\QChatHistory.ui" />
-    <QtUic Include="widgets\QChatRooms\QChatRooms.ui" />
     <QtUic Include="widgets\QChatWidget\QChatWidget.ui" />
     <QtUic Include="windows\RelayClient\RelayClient.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="widgets\QChatHistory\QChatHistory.h" />
-    <QtMoc Include="widgets\QChatRooms\QChatRooms.h" />
     <QtMoc Include="widgets\QChatWidget\QChatWidget.h" />
     <QtMoc Include="windows\RelayClient\RelayClient.h" />
     <QtMoc Include="components\QMessage\QMessage.h" />
@@ -130,6 +135,17 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="models\QChatRoomsModel\QChatRoomsModel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RelayIMClientShared\RelayIMClientShared.vcxproj">
+      <Project>{40351d4c-c3a8-4598-bc24-64d03926d969}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RelayIMShared\RelayIMShared.vcxproj">
+      <Project>{5e0b233d-e907-4b59-8f80-030776c1771e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -1,48 +1,39 @@
 
-#include <qboxlayout.h>
-#include <qframe.h>
+#include <QBoxLayout>
+#include <QFrame>
 
 #include "widgets/QChatWidget/QChatWidget.h"
-#include "widgets/QChatHistory/QChatHistory.h"
-#include "components/QChatInput/QChatInput.h"
 
-QChatWidget::QChatWidget(QWidget *parent)
+QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     : QWidget(parent)
 {
     ui.setupUi(this);
+
+    m_manager = manager;
 
     // Ensure this widget stretches to fill available space
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_roomNameLabel = new QLabel(this);
-    m_roomNameLabel->setText("No chat room selected");
+    m_roomNameLabel->setText("- No Chatroom -");
 
     QVBoxLayout *vLayoutMainContent = new QVBoxLayout(this);
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
 
-    m_chatHistory = new QChatHistory();
+    m_chatListView = new QListView();
+    m_chatListView->setSelectionMode(QListView::SelectionMode::NoSelection);
+
     m_chatInput = new QChatInput();
 
     vLayoutMainContent->addWidget(m_roomNameLabel, 0);
-    vLayoutMainContent->addWidget(m_chatHistory, 7);
+    vLayoutMainContent->addWidget(m_chatListView, 7);
     vLayoutMainContent->addWidget(m_chatInput, 2);
 }
 
-QChatWidget::~QChatWidget()
-{}
-
-void QChatWidget::addChatMessage(const std::string& message)
+void QChatWidget::setRoom(RoomID roomID)
 {
-    m_chatHistory->addMessage(message);
-}
+    std::shared_ptr<QChatRoomMessagesModel> model = m_manager->GetModelForRoom(roomID);
+    Q_ASSERT(model);
 
-void QChatWidget::clear()
-{
-    m_chatHistory->clear();
-}
-
-void QChatWidget::setRoom(int roomId, const std::string& roomName)
-{
-    m_roomId = roomId;
-    m_roomNameLabel->setText(roomName.c_str());
+    m_chatListView->setModel(m_manager->GetModelForRoom(roomID).get());
 }

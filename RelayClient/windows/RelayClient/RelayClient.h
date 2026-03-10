@@ -1,8 +1,12 @@
 #pragma once
 
-#include <QtWidgets/QMainWindow>
+#include <QMainWindow>
+#include <QListView>
+#include <QPushButton>
 #include "ui_RelayClient.h"
-#include <qboxlayout.h>
+
+#include "widgets/QChatWidget/QChatWidget.h"
+#include "models/QModelManager/QModelManager.h"
 
 class RelayClient : public QMainWindow
 {
@@ -14,5 +18,13 @@ public:
 
 private:
     Ui::RelayClientClass ui;
+
+    QModelManager m_manager;
+
+    QListView* m_roomsListView;
+    QChatWidget* m_chatWidget;
+
+    QPushButton* m_createChatRoomButton;
+    QPushButton* m_joinChatRoomButton;
 };
 

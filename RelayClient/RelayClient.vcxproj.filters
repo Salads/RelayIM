@@ -35,12 +35,6 @@
     <ClCompile Include="components\QMessage\QMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="widgets\QChatHistory\QChatHistory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="widgets\QChatRooms\QChatRooms.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="models\QChatRoomsModel\QChatRoomsModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,15 +61,6 @@
     <QtMoc Include="windows\RelayClient\RelayClient.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="widgets\QChatWidget\QChatWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="widgets\QChatHistory\QChatHistory.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="widgets\QChatRooms\QChatRooms.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="components\QChatRoom\QChatRoom.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -82,15 +70,15 @@
     <QtMoc Include="models\QChatRoomsModel\QChatRoomsModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="widgets\QChatWidget\QChatWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="windows\RelayClient\RelayClient.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="widgets\QChatHistory\QChatHistory.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="widgets\QChatRooms\QChatRooms.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="widgets\QChatWidget\QChatWidget.ui">

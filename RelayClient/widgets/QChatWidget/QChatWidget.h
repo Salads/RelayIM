@@ -1,31 +1,30 @@
 #pragma once
 
 #include <QWidget>
+#include <QListView>
+#include <QLabel>
 
-#include "widgets/QChatHistory/QChatHistory.h"
+#include "Types.h"
 #include "components/QChatInput/QChatInput.h"
+#include "models/QModelManager/QModelManager.h"
 #include "ui_QChatWidget.h"
-
-#include <qlabel.h>
 
 class QChatWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    QChatWidget(QWidget *parent = nullptr);
-    ~QChatWidget();
+    QChatWidget(QModelManager* manager, QWidget *parent = nullptr);
 
-    void addChatMessage(const std::string& message);
-    void setRoom(int roomId, const std::string& roomName);
-    void clear();
+    void setRoom(RoomID roomID);
 
 private:
     Ui::QChatWidgetClass ui;
 
-    int m_roomId;
+    QModelManager* m_manager;
+
     QLabel* m_roomNameLabel;
-    QChatHistory* m_chatHistory;
+    QListView* m_chatListView;
     QChatInput* m_chatInput;
 };
 
