@@ -27,6 +27,8 @@ void QModelManager::Shutdown()
 
 void QModelManager::InitializeClientCallbacks()
 {
+    if (m_callbacksInitialized) { return; }
+
     m_client.OnLocalRegistered = [this](PeerID peerID, std::string username)
     {
         QMutexLocker lock(&m_mutex);
@@ -97,6 +99,8 @@ void QModelManager::InitializeClientCallbacks()
     {
         // TODO(Salads): What do here?
     };
+
+    m_callbacksInitialized = true;
 }
 
 PeerID QModelManager::GetLocalPeerID()

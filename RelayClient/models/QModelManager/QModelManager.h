@@ -37,6 +37,8 @@ private:
 
     QMutex m_mutex;
 
+    bool m_callbacksInitialized = false;
+
     PeerID m_localPeerID = INVALID_PEER_ID; 
     RoomID m_localRoomID = INVALID_ROOM_ID; // Current room
 
