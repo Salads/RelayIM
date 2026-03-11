@@ -56,8 +56,8 @@ bool ClientNetworkInterface::Connect()
         return false;
     }
 
-    m_receiveThread = std::thread(&ClientNetworkInterface::ReceiveLoop, this);
     m_running = true;
+    m_receiveThread = std::thread(&ClientNetworkInterface::ReceiveLoop, this);
 
     return true;
 }
@@ -137,22 +137,22 @@ void ClientNetworkInterface::ReceiveLoop()
 
 void ClientNetworkInterface::Shutdown()
 {
+    m_running = false;
+
     if (m_clientSocket != INVALID_SOCKET) {
         shutdown(m_clientSocket, SD_BOTH);
         closesocket(m_clientSocket);
         m_clientSocket = INVALID_SOCKET;
     }
 
-    freeaddrinfo(m_addrInfo);
-
     if (m_receiveThread.joinable())
     {
         m_receiveThread.join();
     }
 
+    freeaddrinfo(m_addrInfo);
     WSACleanup();
     m_isInitialized = false;
-    m_running = false;
 }
 
 void ClientNetworkInterface::Send(PacketData& data)
