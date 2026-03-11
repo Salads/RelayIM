@@ -74,5 +74,7 @@ void RelayClient::TryConnect()
 }
 
 RelayClient::~RelayClient()
-{}
+{
+    m_manager.Shutdown();
+}
 
