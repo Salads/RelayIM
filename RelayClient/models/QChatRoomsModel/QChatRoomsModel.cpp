@@ -12,7 +12,6 @@ QChatRoomsModel::~QChatRoomsModel()
 
 int QChatRoomsModel::rowCount(const QModelIndex& parent) const
 {
-    QMutexLocker lock(&m_mutex);
     return m_chatRooms.size();
 }
 
@@ -20,10 +19,8 @@ QVariant QChatRoomsModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid()){ return QVariant(); }
 
-    QMutexLocker lock(&m_mutex);
-
     int row = index.row();
-    std::shared_ptr<ChatRoomInfo> info = m_chatRooms[row];
+    const ChatRoomInfo* info = &m_chatRooms[row];
 
     switch (role)
     {
@@ -37,7 +34,7 @@ QVariant QChatRoomsModel::data(const QModelIndex& index, int role) const
         }
         case Qt::DisplayRole:
         {
-            return QString::fromStdString(info->m_roomname + std::string("(id ") + std::to_string(info->m_roomID) + std::string(")"));
+            return QString::fromStdString(info->m_roomname + std::string(" (id ") + std::to_string(info->m_roomID) + std::string(")"));
         }
         default:
         {
@@ -56,14 +53,11 @@ QHash<int, QByteArray> QChatRoomsModel::roleNames() const
 
 qsizetype QChatRoomsModel::FindRoom(RoomID roomID)
 {
-    QMutexLocker lock(&m_mutex);
-
     for (qsizetype i = 0; i < m_chatRooms.size(); i++)
     {
-        if (m_chatRooms[i]->m_roomID == roomID)
+        if (m_chatRooms[i].m_roomID == roomID)
         {
             return i;
-            break;
         }
     }
 
@@ -72,31 +66,17 @@ qsizetype QChatRoomsModel::FindRoom(RoomID roomID)
 
 void QChatRoomsModel::AddChatRoom(RoomID roomID, QString roomname)
 {
-    QMutexLocker lock(&m_mutex);
-
-    if (FindRoom(roomID) != -1) { return; }
+    if(FindRoom(roomID) != -1) { return; }
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_chatRooms.emplaceBack(std::make_shared<ChatRoomInfo>(roomID, roomname.toStdString()));
+    m_chatRooms.emplaceBack(roomID, roomname.toStdString());
     endInsertRows();
 }
 
 void QChatRoomsModel::RemoveChatRoom(RoomID roomID)
 {
-    QMutexLocker lock(&m_mutex);
-
     // Find the index of the room we want to remove.
-    qsizetype idx = -1;
-    for (int i = 0; i < m_chatRooms.size(); i++)
-    {
-        std::shared_ptr<ChatRoomInfo> room = m_chatRooms[i];
-        if (room->m_roomID == roomID)
-        {
-            idx = i;
-            break;
-        }
-    }
-
+    qsizetype idx = FindRoom(roomID);
     if (idx == -1)
     {
         return;
@@ -112,7 +92,7 @@ std::shared_ptr<ChatRoomInfo> QChatRoomsModel::GetChatRoomInfo(RoomID roomID)
     qsizetype idx = FindRoom(roomID);
     if (idx != -1)
     {
-        return m_chatRooms[idx];
+        return std::make_shared<ChatRoomInfo>(m_chatRooms[idx]);
     }
 
     return nullptr;

@@ -56,6 +56,12 @@
     <ClCompile Include="windows\QRegisterDialog\QRegisterDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="windows\ChatRoomsDialog\QChatRoomsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="models\QJoinChatRoomsModel\QJoinChatRoomsModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="components\QChatInput\QChatInput.h">
@@ -88,6 +94,12 @@
     <QtMoc Include="windows\QRegisterDialog\QRegisterDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="windows\ChatRoomsDialog\QChatRoomsDialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="models\QJoinChatRoomsModel\QJoinChatRoomsModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="windows\RelayClient\RelayClient.ui">
@@ -106,6 +118,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="widgets\QConnectionStatus\QConnectionStatus.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="windows\ChatRoomsDialog\QChatRoomsDialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

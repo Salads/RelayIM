@@ -24,27 +24,30 @@ public:
     void SendCreateChatRoom(std::string roomName);
     void SendLeaveChatRoom(RoomID roomID);
     void SendMessageToRoom(RoomID roomID, std::string message);
+    
+    // Local Client registration result
+    std::function<void(PacketResponseReason, PeerID, std::string)> OnRegisterResponse;
 
-    std::function<void(PeerID, std::string)> OnLocalRegistered;
+    // Requested information of all existing chat rooms result
+    std::function<void(std::shared_ptr<std::vector<ChatRoomInfo>>)> OnListChatRoomsResponse;
 
-    // Simple header information for every chat room. 
-    std::function<void(std::shared_ptr<std::vector<ChatRoomInfo>>)> OnListChatRoomsReceived;
+    // Local Client join existing chat room result
+    std::function<void(PacketResponseReason, RoomID, std::string)> OnJoinRoomResponse;
 
-    // A new client's information. Could be through it joining a chat room we're in, or through us joining a chat room.
-    std::function<void(PeerID, RoomID, std::string)> OnNewClientDiscovered;
+    // Local Client create chat room result (also joins room)
+    std::function<void(PacketResponseReason, RoomID, std::string)> OnCreateRoomResponse;
 
-    std::function<void(RoomID, std::string)> OnLocalChatRoomJoined;
+    // Any Client has sent a message to a chat room
+    std::function<void(RoomID, PeerID, std::string)> OnRoomUpdate_NewMessage;
 
-    // A client has left a chat room.
-    std::function<void(PeerID, RoomID)> OnClientLeftChatRoom;
+    // Local Client joined a existing chat room with messages/clients
+    std::function<void(RoomID, std::unique_ptr<std::vector<ChatMessage>>)> OnRoomUpdate_FullUpdate;
 
-    // When a single message has been received
-    std::function<void(RoomID, PeerID, std::string)> OnMessageReceived;
+    // Remote Client has joined a chat room we're in.
+    std::function<void(RoomID, PeerID, std::string)> OnRoomUpdate_UserJoined;
 
-    // All information for catching us up to the current state of the chat room.
-    std::function<void(RoomID, std::unique_ptr<std::vector<ChatMessage>>)> OnRoomFullUpdate;
-
-    std::function<void(PacketResponseReason)> OnResponseFailed;
+    // Remote Client has left a chat room we're in.
+    std::function<void(RoomID, PeerID)> OnRoomUpdate_UserLeft;
 
 private:
     void HandleServerPacket(std::unique_ptr<NetworkPacket> serverPacket);

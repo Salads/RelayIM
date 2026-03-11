@@ -70,3 +70,11 @@ bool PacketReader::ReadHeader(PacketHeader& outHeader)
 
     return true;
 }
+
+bool PacketReader::ReadPacketResponseReason(PacketResponseReason& reason)
+{
+    uint8_t data = 0;
+    bool result = ReadUInt8(data);
+    reason = static_cast<PacketResponseReason>(data);
+    return result;
+}

@@ -22,13 +22,14 @@ QRegisterDialog::QRegisterDialog(QModelManager* manager, QWidget* parent)
     formLayout->addRow(usernameLabel, m_usernameLineEdit);
     formLayout->addRow(nullptr, m_usernameResultLabel);
 
-    m_OKButton = new QPushButton("OK");
+    m_OKButton = new QPushButton("Register");
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_OKButton);
 
-    connect(m_modelManager, &QModelManager::RegisterResult, this, [this](bool success)
+    connect(m_modelManager, &QModelManager::Event_RegisterResponse, this, [this](PacketResponseReason reason)
     {
-        if(success)
+        qDebug() << "Register Response - " << ResponseTypeToString(reason);
+        if(reason == PacketResponseReason::Success)
         {
             close();
         }
@@ -36,6 +37,7 @@ QRegisterDialog::QRegisterDialog(QModelManager* manager, QWidget* parent)
         {
             m_usernameResultLabel->setStyleSheet("QLabel { color: red }");
             m_usernameResultLabel->setText("Username Taken");
+            m_OKButton->setText("Register");
             m_OKButton->setDisabled(true);
         }
 
@@ -44,6 +46,7 @@ QRegisterDialog::QRegisterDialog(QModelManager* manager, QWidget* parent)
     connect(m_OKButton, &QPushButton::clicked, this, [this](bool checked)
     {
         m_modelManager->GetClient()->SendConnect(m_usernameLineEdit->text().toStdString());
+        m_OKButton->setText("Registering...");
         m_OKButton->setDisabled(true);
     });
 }

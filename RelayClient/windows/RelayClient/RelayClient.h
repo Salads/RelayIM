@@ -12,6 +12,7 @@
 #include "widgets/QChatWidget/QChatWidget.h"
 #include "widgets/QConnectionStatus/QConnectionStatus.h"
 #include "windows/QRegisterDialog/QRegisterDialog.h"
+#include "windows/ChatRoomsDialog/QChatRoomsDialog.h"
 
 class RelayClient : public QMainWindow
 {

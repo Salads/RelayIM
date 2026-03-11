@@ -153,8 +153,7 @@ void RelayIMServer::ProcessClientPackets()
                 writer.WriteString(newUsername);
                 writer.Finalize();
                 m_serverNetwork.SendToClient(peerID, &response);
-
-                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "New client %u registered as '%s'\n", peerID, newUsername);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Sent (%s) Size:%u\n", PacketTypeToString(PacketType_ConnectResponse), response.size());
             }
             else
             {
@@ -162,8 +161,6 @@ void RelayIMServer::ProcessClientPackets()
                 BinaryWriter writer(response);
                 writer.WriteHeader(PacketType_ConnectResponse);
                 writer.WriteUInt8(PacketResponseReason::UsernameTaken);
-                writer.WriteUInt32(INVALID_PEER_ID);
-                writer.WriteString("");
                 writer.Finalize();
                 m_serverNetwork.SendToClient(peerID, &response);
             }
@@ -172,8 +169,6 @@ void RelayIMServer::ProcessClientPackets()
         }
         case PacketType_ListChatRooms:
         {
-            // TODO(Salads): Server Packet
-
             // Send PacketType_ListChatRooms_Result -> ARRAY[RoomID, RoomName]
             PacketData response;
             BinaryWriter writer(response);
@@ -195,9 +190,8 @@ void RelayIMServer::ProcessClientPackets()
             writer.Finalize();
 
             m_serverNetwork.SendToClient(peerID, &response);
-
-            break;
-        } 
+            LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Sent (%s) Size:%u\n", PacketTypeToString(PacketType_ListChatRooms_Result), response.size());
+        } break;
         case PacketType_JoinChatRoom:
         {
             uint32_t roomID = 0;
@@ -323,7 +317,7 @@ void RelayIMServer::ProcessClientPackets()
                 writer.Finalize();
                 m_serverNetwork.SendToClient(peerID, &response);
 
-                LogDepthConditional(LOG_NETWORK_PACKETS, 1, "Client created roomname: '%s'\n", roomName);
+                LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Sent (%s) Size:%u\n", PacketTypeToString(PacketType_CreateChatRoomResponse), response.size());
             }
             else
             {
@@ -331,8 +325,6 @@ void RelayIMServer::ProcessClientPackets()
                 BinaryWriter writer(response);
                 writer.WriteHeader(PacketType_CreateChatRoomResponse);
                 writer.WriteUInt8(PacketResponseReason::ChatRoomNameTaken);
-                writer.WriteUInt32(INVALID_ROOM_ID);
-                writer.WriteString("");
                 writer.Finalize();
                 m_serverNetwork.SendToClient(peerID, &response);
             }

@@ -24,6 +24,7 @@ public:
     ~QChatRoomMessagesModel();
 
     void Initialize(QMap<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info);
+    void Initialize(QMap<PeerID, std::string>* knownUsers, RoomID roomID, std::string chatRoomName);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -33,11 +34,9 @@ public:
 
 private:
 
-    std::shared_ptr<ChatRoomInfo> m_info;
+    ChatRoomInfo m_info;
 
     QVector<ChatMessage> m_messages;
     QMap<PeerID, std::string> *m_knownUsers;
-
-    mutable QMutex m_mutex;
 };
 

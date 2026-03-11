@@ -9,13 +9,11 @@ QChatRoomMessagesModel::~QChatRoomMessagesModel()
 
 int QChatRoomMessagesModel::rowCount(const QModelIndex& parent) const
 {
-    QMutexLocker lock(&m_mutex);
     return m_messages.size();
 }
 
 QVariant QChatRoomMessagesModel::data(const QModelIndex& index, int role) const
 {
-    QMutexLocker lock(&m_mutex);
     if (!index.isValid()) { return QVariant(); }
 
     if (role == PeerIDRole)
@@ -43,9 +41,15 @@ QVariant QChatRoomMessagesModel::data(const QModelIndex& index, int role) const
 
 void QChatRoomMessagesModel::Initialize(QMap<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info)
 {
-    QMutexLocker lock(&m_mutex);
     m_knownUsers = knownUsers;
-    m_info = info;
+    m_info = *info.get();
+}
+
+void QChatRoomMessagesModel::Initialize(QMap<PeerID, std::string>* knownUsers, RoomID roomID, std::string chatRoomName)
+{
+    m_knownUsers = knownUsers;
+    m_info.m_roomID = roomID;
+    m_info.m_roomname = chatRoomName;
 }
 
 QHash<int, QByteArray> QChatRoomMessagesModel::roleNames() const
@@ -58,7 +62,6 @@ QHash<int, QByteArray> QChatRoomMessagesModel::roleNames() const
 
 void QChatRoomMessagesModel::AddMessage(PeerID peerID, QString message)
 {
-    QMutexLocker lock(&m_mutex);
     beginInsertRows(QModelIndex(), m_messages.size(), m_messages.size());
     m_messages.emplaceBack(peerID, message.toStdString());
     endInsertRows();

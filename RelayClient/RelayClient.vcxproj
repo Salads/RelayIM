@@ -113,9 +113,11 @@
     <ClCompile Include="components\QMessage\QMessage.cpp" />
     <ClCompile Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.cpp" />
     <ClCompile Include="models\QChatRoomsModel\QChatRoomsModel.cpp" />
+    <ClCompile Include="models\QJoinChatRoomsModel\QJoinChatRoomsModel.cpp" />
     <ClCompile Include="models\QModelManager\QModelManager.cpp" />
     <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp" />
     <ClCompile Include="widgets\QConnectionStatus\QConnectionStatus.cpp" />
+    <ClCompile Include="windows\ChatRoomsDialog\QChatRoomsDialog.cpp" />
     <ClCompile Include="windows\QRegisterDialog\QRegisterDialog.cpp" />
     <ClCompile Include="windows\RelayClient\RelayClient.cpp" />
     <ClCompile Include="main.cpp" />
@@ -124,6 +126,7 @@
     <QtUic Include="components\QMessage\QMessage.ui" />
     <QtUic Include="widgets\QChatWidget\QChatWidget.ui" />
     <QtUic Include="widgets\QConnectionStatus\QConnectionStatus.ui" />
+    <QtUic Include="windows\ChatRoomsDialog\QChatRoomsDialog.ui" />
     <QtUic Include="windows\RelayClient\RelayClient.ui" />
     <QtRcc Include="windows\RelayClient\RelayClient.qrc" />
   </ItemGroup>
@@ -156,6 +159,12 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="windows\QRegisterDialog\QRegisterDialog.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="windows\ChatRoomsDialog\QChatRoomsDialog.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="models\QJoinChatRoomsModel\QJoinChatRoomsModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

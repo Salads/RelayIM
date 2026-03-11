@@ -17,6 +17,8 @@ public:
     bool ReadUInt32(uint32_t& outValue);
     bool ReadString(std::string &outString);
 
+    bool ReadPacketResponseReason(PacketResponseReason& reason);
+
     bool ReadHeader(PacketHeader& outHeader);
 
 private:

@@ -52,12 +52,14 @@ RelayClient::RelayClient(QWidget *parent)
 
     connect(m_createOrJoinChatRoomButton, &QPushButton::clicked, this, [this](bool checked)
     {
-        // TODO(Salads): Open Chat Room dialog here.
+        QChatRoomsDialog diag(&m_manager);
+        diag.exec();
     });
 }
 
 void RelayClient::TryConnect()
 {
+    m_connectionStatus->SetStatus(QConnectionStatus::Status::Connecting);
     if(m_manager.Connect())
     {
         m_connectionStatus->SetStatus(QConnectionStatus::Status::ConnectedUnregistered);
@@ -66,6 +68,7 @@ void RelayClient::TryConnect()
     }
     else
     {
+        m_connectionStatus->SetStatus(QConnectionStatus::Status::NotConnected);
         QErrorMessage diag;
         diag.showMessage("Could not connect to server. Exiting...");
         diag.exec();
