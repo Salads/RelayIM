@@ -24,7 +24,10 @@ public:
     std::shared_ptr<QChatRoomsModel> GetModelForRooms();
     std::shared_ptr<QChatRoomMessagesModel> GetModelForRoom(RoomID roomID);
 
+    RelayIMClient* GetClient();
+
 signals:
+    void RegisterResult(bool success);
     void ChatRoomsListReceived(std::shared_ptr<std::vector<ChatRoomInfo>>);
 
 public slots:

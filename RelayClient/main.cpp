@@ -25,5 +25,6 @@ int main(int argc, char *argv[])
 
     RelayClient window;
     window.show();
+    window.TryConnect();
     return app.exec();
 }

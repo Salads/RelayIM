@@ -34,6 +34,8 @@ void QModelManager::InitializeClientCallbacks()
         QMutexLocker lock(&m_mutex);
         m_localPeerID = peerID;
         m_knownUsers[peerID] = username;
+
+        emit RegisterResult(true);
     };
 
     m_client.OnListChatRoomsReceived = [this](std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
@@ -98,6 +100,10 @@ void QModelManager::InitializeClientCallbacks()
     m_client.OnResponseFailed = [this](PacketResponseReason reason)
     {
         // TODO(Salads): What do here?
+        if(reason == PacketResponseReason::UsernameTaken)
+        {
+            emit RegisterResult(false);
+        }
     };
 
     m_callbacksInitialized = true;
@@ -128,4 +134,9 @@ std::shared_ptr<QChatRoomsModel> QModelManager::GetModelForRooms()
 {
     QMutexLocker lock(&m_mutex);
     return m_chatRoomsModel;
+}
+
+RelayIMClient* QModelManager::GetClient()
+{
+    return &m_client;
 }

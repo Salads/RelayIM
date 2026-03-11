@@ -3,11 +3,15 @@
 #include <QMainWindow>
 #include <QListView>
 #include <QPushButton>
+#include <QBoxLayout>
+#include <QErrorMessage>
 #include "ui_RelayClient.h"
 
-#include "widgets/QChatWidget/QChatWidget.h"
 #include "models/QModelManager/QModelManager.h"
+#include "models/QChatRoomsModel/QChatRoomsModel.h"
+#include "widgets/QChatWidget/QChatWidget.h"
 #include "widgets/QConnectionStatus/QConnectionStatus.h"
+#include "windows/QRegisterDialog/QRegisterDialog.h"
 
 class RelayClient : public QMainWindow
 {
@@ -16,6 +20,8 @@ class RelayClient : public QMainWindow
 public:
     RelayClient(QWidget *parent = nullptr);
     ~RelayClient();
+
+    void TryConnect();
 
 private:
     Ui::RelayClientClass ui;
@@ -28,5 +34,7 @@ private:
     QPushButton* m_createOrJoinChatRoomButton;
 
     QConnectionStatus* m_connectionStatus;
+
+    QRegisterDialog* m_registerDialog;
 };
 

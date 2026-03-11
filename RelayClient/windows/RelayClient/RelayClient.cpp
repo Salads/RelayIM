@@ -1,12 +1,11 @@
 #include "RelayClient.h"
-#include "models/QChatRoomsModel/QChatRoomsModel.h"
-
-#include <QBoxLayout>
 
 RelayClient::RelayClient(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this); // Generated UI from visual editor
+
+    m_registerDialog = new QRegisterDialog(&m_manager);
 
     QHBoxLayout* hLayoutMainContent = new QHBoxLayout(this->centralWidget()); // Main Content Layout (ChatRooms, Chat Area)
     hLayoutMainContent->setContentsMargins(10, 10, 10, 10);
@@ -48,6 +47,30 @@ RelayClient::RelayClient(QWidget *parent)
     m_connectionStatus = new QConnectionStatus();
     ui.m_statusBar->addWidget(m_connectionStatus);
     ui.m_statusBar->setStyleSheet("QStatusBar { background: gray }"); // TEMP(Salads): status bar QSS
+
+    m_manager.Initialize();
+
+    connect(m_createOrJoinChatRoomButton, &QPushButton::clicked, this, [this](bool checked)
+    {
+        // TODO(Salads): Open Chat Room dialog here.
+    });
+}
+
+void RelayClient::TryConnect()
+{
+    if(m_manager.Connect())
+    {
+        m_connectionStatus->SetStatus(QConnectionStatus::Status::ConnectedUnregistered);
+        m_registerDialog->exec();
+        m_connectionStatus->SetStatus(QConnectionStatus::Status::ConnectedRegistered);
+    }
+    else
+    {
+        QErrorMessage diag;
+        diag.showMessage("Could not connect to server. Exiting...");
+        diag.exec();
+        exit(-1);
+    }
 }
 
 RelayClient::~RelayClient()

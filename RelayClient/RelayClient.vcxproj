@@ -116,6 +116,7 @@
     <ClCompile Include="models\QModelManager\QModelManager.cpp" />
     <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp" />
     <ClCompile Include="widgets\QConnectionStatus\QConnectionStatus.cpp" />
+    <ClCompile Include="windows\QRegisterDialog\QRegisterDialog.cpp" />
     <ClCompile Include="windows\RelayClient\RelayClient.cpp" />
     <ClCompile Include="main.cpp" />
     <QtUic Include="components\QChatInput\QChatInput.ui" />
@@ -152,6 +153,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="widgets\QConnectionStatus\QConnectionStatus.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="windows\QRegisterDialog\QRegisterDialog.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -53,6 +53,9 @@
     <ClCompile Include="widgets\QConnectionStatus\QConnectionStatus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="windows\QRegisterDialog\QRegisterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="components\QChatInput\QChatInput.h">
@@ -80,6 +83,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="widgets\QConnectionStatus\QConnectionStatus.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="windows\QRegisterDialog\QRegisterDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
