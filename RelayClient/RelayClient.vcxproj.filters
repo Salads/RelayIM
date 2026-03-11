@@ -50,6 +50,9 @@
     <ClCompile Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="widgets\QConnectionStatus\QConnectionStatus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="components\QChatInput\QChatInput.h">
@@ -76,6 +79,9 @@
     <QtMoc Include="widgets\QChatWidget\QChatWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="widgets\QConnectionStatus\QConnectionStatus.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="windows\RelayClient\RelayClient.ui">
@@ -93,5 +99,13 @@
     <QtUic Include="components\QChatRoom\QChatRoom.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="widgets\QConnectionStatus\QConnectionStatus.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="windows\RelayClient\RelayClient.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
   </ItemGroup>
 </Project>

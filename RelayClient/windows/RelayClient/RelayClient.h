@@ -7,6 +7,7 @@
 
 #include "widgets/QChatWidget/QChatWidget.h"
 #include "models/QModelManager/QModelManager.h"
+#include "widgets/QConnectionStatus/QConnectionStatus.h"
 
 class RelayClient : public QMainWindow
 {
@@ -24,7 +25,8 @@ private:
     QListView* m_roomsListView;
     QChatWidget* m_chatWidget;
 
-    QPushButton* m_createChatRoomButton;
-    QPushButton* m_joinChatRoomButton;
+    QPushButton* m_createOrJoinChatRoomButton;
+
+    QConnectionStatus* m_connectionStatus;
 };
 

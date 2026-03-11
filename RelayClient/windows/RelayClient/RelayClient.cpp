@@ -26,14 +26,10 @@ RelayClient::RelayClient(QWidget *parent)
     m_roomsListView->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     vLayoutChatRooms->addWidget(m_roomsListView, 9);
 
-    m_createChatRoomButton = new QPushButton("Create Room");
-    m_createChatRoomButton->setMaximumHeight(30);
+    m_createOrJoinChatRoomButton = new QPushButton("Create/Join");
+    m_createOrJoinChatRoomButton->setMaximumHeight(30);
 
-    m_joinChatRoomButton = new QPushButton("Join Room");
-    m_joinChatRoomButton->setMaximumHeight(30);
-
-    buttonLayout->addWidget(m_createChatRoomButton);
-    buttonLayout->addWidget(m_joinChatRoomButton);
+    buttonLayout->addWidget(m_createOrJoinChatRoomButton);
     vLayoutChatRooms->addLayout(buttonLayout, 1);
 
     m_chatWidget = new QChatWidget(&m_manager);
@@ -48,6 +44,10 @@ RelayClient::RelayClient(QWidget *parent)
     });
 
     this->setMinimumSize(550, 350);
+
+    m_connectionStatus = new QConnectionStatus();
+    ui.m_statusBar->addWidget(m_connectionStatus);
+    ui.m_statusBar->setStyleSheet("QStatusBar { background: gray }"); // TEMP(Salads): status bar QSS
 }
 
 RelayClient::~RelayClient()
