@@ -65,10 +65,6 @@ void QModelManager::Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::s
     {
         m_chatRoomMessagesModels[roomID]->AddMessage(peerID, QString::fromStdString(message));
     }
-    else
-    {
-        LogDepth(0, "Received MSG update on Chatroom we are not in! Room: %u, MSG: %s", roomID, message);
-    }
 }
 
 void QModelManager::Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)

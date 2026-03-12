@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <thread>
-#include <chrono>=
+#include <chrono>
 #include <conio.h>
 
 #include "RelayIMServer.h"
+#include "Logging.h"
 
 RelayIMServer g_server;
 std::atomic_bool g_running = true;
@@ -26,7 +27,6 @@ BOOL WINAPI CtrlHandler(DWORD dwCtrlType)
 {
     if (dwCtrlType == CTRL_CLOSE_EVENT) 
     {
-        LogDepth(0, "Close button pressed! Quitting...\n");
         g_running = false;
         return TRUE;
     }
@@ -41,7 +41,6 @@ void InputThreadFunc()
         int keyPress = _getch();
         if (keyPress == 27) // ESCAPE in ASCII = 27
         {
-            LogDepth(0, "ESC pressed! Quitting...\n");
             g_running = false;
             break;
         }
@@ -50,6 +49,7 @@ void InputThreadFunc()
 
 int main()
 {    
+    Log::Initialize("server.log");
     if (!SetConsoleCtrlHandler(CtrlHandler, true))
     {
         std::cerr << "Failed to set Console Window Control Handler" << std::endl;
@@ -77,13 +77,13 @@ int main()
         g_server.Update();
     };
 
-    LogDepth(0, "Joining input thread\n");
     if (inputESCThread.joinable())
     {
         inputESCThread.join();
     }
 
     Shutdown();
+    Log::Destroy();
     
     return 0;
 }

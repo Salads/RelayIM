@@ -36,7 +36,7 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
     PacketReader reader(packet.get());
     PacketHeader header; reader.ReadHeader(header);
 
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Packet Received (%s): [%X, %u]\n", PacketTypeToString(header.m_packetType), header.m_passCode, header.m_version);
+    Log::Get()->ConditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "RECV(%s)", PacketTypeToString(header.m_packetType));
 
     switch (header.m_packetType)
     {
@@ -70,18 +70,11 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
             std::string roomName; reader.ReadString(roomName);
 
             rooms->emplace_back(roomID, roomName);
-
-            LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "Room %u: %s\n", roomID, roomName);
         }
 
         if (OnListChatRoomsResponse)
         {
             OnListChatRoomsResponse(std::move(rooms));
-        }
-
-        if (!nRooms)
-        {
-            LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "No chat rooms exist yet!\n");
         }
 
     } break;
@@ -95,8 +88,6 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
         {
             reader.ReadUInt32(newRoomID);
             reader.ReadString(newRoomname);
-
-            LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "Joined room '%s'\n", newRoomname);
         }
 
         if(OnJoinRoomResponse)
@@ -115,12 +106,6 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
         {
             reader.ReadUInt32(newRoomID);
             reader.ReadString(newRoomname);
-
-            LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "Created room '%s'\n", newRoomname);
-        }
-        else if(result == PacketResponseReason::ChatRoomNameTaken)
-        {
-            LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "Could not create chat room. Name was taken\n");
         }
 
         if(OnCreateRoomResponse)
@@ -139,8 +124,6 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
         {
             OnRoomUpdate_NewMessage(peerID, roomID, message);
         }
-
-        LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "New Message (Room %u): '%s'\n", roomID, message);
         
     } break;
     case PacketType_RoomUpdate_FULL:
@@ -168,8 +151,6 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
             std::string message; reader.ReadString(message);
 
             messages->emplace_back(userID, message);
-
-            LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "Message %d: '%s'\n", i, message);
         }
 
         if (OnRoomUpdate_FullUpdate)
@@ -189,7 +170,6 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
             OnRoomUpdate_UserJoined(roomID, peerID, username);
         }
 
-        LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "User '%s' (id %u) joined room %u\n", username, peerID, roomID);
     } break;
     case PacketType_RoomUpdate_UserLeft:
     {
@@ -201,11 +181,10 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
             OnRoomUpdate_UserLeft(peerID, roomID);
         }
 
-        LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 1, "User id %u left room %u\n", peerID, roomID);
     } break;
     default:
     {
-        LogDepthConditional(LOG_NETWORK_PACKETS_DATA, 0, "Unknown Packet Type: %u", header.m_packetType);
+
     } break;
     }
 }

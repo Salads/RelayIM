@@ -106,7 +106,6 @@ void ServerNetworkInterface::ListenForClients()
             return;
         }
 
-        LogDepth(0, "New client socket connected: %u\n", m_nextClientID.load());
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
         newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::ReceiveLoopForClient, this, newPeerClient.get(), newClientSocket);
         newPeerClient->m_sendThread = std::thread(&ServerNetworkInterface::SendLoopForClient, this, newPeerClient.get(), newClientSocket);
@@ -139,8 +138,6 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
         int recvResult = recv(peerSocket, (char*)receiveBuffer, NETWORK_BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
         if (recvResult == 0)
         {
-            LogDepth(0, "Client %u disconnected\n", client->m_peerID);
-
             MarkPeerClientForDeletion(client->m_peerID);
 
             if (OnClientDisconnected) 
@@ -164,7 +161,6 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
             break;
         }
 
-        LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Received data from client %u: %u bytes\n", client->m_peerID, recvResult);
         client->m_receiveBuffer.insert(client->m_receiveBuffer.end(), receiveBuffer, receiveBuffer + recvResult);
 
         /////////////////////////////////////////////
@@ -212,12 +208,9 @@ void ServerNetworkInterface::DeleteDisconnectedClients()
         int nDeleted = 0;
         while (!m_deletedPeerClients.empty())
         {
-            LogDepth(0, "Removing deleted peer client %u\n", nDeleted++);
-            std::move(m_deletedPeerClients.front());
             m_deletedPeerClients.pop();
         }
 
-        LogDepthConditional(nDeleted > 0, 0, "Finished removing %u clients\n", nDeleted);
     }
 }
 
@@ -258,7 +251,6 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
         }
         else
         {
-            LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Sent data to client %u: %u bytes\n", client->m_peerID, sendResult);
             client->m_sendBuffer.erase(client->m_sendBuffer.begin(), client->m_sendBuffer.begin() + sendResult);
         }
     }
@@ -274,11 +266,9 @@ void ServerNetworkInterface::SendToClient(PeerID clientPeerID, PacketData* packe
 
     if (client)
     {
+        uint8_t* type = packet->data() + 7; // 8th Byte is packet type
+        Log::Get()->ConditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "SEND(%s) to Peer(%u)", PacketTypeToString(*type), clientPeerID);
         client->Send(packet);
-    }
-    else
-    {
-        LogDepth(0, "SendToCLient could not find client %u\n", clientPeerID);
     }
 }
 

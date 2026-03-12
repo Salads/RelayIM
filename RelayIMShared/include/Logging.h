@@ -1,17 +1,11 @@
 #pragma once
 
+#define LOG_NETWORK_PACKET_TYPES true
+
 #include <mutex>
+#include <stdio.h>
 
-#include "NetworkTypes.h"
-
-#define LOGGING_SPACES_PER_DEPTH 2
-
-#define LOG_NETWORK_PACKETS false
-#define LOG_NETWORK_PACKETS_DATA false
-#define LOG_NETWORK_BYTESTREAM false
-
-extern std::mutex g_loggingMutex;
-
+// NOTE(Salads): LogArguments simply convert std::strings into c strings for proper printing
 template <typename T>
 T LogArgument(T value) noexcept
 {
@@ -24,25 +18,43 @@ T const* LogArgument(std::basic_string<T> const& value) noexcept
     return value.c_str();
 };
 
-template <typename ... Args>
-void LogDepth(uint32_t depth, const char* fmt, Args const & ... args) noexcept
+class Log
 {
-    std::lock_guard lock(g_loggingMutex);
+public:
 
-    std::string str = fmt;
+    static Log* Get();
+    static void Initialize(std::string filename);
+    static void Destroy();
 
-    if (depth > 0)
+    Log(std::string logFilename);
+    ~Log();
+
+    Log(Log& log) = delete;
+
+    // Simply prints a formatted string. Formatting is the same as printf.
+    template <typename ... Args>
+    void WriteLine(const char* fmt, Args const& ... args) noexcept
     {
-        str = std::string(depth * LOGGING_SPACES_PER_DEPTH, ' ') + str;
-    }
+        std::lock_guard lock(m_mutex);
+        if(!m_initialized) { return; }
 
-    printf(str.c_str(), LogArgument(args) ...);
+        std::string str = fmt;
+        str += "\n";
+
+        fprintf(m_file, str.c_str(), LogArgument(args) ...);
+        fflush(m_file);
+    };
+
+    template <typename ... Args>
+    void ConditionalWriteLine(bool condition, const char* fmt, Args const& ... args) noexcept
+    {
+        if(!condition) { return; }
+        WriteLine(fmt, args ...);
+    };
+
+private:
+
+    bool m_initialized = false;
+    FILE* m_file = nullptr;
+    std::mutex m_mutex;
 };
-
-template <typename ... Args>
-void LogDepthConditional(bool cond, uint32_t depth, const char* fmt, Args const & ... args) noexcept
-{
-    if (!cond) { return; }
-
-    LogDepth(depth, fmt, args ...);
-}

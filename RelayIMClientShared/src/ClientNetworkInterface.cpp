@@ -92,7 +92,6 @@ void ClientNetworkInterface::ReceiveLoop()
             break;
         }
 
-        LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Received data from server: %u bytes\n", recvResult);
         m_receiveBuffer.insert(m_receiveBuffer.end(), receiveBuffer, receiveBuffer + recvResult);
 
         /////////////////////////////////////////////
@@ -163,10 +162,11 @@ void ClientNetworkInterface::Send(PacketData& data)
         return;
     }
 
+    uint8_t* packetType = data.data() + 7;
+    Log::Get()->ConditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "SEND(%s)", PacketTypeToString(*packetType));
+
     int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
     if (iResult == SOCKET_ERROR) {
         printf("send failed: %d\n", WSAGetLastError());
     }
-
-    LogDepthConditional(LOG_NETWORK_BYTESTREAM, 0, "Sent data to server: %u bytes\n", iResult);
 }

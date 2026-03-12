@@ -13,6 +13,7 @@
 
 int main()
 {
+    Log::Initialize("simple-client-test.log");
     RelayIMClient client;
 
     if (!client.Initialize())
@@ -30,24 +31,19 @@ int main()
     }
 
     client.SendConnect("Test Username");
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_Connect));
 
     client.SendRequestAllChatRooms();
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_ListChatRooms));
 
     client.SendCreateChatRoom("Hello Test Room");
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_CreateChatRoom));
 
     client.SendJoinChatRoom(0);
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_JoinChatRoom));
 
     client.SendMessageToRoom(0, "Test Message! Very Cool!");
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_SendMessage));
 
     client.SendLeaveChatRoom(0);
-    LogDepthConditional(LOG_NETWORK_PACKETS, 0, "Sent %s\n", PacketTypeToString(PacketType_LeaveChatRoom));
 
     while (true) {}
 
     client.Shutdown();
+    Log::Destroy();
 }

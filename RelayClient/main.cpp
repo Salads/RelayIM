@@ -3,9 +3,11 @@
 #include <QColor>
 
 #include "windows/RelayClient/RelayClient.h"
+#include "Logging.h"
 
 int main(int argc, char *argv[])
 {
+    Log::Initialize("client.log");
     QApplication app(argc, argv);
 
     // Set light mode stylesheet globally
@@ -26,5 +28,9 @@ int main(int argc, char *argv[])
     RelayClient window;
     window.show();
     window.TryConnect();
-    return app.exec();
+
+    int execResult = app.exec();
+    Log::Destroy();
+
+    return execResult;
 }
