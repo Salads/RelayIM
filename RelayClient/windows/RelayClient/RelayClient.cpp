@@ -27,15 +27,17 @@ RelayClient::RelayClient(QWidget *parent)
 
     m_createOrJoinChatRoomButton = new QPushButton("Create/Join");
     m_createOrJoinChatRoomButton->setMaximumHeight(30);
+    m_leaveChatRoomButton = new QPushButton("Leave");
 
     buttonLayout->addWidget(m_createOrJoinChatRoomButton);
+    buttonLayout->addWidget(m_leaveChatRoomButton);
     vLayoutChatRooms->addLayout(buttonLayout, 1);
 
     m_chatWidget = new QChatWidget(&m_manager);
 
     hLayoutMainContent->addWidget(m_chatWidget, 8);
 
-    connect(m_roomsListView, &QListView::clicked, this, [this](const QModelIndex& clickedItem) 
+    connect(m_roomsListView, &QListView::clicked, this, [this](const QModelIndex& clickedItem)
     {
         // NOTE(Salads): Via Docs: clicked emitted only when index is valid.
         QVariant roomID = clickedItem.data(QChatRoomsModel::Role::RoomIDRole);
@@ -54,6 +56,16 @@ RelayClient::RelayClient(QWidget *parent)
     {
         QChatRoomsDialog diag(&m_manager);
         diag.exec();
+    });
+
+    connect(m_leaveChatRoomButton, &QPushButton::clicked, this, [this](bool checked)
+    {
+        QModelIndex currentIndex = m_roomsListView->currentIndex();
+        if(currentIndex.isValid())
+        {
+            RoomID roomID = m_manager.GetModelForRooms()->data(currentIndex, QChatRoomsModel::Role::RoomIDRole).toUInt();
+            m_manager.GetClient()->SendLeaveChatRoom(roomID);
+        }
     });
 }
 

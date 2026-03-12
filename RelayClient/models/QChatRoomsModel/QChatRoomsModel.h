@@ -8,6 +8,7 @@
 
 #include "ChatRoomInfo.h"
 
+// Data model to hold a list of chat rooms, but not the data inside (messages)
 class QChatRoomsModel  : public QAbstractListModel
 {
     Q_OBJECT

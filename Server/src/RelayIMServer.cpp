@@ -343,8 +343,6 @@ void RelayIMServer::ProcessClientPackets()
 
             if (roomExists)
             {
-                m_chatRooms[roomID]->RemoveClient(peerID);
-
                 // Notify chat room members of leaving user
                 std::vector<uint8_t> responsePacket;
                 BinaryWriter writer(responsePacket);
@@ -362,6 +360,8 @@ void RelayIMServer::ProcessClientPackets()
                         m_serverNetwork.SendToClient(roomClient, &responsePacket);
                     }
                 }
+
+                m_chatRooms[roomID]->RemoveClient(peerID);
             }
 
             break;

@@ -33,6 +33,7 @@ private:
     QChatWidget* m_chatWidget;
 
     QPushButton* m_createOrJoinChatRoomButton;
+    QPushButton* m_leaveChatRoomButton;
 
     QConnectionStatus* m_connectionStatus;
 

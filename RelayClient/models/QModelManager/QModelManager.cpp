@@ -85,6 +85,10 @@ void QModelManager::Slot_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, 
 void QModelManager::Slot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID)
 {
     m_userRooms[peerID].remove(roomID);
+    if(peerID == m_localPeerID)
+    {
+        m_chatRoomsModel->RemoveChatRoom(roomID);
+    }
 }
 
 void QModelManager::InitializeClientCallbacks()
