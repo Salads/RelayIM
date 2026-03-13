@@ -329,7 +329,7 @@ void RelayIMServer::ProcessClientPackets()
         }
         case PacketType_LeaveChatRoom:
         {
-            uint32_t roomID = 0;
+            uint32_t roomID = INVALID_ROOM_ID;
             if (!reader.ReadUInt32(roomID))
             {
                 break;

@@ -178,7 +178,7 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
 
         if (OnRoomUpdate_UserLeft)
         {
-            OnRoomUpdate_UserLeft(peerID, roomID);
+            OnRoomUpdate_UserLeft(roomID, peerID);
         }
 
     } break;
