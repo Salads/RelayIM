@@ -49,6 +49,25 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     createLayout->addWidget(m_createRoomLineEdit);
     createMainLayout->addWidget(m_createButton);
 
+    connect(m_manager, &QModelManager::Event_JoinRoomResponse, this, [this](PacketResponseReason reason, RoomID roomID, std::string newRoomName)
+    {
+        if(reason == PacketResponseReason::Success)
+        {
+            close();
+        }
+        else
+        {
+            std::string popupText = "Could not join room '" + newRoomName + "'. Reason: " + ResponseTypeToString(reason);
+
+            QMessageBox diag;
+            diag.setWindowTitle("Join Error");
+            diag.setText(QString::fromStdString(popupText));
+            diag.exec();
+
+            m_joinRoomButton->setEnabled(true);
+        }
+    }, Qt::QueuedConnection);
+
     connect(m_joinableRoomsListView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex &current, const QModelIndex &prev)
     {
         m_joinRoomButton->setDisabled(!current.isValid());
@@ -61,6 +80,8 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
         {
             RoomID roomID = m_manager->GetModelForRooms()->data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt();
             m_manager->GetClient()->SendJoinChatRoom(roomID);
+            m_joinRoomButton->setText("Joining...");
+            m_joinRoomButton->setDisabled(true);
         }
     });
 
