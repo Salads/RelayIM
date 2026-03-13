@@ -2,33 +2,41 @@
 #include <qtextedit.h>
 #include <qboxlayout.h>
 
-QChatInput::QChatInput(QWidget *parent)
-    : QWidget(parent)
+QChatInput::QChatInput(QModelManager *manager, QWidget* parent)
+    : QTextEdit(parent)
 {
-    ui.setupUi(this);
-    setFixedHeight(30);
-
-    setAttribute(Qt::WA_StyledBackground, true);
-    setStyleSheet("QWidget { background-color: #f0f0f0; border: 1px solid #cccccc; border-radius: 5px; }");
-
-    QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(5, 2, 5, 2);
-
-    QTextEdit* inputField = new QTextEdit(this);
-    inputField->setPlaceholderText("Enter message...");
-    inputField->setFixedHeight(30);
-    inputField->setStyleSheet(
-        "QTextEdit { "
-        "border: none; "
-        "color: #000000; "
-        "} "
-        "QTextEdit::placeholder { "
-        "color: #999999; "
-        "}"
-    );
-    mainLayout->addWidget(inputField);
+    m_manager = manager;
 }
 
-QChatInput::~QChatInput()
-{}
+void QChatInput::keyPressEvent(QKeyEvent* event)
+{
+    if(m_roomID == INVALID_ROOM_ID) { return; }
 
+    if(event->key() == Qt::Key_Return)
+    {
+        if(event->modifiers() & Qt::KeyboardModifier::ShiftModifier)
+        {
+            setPlainText(toPlainText() + "\n");
+            moveCursor(QTextCursor::MoveOperation::End);
+        }
+        else
+        {
+            QString currentText = toPlainText();
+            QString currentTextTrimmed = currentText.trimmed();
+            if(!currentTextTrimmed.isEmpty())
+            {
+                m_manager->GetClient()->SendMessageToRoom(m_roomID, currentText.toStdString());
+                clear();
+            }
+        }
+    }
+    else
+    {
+        QTextEdit::keyPressEvent(event);
+    }
+}
+
+void QChatInput::setRoom(RoomID roomID)
+{
+    m_roomID = roomID;
+}

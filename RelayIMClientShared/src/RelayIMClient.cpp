@@ -122,7 +122,7 @@ void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPack
 
         if (OnRoomUpdate_NewMessage)
         {
-            OnRoomUpdate_NewMessage(peerID, roomID, message);
+            OnRoomUpdate_NewMessage(roomID, peerID, message);
         }
         
     } break;
@@ -245,6 +245,8 @@ void RelayIMClient::SendLeaveChatRoom(RoomID roomID)
 
 void RelayIMClient::SendMessageToRoom(RoomID roomID, std::string message)
 {
+    Log::Get()->ConditionalWriteLine(LOG_UI, "Sending '%s' to Room %u", message, roomID);
+
     PacketData packetData;
     BinaryWriter writer(packetData);
     writer.WriteHeader(PacketType_SendMessage);

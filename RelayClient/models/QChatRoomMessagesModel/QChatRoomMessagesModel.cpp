@@ -66,3 +66,13 @@ void QChatRoomMessagesModel::AddMessage(PeerID peerID, QString message)
     m_messages.emplaceBack(peerID, message.toStdString());
     endInsertRows();
 }
+
+RoomID QChatRoomMessagesModel::GetRoomID()
+{
+    return m_info.m_roomID;
+}
+
+std::string QChatRoomMessagesModel::GetRoomname()
+{
+    return m_info.m_roomname;
+}

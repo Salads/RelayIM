@@ -23,7 +23,7 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     m_chatListView = new QListView();
     m_chatListView->setSelectionMode(QListView::SelectionMode::NoSelection);
 
-    m_chatInput = new QChatInput();
+    m_chatInput = new QChatInput(m_manager);
 
     vLayoutMainContent->addWidget(m_roomNameLabel, 0);
     vLayoutMainContent->addWidget(m_chatListView, 7);
@@ -32,8 +32,19 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
 
 void QChatWidget::setRoom(RoomID roomID)
 {
-    std::shared_ptr<QChatRoomMessagesModel> model = m_manager->GetModelForRoom(roomID);
-    Q_ASSERT(model);
+    if(roomID == INVALID_ROOM_ID)
+    {
+        m_chatListView->setModel(nullptr);
+        m_roomNameLabel->setText("- No Chatroom -");
+    }
+    else
+    {
+        std::shared_ptr<QChatRoomMessagesModel> model = m_manager->GetModelForRoom(roomID);
+        Q_ASSERT(model);
 
-    m_chatListView->setModel(m_manager->GetModelForRoom(roomID).get());
+        m_chatListView->setModel(m_manager->GetModelForRoom(roomID).get());
+        m_roomNameLabel->setText(QString::fromStdString("# " + model->GetRoomname()));
+    }
+
+    m_chatInput->setRoom(roomID);
 }

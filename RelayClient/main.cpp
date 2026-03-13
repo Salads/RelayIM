@@ -4,10 +4,12 @@
 
 #include "windows/RelayClient/RelayClient.h"
 #include "Logging.h"
+#include "Util.h"
 
 int main(int argc, char *argv[])
 {
     Log::Initialize("client.log");
+    //Log::Initialize("client-" + GetLocalTimestamp() + ".log");
     QApplication app(argc, argv);
 
     // Set light mode stylesheet globally

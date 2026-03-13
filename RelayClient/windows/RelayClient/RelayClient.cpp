@@ -67,6 +67,18 @@ RelayClient::RelayClient(QWidget *parent)
             m_manager.GetClient()->SendLeaveChatRoom(roomID);
         }
     });
+
+    connect(m_roomsListView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex& current, const QModelIndex& prev)
+    {
+        bool isSomethingSelected = current.isValid();
+        m_leaveChatRoomButton->setEnabled(isSomethingSelected);
+
+        if(isSomethingSelected)
+        {
+            RoomID roomID = m_manager.GetModelForRooms()->data(current, QChatRoomsModel::Role::RoomIDRole).toUInt();
+            m_chatWidget->setRoom(roomID);
+        }
+    });
 }
 
 void RelayClient::TryConnect()

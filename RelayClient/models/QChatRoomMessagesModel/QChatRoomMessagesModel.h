@@ -31,6 +31,8 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void AddMessage(PeerID peerID, QString message);
+    RoomID GetRoomID();
+    std::string GetRoomname();
 
 private:
 

@@ -16,3 +16,12 @@ void PrintWSAError(const char* message)
     );
     std::cerr << message << ": " << buffer << std::endl;
 }
+
+std::string GetLocalTimestamp()
+{
+    using namespace std::chrono;
+
+    system_clock::time_point now = std::chrono::system_clock::now();
+    zoned_time zoned = zoned_time(std::chrono::current_zone(), now);
+    return std::format("{:%H-%M-%S}", zoned);
+}

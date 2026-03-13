@@ -1,6 +1,9 @@
 #pragma once
 
+#define LOG_NETWORK_EVENTS true
 #define LOG_NETWORK_PACKET_TYPES true
+
+#define LOG_UI true
 
 #include <mutex>
 #include <stdio.h>
