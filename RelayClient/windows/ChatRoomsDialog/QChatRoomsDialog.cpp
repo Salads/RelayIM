@@ -12,6 +12,7 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     QHBoxLayout* joinButtonLayout = new QHBoxLayout();
     QVBoxLayout* createMainLayout = new QVBoxLayout();
     QHBoxLayout* createLayout = new QHBoxLayout();
+    QHBoxLayout* createButtonLayout = new QHBoxLayout();
 
     QGroupBox* joinGroupBox = new QGroupBox();
     QGroupBox* createGroupBox = new QGroupBox();
@@ -26,6 +27,7 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     joinGroupBox->setLayout(joinLayout);
 
     createMainLayout->addLayout(createLayout);
+    createMainLayout->addLayout(createButtonLayout);
 
     m_joinableRoomsListView = new QListView();
     m_joinableRoomsListView->setModel(m_manager->GetModelForRooms().get());
@@ -47,7 +49,8 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     createLayout->addWidget(m_createRoomLabel);
     createLayout->addStretch();
     createLayout->addWidget(m_createRoomLineEdit);
-    createMainLayout->addWidget(m_createButton);
+    createButtonLayout->addStretch();
+    createButtonLayout->addWidget(m_createButton);
 
     connect(m_manager, &QModelManager::Event_JoinRoomResponse, this, [this](PacketResponseReason reason, RoomID roomID, std::string newRoomName)
     {
