@@ -12,7 +12,7 @@
 #include "ui_QChatRoomsDialog.h"
 
 #include "models/QModelManager/QModelManager.h"
-#include "models/QJoinChatRoomsModel/QJoinChatRoomsModel.h"
+#include "models/QChatRoomsModel/QChatRoomsModel.h"
 
 class QChatRoomsDialog : public QDialog
 {
@@ -27,9 +27,8 @@ private:
 
     QModelManager* m_manager;
 
-    QJoinChatRoomsModel m_model;
-
     QListView* m_joinableRoomsListView;
+    QPushButton* m_joinRoomButton;
 
     QLineEdit* m_createRoomLineEdit;
     QLabel* m_createRoomLabel;

@@ -64,6 +64,30 @@ qsizetype QChatRoomsModel::FindRoom(RoomID roomID)
     return -1;
 }
 
+void QChatRoomsModel::ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData)
+{
+    std::vector<ChatRoomInfo>* vec = newData.get();
+
+    if(!m_chatRooms.isEmpty())
+    {
+        beginRemoveRows(QModelIndex(), 0, m_chatRooms.size() - 1);
+        m_chatRooms.clear();
+        endRemoveRows();
+    }
+
+    if(!vec->empty())
+    {
+        beginInsertRows(QModelIndex(), 0, vec->size() - 1);
+
+        for(int i = 0; i < vec->size(); i++)
+        {
+            m_chatRooms.emplaceBack((*vec)[i]);
+        }
+
+        endInsertRows();
+    }
+}
+
 void QChatRoomsModel::AddChatRoom(RoomID roomID, QString roomname)
 {
     if(FindRoom(roomID) != -1) { return; }

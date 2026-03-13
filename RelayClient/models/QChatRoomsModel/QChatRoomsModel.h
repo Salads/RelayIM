@@ -32,6 +32,7 @@ public:
     void RemoveChatRoom(RoomID roomID);
 
     qsizetype FindRoom(RoomID roomID);
+    void ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData);
 
     std::shared_ptr<ChatRoomInfo> GetChatRoomInfo(RoomID roomID);
 

@@ -59,9 +59,6 @@
     <ClCompile Include="windows\ChatRoomsDialog\QChatRoomsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="models\QJoinChatRoomsModel\QJoinChatRoomsModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="components\QChatInput\QChatInput.h">
@@ -95,9 +92,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="windows\ChatRoomsDialog\QChatRoomsDialog.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="models\QJoinChatRoomsModel\QJoinChatRoomsModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
