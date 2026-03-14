@@ -35,6 +35,7 @@ const char* ResponseTypeToString(uint8_t type);
     X(UsernameInvalid)       \
     X(ChatRoomDoesntExist)   \
     X(ChatRoomNameTaken)     \
+    X(ChatRoomNameInvalid)   \
     X(Unspecified)               
 
 enum PacketResponseReason : uint8_t

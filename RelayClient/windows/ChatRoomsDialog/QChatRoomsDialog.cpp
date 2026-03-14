@@ -108,11 +108,34 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
 
     connect(m_createButton, &QPushButton::clicked, this, [this](bool checked)
     {
-        if(!m_createRoomLineEdit->text().isEmpty())
+        std::string desiredRoomname = m_createRoomLineEdit->text().toStdString();
+        PacketResponseReason checkResult = CheckRoomname(desiredRoomname);
+        if(checkResult == PacketResponseReason::Success)
         {
             m_manager->GetClient()->SendCreateChatRoom(m_createRoomLineEdit->text().toStdString());
             m_createButton->setDisabled(true);
             m_createButton->setText("Creating...");
+        }
+        else
+        {
+            std::string errorDesc;
+            switch(checkResult)
+            {
+                case PacketResponseReason::ChatRoomNameInvalid:
+                    errorDesc = "Roomname must not be empty, and must NOT start with a space.";
+                    break;
+                case PacketResponseReason::ChatRoomNameTaken:
+                    errorDesc = "Roomname is taken.";
+                    break;
+                default:
+                    errorDesc = "Unknown error";
+                    break;
+            }
+
+            QMessageBox p;
+            p.setWindowTitle("Roomname Error");
+            p.setText(QString::fromStdString(errorDesc));
+            p.exec();
         }
     });
 
@@ -133,6 +156,21 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     }, Qt::QueuedConnection);
 
     m_manager->GetClient()->SendRequestAllChatRooms();
+}
+
+PacketResponseReason QChatRoomsDialog::CheckRoomname(const std::string& newRoomname)
+{
+    if(newRoomname.empty() || newRoomname[0] == ' ')
+    {
+        return PacketResponseReason::ChatRoomNameInvalid;
+    }
+
+    if(m_model.RoomExists(newRoomname) || m_manager->GetModelForRooms()->RoomExists(newRoomname))
+    {
+        return PacketResponseReason::ChatRoomNameTaken;
+    }
+
+    return PacketResponseReason::Success;
 }
 
 QChatRoomsDialog::~QChatRoomsDialog()

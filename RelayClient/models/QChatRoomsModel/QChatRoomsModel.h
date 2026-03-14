@@ -32,6 +32,7 @@ public:
     void RemoveJoinedChatRoom(RoomID roomID);
 
     qsizetype FindRoom(RoomID roomID);
+    bool RoomExists(const std::string& roomname);
     void ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData);
 
     std::shared_ptr<ChatRoomInfo> GetChatRoomInfo(RoomID roomID);

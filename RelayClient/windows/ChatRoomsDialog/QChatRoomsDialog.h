@@ -22,6 +22,8 @@ public:
     QChatRoomsDialog(QModelManager* manager, QWidget *parent = nullptr);
     ~QChatRoomsDialog();
 
+    PacketResponseReason CheckRoomname(const std::string& newRoomname);
+
 private:
     Ui::QChatRoomsDialogClass ui;
 

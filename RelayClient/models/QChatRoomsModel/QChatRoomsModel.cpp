@@ -64,6 +64,19 @@ qsizetype QChatRoomsModel::FindRoom(RoomID roomID)
     return -1;
 }
 
+bool QChatRoomsModel::RoomExists(const std::string& roomname)
+{
+    for(int i = 0; i < m_chatRooms.size(); i++)
+    {
+        if(m_chatRooms[i].m_roomname == roomname)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void QChatRoomsModel::ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData)
 {
     std::vector<ChatRoomInfo>* vec = newData.get();
