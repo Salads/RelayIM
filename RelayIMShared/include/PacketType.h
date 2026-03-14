@@ -32,6 +32,7 @@ const char* ResponseTypeToString(uint8_t type);
 #define PACKET_RESPONSE_REASONS \
     X(Success)               \
     X(UsernameTaken)         \
+    X(UsernameInvalid)       \
     X(ChatRoomDoesntExist)   \
     X(ChatRoomNameTaken)     \
     X(Unspecified)               

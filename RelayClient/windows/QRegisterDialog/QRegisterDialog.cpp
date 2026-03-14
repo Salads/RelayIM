@@ -45,9 +45,36 @@ QRegisterDialog::QRegisterDialog(QModelManager* manager, QWidget* parent)
 
     connect(m_OKButton, &QPushButton::clicked, this, [this](bool checked)
     {
-        m_modelManager->GetClient()->SendConnect(m_usernameLineEdit->text().toStdString());
-        m_OKButton->setText("Registering...");
-        m_OKButton->setDisabled(true);
+        std::string desiredUsername = m_usernameLineEdit->text().toStdString();
+        PacketResponseReason usernameCheckResult = m_modelManager->CheckDesiredUsername(desiredUsername);
+        if(usernameCheckResult == PacketResponseReason::Success)
+        {
+            m_modelManager->GetClient()->SendConnect(m_usernameLineEdit->text().toStdString());
+            m_OKButton->setText("Registering...");
+            m_OKButton->setDisabled(true);
+        }
+        else
+        {
+            std::string reasonDesc;
+            switch(usernameCheckResult)
+            {
+                case PacketResponseReason::UsernameInvalid:
+                    reasonDesc = "Username must not be empty, and not start with a space.";
+                    break;
+                case PacketResponseReason::UsernameTaken:
+                    reasonDesc = "Username has been taken.";
+                    break;
+                default:
+                    reasonDesc = "Unknown reason.";
+                    break;
+            }
+
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Username error");
+            msgBox.setText(QString::fromStdString(reasonDesc));
+            msgBox.exec();
+        }
+        
     });
 }
 

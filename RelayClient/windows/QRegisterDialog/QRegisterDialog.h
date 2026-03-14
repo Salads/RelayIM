@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QFormLayout>
+#include <QMessageBox>
 
 #include "models/QModelManager/QModelManager.h"
 

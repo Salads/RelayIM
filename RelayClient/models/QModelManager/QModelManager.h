@@ -33,6 +33,7 @@ public:
     QModelIndex GetChatRoomIdx(RoomID roomID);
 
     bool HasJoinedRoom(RoomID roomID);
+    PacketResponseReason CheckDesiredUsername(const std::string& desiredUsername);
 
     /// <summary>
     /// Adds a chat room to the QChatRoomsModel, and creates a new QChatRoomMessagesModel for the RoomID given.

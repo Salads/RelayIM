@@ -107,6 +107,24 @@ void QModelManager::RemoveUserFromRoom(PeerID peerID, RoomID roomID)
     m_userRooms[peerID].remove(roomID);
 }
 
+PacketResponseReason QModelManager::CheckDesiredUsername(const std::string& desiredUsername)
+{
+    if(desiredUsername.empty() || desiredUsername[0] == ' ')
+    {
+        return PacketResponseReason::UsernameInvalid;
+    }
+
+    for(auto [key, val] : m_knownUsers.asKeyValueRange())
+    {
+        if(val == desiredUsername)
+        {
+            return PacketResponseReason::UsernameTaken;
+        }
+    }
+
+    return PacketResponseReason::Success;
+}
+
 void QModelManager::InitializeClientCallbacks()
 {
     if (m_callbacksInitialized) { return; }
