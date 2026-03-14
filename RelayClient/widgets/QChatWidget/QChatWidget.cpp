@@ -30,7 +30,7 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     vLayoutMainContent->addWidget(m_chatInput, 2);
 }
 
-void QChatWidget::setRoom(RoomID roomID)
+void QChatWidget::SetRoomID(RoomID roomID)
 {
     if(roomID == INVALID_ROOM_ID)
     {
@@ -39,12 +39,18 @@ void QChatWidget::setRoom(RoomID roomID)
     }
     else
     {
-        std::shared_ptr<QChatRoomMessagesModel> model = m_manager->GetModelForRoom(roomID);
+        QChatRoomMessagesModel* model = m_manager->GetModelForRoom(roomID);
         Q_ASSERT(model);
 
-        m_chatListView->setModel(m_manager->GetModelForRoom(roomID).get());
+        m_chatListView->setModel(model);
         m_roomNameLabel->setText(QString::fromStdString("# " + model->GetRoomname()));
     }
 
-    m_chatInput->setRoom(roomID);
+    m_chatInput->SetRoomID(roomID);
+    m_currentRoomID = roomID;
+}
+
+RoomID QChatWidget::GetRoomID()
+{
+    return m_currentRoomID;
 }

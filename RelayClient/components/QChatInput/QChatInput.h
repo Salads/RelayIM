@@ -15,7 +15,7 @@ public:
     QChatInput(QModelManager* manager, QWidget* parent = nullptr);
 
     void keyPressEvent(QKeyEvent* event) override;
-    void setRoom(RoomID roomID);
+    void SetRoomID(RoomID roomID);
 
 private:
     Ui::QChatInputClass ui;

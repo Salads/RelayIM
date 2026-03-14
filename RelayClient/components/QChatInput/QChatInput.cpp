@@ -36,7 +36,7 @@ void QChatInput::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void QChatInput::setRoom(RoomID roomID)
+void QChatInput::SetRoomID(RoomID roomID)
 {
     m_roomID = roomID;
 }

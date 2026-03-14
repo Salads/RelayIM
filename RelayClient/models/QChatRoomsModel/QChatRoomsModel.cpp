@@ -88,7 +88,7 @@ void QChatRoomsModel::ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newD
     }
 }
 
-void QChatRoomsModel::AddChatRoom(RoomID roomID, QString roomname)
+void QChatRoomsModel::AddJoinedChatRoom(RoomID roomID, QString roomname)
 {
     if(FindRoom(roomID) != -1) { return; }
 
@@ -97,7 +97,7 @@ void QChatRoomsModel::AddChatRoom(RoomID roomID, QString roomname)
     endInsertRows();
 }
 
-void QChatRoomsModel::RemoveChatRoom(RoomID roomID)
+void QChatRoomsModel::RemoveJoinedChatRoom(RoomID roomID)
 {
     // Find the index of the room we want to remove.
     qsizetype idx = FindRoom(roomID);

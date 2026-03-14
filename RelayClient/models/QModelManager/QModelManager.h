@@ -14,18 +14,39 @@ class QModelManager : public QObject
 
 public:
     QModelManager(QObject* parent = nullptr);
+    ~QModelManager();
 
     bool Initialize();
     bool Connect();
     void Shutdown();
 
     PeerID GetLocalPeerID();
-    RoomID GetLocalRoomID();
+    void SetLocalPeerID(PeerID peerID);
 
-    std::shared_ptr<QChatRoomsModel> GetModelForRooms();
-    std::shared_ptr<QChatRoomMessagesModel> GetModelForRoom(RoomID roomID);
+    void AddKnownUser(PeerID peerID, const std::string& username);
+    void AddUserToRoom(PeerID peerID, RoomID roomID);
+    void AddMessageToRoom(RoomID roomID, PeerID peerID, const std::string& message);
+
+    void RemoveUserFromRoom(PeerID peerID, RoomID roomID);
+    void RemoveJoinedChatRoom(RoomID roomID);
+
+    QModelIndex GetChatRoomIdx(RoomID roomID);
+
+    bool HasJoinedRoom(RoomID roomID);
+
+    /// <summary>
+    /// Adds a chat room to the QChatRoomsModel, and creates a new QChatRoomMessagesModel for the RoomID given.
+    /// If a QChatRoomMessagesModel exists, deletes it first before adding a new one.
+    /// </summary>
+    /// <param name="roomID">RoomID of new chat room</param>
+    /// <param name="roomname">Display roomname of new chat room</param>
+    void AddJoinedChatRoom(RoomID roomID, const std::string& roomname);
+
+    QChatRoomsModel* GetModelForRooms();
+    QChatRoomMessagesModel* GetModelForRoom(RoomID roomID);
 
     RelayIMClient* GetClient();
+    
 
 signals:
 
@@ -41,20 +62,9 @@ signals:
     void Event_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName);
     void Event_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID);
 
-public slots:
-
-    // NOTE(Salads): All of these slots exist to bring the incoming data to the main thread, since QModels NEED to operate on the main thread.
-    void Slot_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username);
-    void Slot_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
-    void Slot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
-    
-    void Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
-    void Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
-    void Slot_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName);
-    void Slot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID);
-
 private:
     void InitializeClientCallbacks();
+    void DeleteRoomMessagesModel(RoomID roomID);
 
 private:
     RelayIMClient m_client;
@@ -62,11 +72,10 @@ private:
     bool m_callbacksInitialized = false;
 
     PeerID m_localPeerID = INVALID_PEER_ID; 
-    RoomID m_localRoomID = INVALID_ROOM_ID; // Current room
 
     QMap<PeerID, std::string> m_knownUsers;
     QMap<PeerID, QSet<RoomID>> m_userRooms;
 
-    std::shared_ptr<QChatRoomsModel> m_chatRoomsModel; // Joined Chat Rooms ListView data
-    QMap<RoomID, std::shared_ptr<QChatRoomMessagesModel>> m_chatRoomMessagesModels;
+    QChatRoomsModel m_joinedChatRoomsModel;
+    QMap<RoomID, QChatRoomMessagesModel*> m_chatRoomMessagesModels;
 };

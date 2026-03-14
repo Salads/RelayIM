@@ -1,7 +1,10 @@
 #pragma once
 
+// User-level network-data events
 #define LOG_NETWORK_EVENTS true
-#define LOG_NETWORK_PACKET_TYPES true
+
+// Packet receives and sends
+#define LOG_NETWORK_PACKET_TYPES false
 
 #define LOG_UI true
 

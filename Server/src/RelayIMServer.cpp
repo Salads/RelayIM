@@ -221,7 +221,7 @@ void RelayIMServer::ProcessClientPackets()
                     joinerResponseWriter.WriteHeader(PacketType_JoinChatRoomResponse);
                     joinerResponseWriter.WriteUInt8(PacketResponseReason::Success);
                     joinerResponseWriter.WriteUInt32(roomID);
-                    joinerResponseWriter.WriteString(joiningUsername);
+                    joinerResponseWriter.WriteString(m_chatRooms[roomID]->GetRoomName());
                     joinerResponseWriter.Finalize();
                     m_serverNetwork.SendToClient(peerID, &joinerResponse);
                     

@@ -30,7 +30,7 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void AddMessage(PeerID peerID, QString message);
+    void AddMessage(PeerID peerID, const std::string& message);
     RoomID GetRoomID();
     std::string GetRoomname();
 

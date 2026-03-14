@@ -30,7 +30,7 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     createMainLayout->addLayout(createButtonLayout);
 
     m_joinableRoomsListView = new QListView();
-    m_joinableRoomsListView->setModel(m_manager->GetModelForRooms().get());
+    m_joinableRoomsListView->setModel(&m_model);
     m_joinableRoomsListView->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     m_joinRoomButton = new QPushButton("Join Room");
     m_joinRoomButton->setMaximumWidth(125);
@@ -56,6 +56,7 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     {
         if(reason == PacketResponseReason::Success)
         {
+            Log::Get()->ConditionalWriteLine(LOG_NETWORK_EVENTS, "Joined Room (%s), (ID=%u)", newRoomName, roomID);
             close();
         }
         else
@@ -81,7 +82,7 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
         QModelIndex currentIdx = m_joinableRoomsListView->currentIndex();
         if(currentIdx.isValid())
         {
-            RoomID roomID = m_manager->GetModelForRooms()->data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt();
+            RoomID roomID = m_model.data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt();
             m_manager->GetClient()->SendJoinChatRoom(roomID);
             m_joinRoomButton->setText("Joining...");
             m_joinRoomButton->setDisabled(true);
@@ -90,7 +91,18 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
 
     connect(m_manager, &QModelManager::Event_ListChatRoomsResponse, this, [this](std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
     {
-        m_manager->GetModelForRooms()->ReplaceAll(chatRooms);
+        // Remove chat rooms that have already been joined.
+        std::shared_ptr<std::vector<ChatRoomInfo>> filteredRooms = std::make_shared<std::vector<ChatRoomInfo>>();
+        std::vector<ChatRoomInfo>& vec = *chatRooms.get();
+        for(ChatRoomInfo& room : vec)
+        {
+            if(!m_manager->HasJoinedRoom(room.m_roomID))
+            {
+                filteredRooms->push_back(room);
+            }
+        }
+
+        m_model.ReplaceAll(filteredRooms);
 
     }, Qt::QueuedConnection);
 

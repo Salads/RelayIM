@@ -16,7 +16,8 @@ class QChatWidget : public QWidget
 public:
     QChatWidget(QModelManager* manager, QWidget *parent = nullptr);
 
-    void setRoom(RoomID roomID);
+    void SetRoomID(RoomID roomID);
+    RoomID GetRoomID();
 
 private:
     Ui::QChatWidgetClass ui;
@@ -26,5 +27,7 @@ private:
     QLabel* m_roomNameLabel;
     QListView* m_chatListView;
     QChatInput* m_chatInput;
+
+    RoomID m_currentRoomID = INVALID_PEER_ID;
 };
 

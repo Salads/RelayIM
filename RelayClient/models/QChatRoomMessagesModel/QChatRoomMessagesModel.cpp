@@ -60,10 +60,10 @@ QHash<int, QByteArray> QChatRoomMessagesModel::roleNames() const
     return names;
 }
 
-void QChatRoomMessagesModel::AddMessage(PeerID peerID, QString message)
+void QChatRoomMessagesModel::AddMessage(PeerID peerID, const std::string& message)
 {
     beginInsertRows(QModelIndex(), m_messages.size(), m_messages.size());
-    m_messages.emplaceBack(peerID, message.toStdString());
+    m_messages.emplaceBack(peerID, message);
     endInsertRows();
 }
 

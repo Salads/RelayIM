@@ -28,8 +28,8 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void AddChatRoom(RoomID roomID, QString roomname);
-    void RemoveChatRoom(RoomID roomID);
+    void AddJoinedChatRoom(RoomID roomID, QString roomname);
+    void RemoveJoinedChatRoom(RoomID roomID);
 
     qsizetype FindRoom(RoomID roomID);
     void ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData);

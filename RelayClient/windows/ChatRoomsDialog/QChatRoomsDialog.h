@@ -27,6 +27,8 @@ private:
 
     QModelManager* m_manager;
 
+    QChatRoomsModel m_model;
+
     QListView* m_joinableRoomsListView;
     QPushButton* m_joinRoomButton;
 
