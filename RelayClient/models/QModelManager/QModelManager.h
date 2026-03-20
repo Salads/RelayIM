@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QMutexLocker>
+#include <QAbstractItemModel>
 
 #include "RelayIMClient.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
@@ -44,24 +45,46 @@ public:
     void AddJoinedChatRoom(RoomID roomID, const std::string& roomname);
 
     QChatRoomsModel* GetModelForRooms();
-    QChatRoomMessagesModel* GetModelForRoom(RoomID roomID);
+    QList<ChatMessage>* GetMessagesForRoom(RoomID roomID);
 
     RelayIMClient* GetClient();
+
+    std::string GetUsernameByPeerID(PeerID peerID);
+    std::string GetRoomnameByRoomID(RoomID roomID);
     
 
 signals:
+    // NOTE(Salads): Private signals for network data handling ONLY. Use Qt::QueuedConnection to bring data to Qt thread.
+    void NetEvent_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username, QPrivateSignal);
+    void NetEvent_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void NetEvent_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void NetEvent_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>, QPrivateSignal);
+    void NetEvent_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal);
+    void NetEvent_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal);
+    void NetEvent_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal);
+    void NetEvent_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID, QPrivateSignal);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // NOTE(Salads): UI Related Events
+    // Note(Salads): Events for use with UI, with the guarantee that the data is ready (and is on main Qt thread)
     void Event_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username);
     void Event_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
     void Event_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
     void Event_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>);
-
-    // NOTE(Salads): Data related events (models)
     void Event_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
     void Event_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
     void Event_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName);
-    void Event_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID);
+    void Event_RoomUpdate_UserAboutToLeave(RoomID roomID, PeerID peerID); // This event happens BEFORE data alteration, since controls depend on the model that will be deleted.
+
+private slots:
+    // NOTE(Salads): Private slots for network data handling ONLY. Use Qt::QueuedConnection to bring data to Qt thread.
+    void NetSlot_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username, QPrivateSignal);
+    void NetSlot_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void NetSlot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void NetSlot_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>, QPrivateSignal);
+    void NetSlot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal);
+    void NetSlot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal);
+    void NetSlot_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal);
+    void NetSlot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID, QPrivateSignal);
 
 private:
     void InitializeClientCallbacks();
@@ -78,5 +101,5 @@ private:
     QMap<PeerID, QSet<RoomID>> m_userRooms;
 
     QChatRoomsModel m_joinedChatRoomsModel;
-    QMap<RoomID, QChatRoomMessagesModel*> m_chatRoomMessagesModels;
+    QMap<RoomID, QList<ChatMessage>> m_chatRoomMessages;
 };

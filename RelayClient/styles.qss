@@ -1,0 +1,44 @@
+
+QWidget
+{
+	background-color: #18181f;
+	color: #ffffff;
+}
+
+QPushButton
+{
+	background-color: #174123;
+}
+
+QPushButton::pressed
+{
+	background-color: #31914d;
+}
+
+QPushButton::hover
+{
+	background-color: #206133;
+}
+
+QPushButton::disabled
+{
+	background-color: #555555;
+}
+
+QLineEdit
+{
+	background-color: #2b2b38;
+}
+
+QListView
+{
+	border: 1px solid #2a2a36;
+	border-radius: 5px;
+}
+
+QListView::item::selected{
+	background-color: #174123;
+	border: 1px solid #174123;
+}
+
+

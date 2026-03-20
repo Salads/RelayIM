@@ -25,6 +25,14 @@ public:
     PacketResponseReason CheckRoomname(const std::string& newRoomname);
 
 private:
+    void Slot_JoinRoomResponse(PacketResponseReason reason, RoomID roomID, std::string newRoomName);
+    void Slot_JoinableRoomSelected(const QModelIndex& current, const QModelIndex& prev);
+    void Slot_JoinRoomButtonClicked(bool checked);
+    void Slot_JoinableChatRoomsReceived(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms);
+    void Slot_CreateRoomButtonClicked(bool checked);
+    void Slot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
+
+private:
     Ui::QChatRoomsDialogClass ui;
 
     QModelManager* m_manager;

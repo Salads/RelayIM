@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QVector>
+#include <QList>
 #include <QMutex>
 
 #include "ChatMessage.h"
@@ -38,7 +39,7 @@ private:
 
     ChatRoomInfo m_info;
 
-    QVector<ChatMessage> m_messages;
+    QList<ChatMessage> m_messages;
     QMap<PeerID, std::string> *m_knownUsers;
 };
 

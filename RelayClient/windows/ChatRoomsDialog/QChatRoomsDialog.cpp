@@ -52,110 +52,116 @@ QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     createButtonLayout->addStretch();
     createButtonLayout->addWidget(m_createButton);
 
-    connect(m_manager, &QModelManager::Event_JoinRoomResponse, this, [this](PacketResponseReason reason, RoomID roomID, std::string newRoomName)
-    {
-        if(reason == PacketResponseReason::Success)
-        {
-            Log::Get()->ConditionalWriteLine(LOG_NETWORK_EVENTS, "Joined Room (%s), (ID=%u)", newRoomName, roomID);
-            close();
-        }
-        else
-        {
-            std::string popupText = "Could not join room '" + newRoomName + "'. Reason: " + ResponseTypeToString(reason);
-
-            QMessageBox diag;
-            diag.setWindowTitle("Join Error");
-            diag.setText(QString::fromStdString(popupText));
-            diag.exec();
-
-            m_joinRoomButton->setEnabled(true);
-        }
-    }, Qt::QueuedConnection);
-
-    connect(m_joinableRoomsListView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex &current, const QModelIndex &prev)
-    {
-        m_joinRoomButton->setDisabled(!current.isValid());
-    });
-
-    connect(m_joinRoomButton, &QPushButton::clicked, this, [this](bool checked)
-    {
-        QModelIndex currentIdx = m_joinableRoomsListView->currentIndex();
-        if(currentIdx.isValid())
-        {
-            RoomID roomID = m_model.data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt();
-            m_manager->GetClient()->SendJoinChatRoom(roomID);
-            m_joinRoomButton->setText("Joining...");
-            m_joinRoomButton->setDisabled(true);
-        }
-    });
-
-    connect(m_manager, &QModelManager::Event_ListChatRoomsResponse, this, [this](std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
-    {
-        // Remove chat rooms that have already been joined.
-        std::shared_ptr<std::vector<ChatRoomInfo>> filteredRooms = std::make_shared<std::vector<ChatRoomInfo>>();
-        std::vector<ChatRoomInfo>& vec = *chatRooms.get();
-        for(ChatRoomInfo& room : vec)
-        {
-            if(!m_manager->HasJoinedRoom(room.m_roomID))
-            {
-                filteredRooms->push_back(room);
-            }
-        }
-
-        m_model.ReplaceAll(filteredRooms);
-
-    }, Qt::QueuedConnection);
-
-    connect(m_createButton, &QPushButton::clicked, this, [this](bool checked)
-    {
-        std::string desiredRoomname = m_createRoomLineEdit->text().toStdString();
-        PacketResponseReason checkResult = CheckRoomname(desiredRoomname);
-        if(checkResult == PacketResponseReason::Success)
-        {
-            m_manager->GetClient()->SendCreateChatRoom(m_createRoomLineEdit->text().toStdString());
-            m_createButton->setDisabled(true);
-            m_createButton->setText("Creating...");
-        }
-        else
-        {
-            std::string errorDesc;
-            switch(checkResult)
-            {
-                case PacketResponseReason::ChatRoomNameInvalid:
-                    errorDesc = "Roomname must not be empty, and must NOT start with a space.";
-                    break;
-                case PacketResponseReason::ChatRoomNameTaken:
-                    errorDesc = "Roomname is taken.";
-                    break;
-                default:
-                    errorDesc = "Unknown error";
-                    break;
-            }
-
-            QMessageBox p;
-            p.setWindowTitle("Roomname Error");
-            p.setText(QString::fromStdString(errorDesc));
-            p.exec();
-        }
-    });
-
-    connect(m_manager, &QModelManager::Event_CreateRoomResponse, this, [this](PacketResponseReason reason)
-    {
-        if(reason == PacketResponseReason::Success)
-        {
-            close();
-        }
-        else
-        {
-            QMessageBox diag;
-            diag.setText("Chat room name taken!");
-            diag.exec();
-
-            m_createButton->setText("Create");
-        }
-    }, Qt::QueuedConnection);
+    connect(m_manager, &QModelManager::Event_JoinRoomResponse, this, &QChatRoomsDialog::Slot_JoinRoomResponse);
+    connect(m_joinableRoomsListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &QChatRoomsDialog::Slot_JoinableRoomSelected);
+    connect(m_joinRoomButton, &QPushButton::clicked, this, &QChatRoomsDialog::Slot_JoinRoomButtonClicked);
+    connect(m_manager, &QModelManager::Event_ListChatRoomsResponse, this, &QChatRoomsDialog::Slot_JoinableChatRoomsReceived);
+    connect(m_createButton, &QPushButton::clicked, this, &QChatRoomsDialog::Slot_CreateRoomButtonClicked);
+    connect(m_manager, &QModelManager::Event_CreateRoomResponse, this, &QChatRoomsDialog::Slot_CreateRoomResponse);
 
     m_manager->GetClient()->SendRequestAllChatRooms();
+}
+
+void QChatRoomsDialog::Slot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+{
+    if(reason == PacketResponseReason::Success)
+    {
+        close();
+    }
+    else
+    {
+        QMessageBox diag;
+        diag.setText("Chat room name taken!");
+        diag.exec();
+
+        m_createButton->setText("Create");
+    }
+}
+
+void QChatRoomsDialog::Slot_CreateRoomButtonClicked(bool checked)
+{
+    std::string desiredRoomname = m_createRoomLineEdit->text().toStdString();
+    PacketResponseReason checkResult = CheckRoomname(desiredRoomname);
+    if(checkResult == PacketResponseReason::Success)
+    {
+        m_manager->GetClient()->SendCreateChatRoom(m_createRoomLineEdit->text().toStdString());
+        m_createButton->setDisabled(true);
+        m_createButton->setText("Creating...");
+    }
+    else
+    {
+        std::string errorDesc;
+        switch(checkResult)
+        {
+            case PacketResponseReason::ChatRoomNameInvalid:
+                errorDesc = "Roomname must not be empty, and must NOT start with a space.";
+                break;
+            case PacketResponseReason::ChatRoomNameTaken:
+                errorDesc = "Roomname is taken.";
+                break;
+            default:
+                errorDesc = "Unknown error";
+                break;
+        }
+
+        QMessageBox p;
+        p.setWindowTitle("Roomname Error");
+        p.setText(QString::fromStdString(errorDesc));
+        p.exec();
+    }
+}
+
+void QChatRoomsDialog::Slot_JoinableChatRoomsReceived(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
+{
+    // Remove chat rooms that have already been joined.
+    std::shared_ptr<std::vector<ChatRoomInfo>> filteredRooms = std::make_shared<std::vector<ChatRoomInfo>>();
+    std::vector<ChatRoomInfo>& vec = *chatRooms.get();
+    for(ChatRoomInfo& room : vec)
+    {
+        if(!m_manager->HasJoinedRoom(room.m_roomID))
+        {
+            filteredRooms->push_back(room);
+        }
+    }
+
+    m_model.ReplaceAll(filteredRooms);
+}
+
+void QChatRoomsDialog::Slot_JoinRoomButtonClicked(bool checked)
+{
+    QModelIndex currentIdx = m_joinableRoomsListView->currentIndex();
+    if(currentIdx.isValid())
+    {
+        RoomID roomID = m_model.data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt();
+        m_manager->GetClient()->SendJoinChatRoom(roomID);
+        m_joinRoomButton->setText("Joining...");
+        m_joinRoomButton->setDisabled(true);
+    }
+}
+
+void QChatRoomsDialog::Slot_JoinableRoomSelected(const QModelIndex& current, const QModelIndex& prev)
+{
+    m_joinRoomButton->setDisabled(!current.isValid());
+}
+
+void QChatRoomsDialog::Slot_JoinRoomResponse(PacketResponseReason reason, RoomID roomID, std::string newRoomName)
+{
+    if(reason == PacketResponseReason::Success)
+    {
+        Log::Get()->ConditionalWriteLine(LOG_NETWORK_EVENTS, "Joined Room (%s), (ID=%u)", newRoomName, roomID);
+        close();
+    }
+    else
+    {
+        std::string popupText = "Could not join room '" + newRoomName + "'. Reason: " + ResponseTypeToString(reason);
+
+        QMessageBox diag;
+        diag.setWindowTitle("Join Error");
+        diag.setText(QString::fromStdString(popupText));
+        diag.exec();
+
+        m_joinRoomButton->setEnabled(true);
+    }
 }
 
 PacketResponseReason QChatRoomsDialog::CheckRoomname(const std::string& newRoomname)

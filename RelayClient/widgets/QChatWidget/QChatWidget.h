@@ -7,6 +7,7 @@
 #include "Types.h"
 #include "components/QChatInput/QChatInput.h"
 #include "models/QModelManager/QModelManager.h"
+#include "widgets/QChatView/QChatView.h"
 #include "ui_QChatWidget.h"
 
 class QChatWidget : public QWidget
@@ -25,7 +26,7 @@ private:
     QModelManager* m_manager;
 
     QLabel* m_roomNameLabel;
-    QListView* m_chatListView;
+    QChatView* m_chatListView;
     QChatInput* m_chatInput;
 
     RoomID m_currentRoomID = INVALID_PEER_ID;

@@ -59,6 +59,12 @@
     <ClCompile Include="windows\ChatRoomsDialog\QChatRoomsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="widgets\QChatView\QChatView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="models\QChatModel\QChatModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="components\QChatInput\QChatInput.h">
@@ -94,6 +100,12 @@
     <QtMoc Include="windows\ChatRoomsDialog\QChatRoomsDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="widgets\QChatView\QChatView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="models\QChatModel\QChatModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="windows\RelayClient\RelayClient.ui">
@@ -117,10 +129,16 @@
     <QtUic Include="windows\ChatRoomsDialog\QChatRoomsDialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="widgets\QChatView\QChatView.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="windows\RelayClient\RelayClient.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="styles.qss" />
   </ItemGroup>
 </Project>

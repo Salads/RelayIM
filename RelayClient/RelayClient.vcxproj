@@ -114,6 +114,8 @@
     <ClCompile Include="models\QChatRoomMessagesModel\QChatRoomMessagesModel.cpp" />
     <ClCompile Include="models\QChatRoomsModel\QChatRoomsModel.cpp" />
     <ClCompile Include="models\QModelManager\QModelManager.cpp" />
+    <ClCompile Include="models\QChatModel\QChatModel.cpp" />
+    <ClCompile Include="widgets\QChatView\QChatView.cpp" />
     <ClCompile Include="widgets\QChatWidget\QChatWidget.cpp" />
     <ClCompile Include="widgets\QConnectionStatus\QConnectionStatus.cpp" />
     <ClCompile Include="windows\ChatRoomsDialog\QChatRoomsDialog.cpp" />
@@ -123,6 +125,7 @@
     <QtUic Include="components\QChatInput\QChatInput.ui" />
     <QtUic Include="components\QChatRoom\QChatRoom.ui" />
     <QtUic Include="components\QMessage\QMessage.ui" />
+    <QtUic Include="widgets\QChatView\QChatView.ui" />
     <QtUic Include="widgets\QChatWidget\QChatWidget.ui" />
     <QtUic Include="widgets\QConnectionStatus\QConnectionStatus.ui" />
     <QtUic Include="windows\ChatRoomsDialog\QChatRoomsDialog.ui" />
@@ -161,6 +164,15 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="windows\ChatRoomsDialog\QChatRoomsDialog.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="styles.qss" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="widgets\QChatView\QChatView.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="models\QChatModel\QChatModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -5,25 +5,26 @@ QMessage::QMessage(QWidget *parent)
 {
     ui.setupUi(this);
 
-    lineEditMessage = new QLineEdit(this);
-    lineEditMessage->setReadOnly(true);
+    ui.messageLabel->setWordWrap(true);
+    ui.messageLabel->setMaximumWidth(MessageWidth);
+    ui.messageLabel->setMinimumWidth(MessageWidth);
 
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setFixedHeight(lineEditMessage->sizeHint().height() + 8);
-    setFixedWidth(lineEditMessage->sizeHint().width() + 8);
+    ui.usernameLabel->setMaximumWidth(UsernameWidth);
+    ui.usernameLabel->setMinimumWidth(UsernameWidth);
+
+    int totalWidth = MessageWidth + UsernameWidth;
+    setMinimumWidth(totalWidth);
+    setMaximumWidth(totalWidth);
+
+    ui.usernameLabel->setFont(Font);
+    ui.messageLabel->setFont(Font);
 }
 
 QMessage::~QMessage()
 {}
 
-void QMessage::setMessage(const std::string& msg)
+void QMessage::SetContents(std::string username, std::string message)
 {
-    lineEditMessage->setText(QString::fromStdString(msg));
-    setFixedHeight(lineEditMessage->sizeHint().height() + 8);
-    setFixedWidth(lineEditMessage->sizeHint().width() + 16);
-}
-
-std::string QMessage::getMessage() const
-{
-    return lineEditMessage->text().toStdString();
+    ui.usernameLabel->setText(QString::fromStdString(username) + ": ");
+    ui.messageLabel->setText(QString::fromStdString(message));
 }

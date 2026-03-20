@@ -13,11 +13,15 @@ public:
     QMessage(QWidget *parent = nullptr);
     ~QMessage();
 
-    void setMessage(const std::string& msg);
-    std::string getMessage() const;
+    void SetContents(std::string username, std::string message);
+
+public:
+    inline static const QFont Font = QFont("Arial");
+    inline static const qsizetype UsernameWidth = 100;
+    inline static const qsizetype MessageWidth = 300;
+    inline static const qsizetype Margin = 11;
 
 private:
     Ui::QMessageClass ui;
-    QLineEdit* lineEditMessage;
 };
 

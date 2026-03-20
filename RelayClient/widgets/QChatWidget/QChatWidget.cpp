@@ -20,8 +20,7 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     QVBoxLayout *vLayoutMainContent = new QVBoxLayout(this);
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
 
-    m_chatListView = new QListView();
-    m_chatListView->setSelectionMode(QListView::SelectionMode::NoSelection);
+    m_chatListView = new QChatView(m_manager);
 
     m_chatInput = new QChatInput(m_manager);
 
@@ -34,18 +33,15 @@ void QChatWidget::SetRoomID(RoomID roomID)
 {
     if(roomID == INVALID_ROOM_ID)
     {
-        m_chatListView->setModel(nullptr);
         m_roomNameLabel->setText("- No Chatroom -");
     }
     else
     {
-        QChatRoomMessagesModel* model = m_manager->GetModelForRoom(roomID);
-        Q_ASSERT(model);
-
-        m_chatListView->setModel(model);
-        m_roomNameLabel->setText(QString::fromStdString("# " + model->GetRoomname()));
+        std::string roomname = m_manager->GetRoomnameByRoomID(roomID);
+        m_roomNameLabel->setText(QString::fromStdString("# " + roomname));
     }
 
+    m_chatListView->SetRoom(roomID);
     m_chatInput->SetRoomID(roomID);
     m_currentRoomID = roomID;
 }
