@@ -44,8 +44,8 @@ public:
     std::vector<QMessagePosition> GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
 
 public slots:
-    void NetSlot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
-    void NetSlot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
+    void Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
+    void Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
 
 private:
     /// <summary>
@@ -61,6 +61,9 @@ private:
 
     void ClearMessagePositions();
     void ClearRenderObjects();
+
+    size_t GetFirstMessageIdxForRender_Linear();
+    size_t GetFirstMessageIdxForRender_Binary();
 
 private:
 

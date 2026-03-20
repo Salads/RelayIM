@@ -8,10 +8,15 @@ QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
 
     m_vBar = view->verticalScrollBar();
 
-    connect(m_manager, &QModelManager::Event_RoomUpdate_Message, this, &QChatModel::NetSlot_RoomUpdate_Message);
-    connect(m_manager, &QModelManager::Event_RoomUpdate_FULL, this, &QChatModel::NetSlot_RoomUpdate_FULL);
+    connect(m_manager, &QModelManager::Event_RoomUpdate_Message, this, &QChatModel::Slot_RoomUpdate_Message);
+    connect(m_manager, &QModelManager::Event_RoomUpdate_FULL, this, &QChatModel::Slot_RoomUpdate_FULL);
 
-    connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::RenderObjects);
+    //connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::RenderObjects);
+
+    QPalette pal = QPalette();
+    pal.setColor(QPalette::Window, "#999999");
+    setAutoFillBackground(true);
+    setPalette(pal);
 }
 
 void QChatModel::RenderObjects()
@@ -19,14 +24,25 @@ void QChatModel::RenderObjects()
     float min = m_vBar->minimum();
     float max = m_vBar->maximum();
     float val = m_vBar->value();
-    float percentVal = (val - min) / (max - min);
-    uint64_t pixStartY = m_totalHeight * percentVal;
-    uint64_t pixEndY = pixStartY + m_vBar->pageStep();
+
+    uint64_t pixStartY = 0;
+    uint64_t pixEndY = m_totalHeight;
+
+    // Scrollbar is visible, meaning we are larger than it.
+    if(min && max && val)
+    {
+        float percentVal = (val - min) / (max - min);
+        uint64_t pixStartY = m_totalHeight * percentVal;
+        uint64_t pixEndY = pixStartY + m_vBar->pageStep();
+    }
+
     std::vector<QMessagePosition> positions = GetMessagesForRender(pixStartY, pixEndY);
 
     // Make sure we have the exact amount of QMessage objects
     qsizetype nObjectsNeeded = positions.size();
     qsizetype nObjects = m_messageObjects.size();
+
+    qDebug("QChatModel::RenderObjects - nPositions=%u, nObjects=%u", nObjectsNeeded, nObjects);
 
     for(int i = nObjects; i < nObjectsNeeded; i++)
     {
@@ -34,6 +50,7 @@ void QChatModel::RenderObjects()
         m_messageObjects.push_back(newMessageObj);
     }
 
+    nObjects = m_messageObjects.size();
     for(int i = 0; i < (nObjectsNeeded - nObjects); i++)
     {
         QMessage* messageObj = m_messageObjects.back();
@@ -48,6 +65,8 @@ void QChatModel::RenderObjects()
         QMessagePosition* pos = &positions[i];
         ChatMessage* message = &(*m_messages)[pos->m_index];
         QMessage* obj = m_messageObjects[i];
+
+        qDebug("\tRendering QMessage(%d->%d) at (%u, %u)", pos->m_index, i, 0, pos->m_startY);
 
         std::string username = m_manager->GetUsernameByPeerID(message->m_senderID);
 
@@ -73,17 +92,19 @@ void QChatModel::SetRoom(RoomID roomID)
     PrecalculateMessagePositions();
 }
 
-void QChatModel::NetSlot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message)
+void QChatModel::Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message)
 {
     PrecalculateMessagePositions();
     m_vBar->setValue(m_vBar->maximum());
+    RenderObjects();
 }
 
-void QChatModel::NetSlot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
+void QChatModel::Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
 {
     ClearMessagePositions();
     PrecalculateMessagePositions();
     m_vBar->setValue(m_vBar->maximum());
+    RenderObjects();
 }
 
 uint32_t QChatModel::GetMessageHeight(const std::string& message)
@@ -97,6 +118,17 @@ uint32_t QChatModel::GetMessageHeight(const std::string& message)
     return totalMessageHeight;
 }
 
+/*
+    Messages and Rendering
+    ---------------------------------------
+    Messages come in, we _append_ to a vector. This means that "new" messages are at the back, and order is oldest->newest via index.
+    When rendering, we start from the top to the bottom, so that also means oldest->newest
+
+    When we store message positions, we iterate forwards in the messages list. So, this means we store these oldest->newest as well.
+    
+    When we calculate a new position for a new message, we don't have to modify every other position, because we simply increase the size of the parent
+    background widget that these messages are parented to. The oldest message will always have the same position, because origin is top-left.
+*/
 void QChatModel::PrecalculateMessagePositions()
 {
     if(m_roomID == INVALID_ROOM_ID)
@@ -107,30 +139,38 @@ void QChatModel::PrecalculateMessagePositions()
     size_t startIdx = m_messagePositionsStartY.size();
     uint64_t pixelPosY = QMessage::Margin;
 
+    qDebug("QChatModel::PrecalculateMessagePositions - nPos=%u", startIdx);
+
     if(startIdx > 0)
     {
-        pixelPosY = m_messagePositionsEndY[startIdx - 1] + QMessage::Margin;
+        pixelPosY = m_messagePositionsEndY[startIdx - 1];
     }
 
     for(int i = startIdx; i < m_messages->size(); i++)
     {
-        uint64_t newMessagePixelY = 0;
         const ChatMessage* message = &m_messages->at(i);
 
         uint64_t totalMessageHeight = GetMessageHeight(message->m_message);
-        m_messagePositionsStartY.emplace_back(pixelPosY);
-        m_messagePositionsEndY.emplace_back(pixelPosY + totalMessageHeight);
-        int heightDiff = totalMessageHeight + QMessage::Margin;
+        uint64_t nextYPosDiff = totalMessageHeight + QMessage::Margin;
+        uint64_t nextYPos = pixelPosY + nextYPosDiff;
 
-        pixelPosY += heightDiff;
-        m_totalHeight += heightDiff;
+        qDebug("\tNew Pos: %u (height=%u)", pixelPosY, nextYPosDiff);
+
+        m_messagePositionsStartY.emplace_back(pixelPosY);
+        m_messagePositionsEndY.emplace_back(nextYPos);
+
+        pixelPosY = nextYPos;
+        m_totalHeight = nextYPos;
     }
 
     setFixedHeight(m_totalHeight);
+    setMinimumSize(QMessage::TotalWidth, m_totalHeight);
 }
 
 void QChatModel::ClearMessagePositions()
 {
+    qDebug("QChatModel::ClearMessagePositions");
+    ClearRenderObjects();
     m_messagePositionsStartY.clear();
     m_messagePositionsEndY.clear();
     m_totalHeight = 0;
@@ -138,6 +178,7 @@ void QChatModel::ClearMessagePositions()
 
 void QChatModel::ClearRenderObjects()
 {
+    qDebug("QChatModel::ClearRenderObjects");
     for(int i = 0; i < m_messageObjects.size(); i++)
     {
         delete m_messageObjects[i];
@@ -151,12 +192,15 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
     std::vector<QMessagePosition> result;
 
     // Binary Search, using viewportStartY
-    size_t leftIdx = 0;
-    size_t rightIdx = m_messagePositionsStartY.size() - 1;
-    size_t midIdx = 0;
+    qsizetype leftIdx = 0;
+    qsizetype rightIdx = m_messagePositionsStartY.size() - 1;
+    qsizetype midIdx = 0;
+
+    qDebug("Start - LeftIdx=%u, RightIdx=%u, viewportStartY=%u, viewportEndY=%u, nPositions:%u", leftIdx, rightIdx, viewportStartY, viewportEndY, m_messagePositionsStartY.size());
 
     if(m_messagePositionsStartY.empty())
     {
+        qDebug("End - No positions!");
         return result;
     }
 
@@ -166,29 +210,33 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
         uint64_t midStartY = m_messagePositionsStartY[midIdx];
         uint64_t midEndY = m_messagePositionsEndY[midIdx];
 
-        /*
-            Searching Notes
-
-            I think we want to have the start and end Y positions of the messages, and see if the
-            viewportY interesects these "ranges". However, there are some edge cases.
-
-            1. viewY < midStartY
-                - midIdx completely out of view (should partition left side)
-                - midIdx is first message VALID!
-            2. viewY intersects midObj 
-                - Valid! We found it
-        */
+        qDebug("\tIteration - MidIdx=%u [%u, %u], LeftIdx=%u, RightIdx=%u", midIdx, midStartY, midEndY, leftIdx, rightIdx);
 
         if(viewportStartY >= midStartY && viewportStartY <= midEndY)
         {
+            qDebug("\t\tFound Intersection");
             break;
         }
         else if(viewportStartY < midStartY)
         {
+            qDebug("\t\tCant go more left, we found it.");
+            if(midIdx == 0)
+            {
+                break;
+            }
+
+            qDebug("\t\tUse Left Half");
             rightIdx = midIdx - 1;
         }
         else if(viewportStartY > midStartY)
         {
+            qDebug("\t\tCant go more right, we found it.");
+            if(midIdx == m_messagePositionsStartY.size() - 1)
+            {
+                break;
+            }
+
+            qDebug("\t\tUse Right Half");
             leftIdx = midIdx + 1;
         }
     }
@@ -196,20 +244,28 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
     // If we haven't found an intersection yet, this means we have a "clean" viewport, as in the first message is entirely visible and isn't partially shown.
     // This means we just get the next one after the viewport's start y
 
-    uint64_t midStartY = m_messagePositionsStartY[midIdx];
-    uint64_t midEndY = m_messagePositionsEndY[midIdx];
-    if(viewportStartY > midEndY)
-    {
-        if(midIdx < m_messagePositionsStartY.size() - 1)
-        {
-            midIdx++;
-        }
-    }
+    //uint64_t midStartY = m_messagePositionsStartY[midIdx];
+    //uint64_t midEndY = m_messagePositionsEndY[midIdx];
+    //if(viewportStartY > midEndY) // The message we got is above, and completely hidden
+    //{
+    //    if(midIdx < m_messagePositionsStartY.size() - 1)
+    //    {
+    //        qDebug("Viewport Check - Message is above, get next one");
+    //        midIdx++;
+    //    }
+    //}
 
-    for(uint64_t posStartY = m_messagePositionsStartY[midIdx]; posStartY < viewportEndY;)
+    qDebug("Gather Items from MidIdx");
+    uint64_t posStartY = m_messagePositionsStartY[midIdx];
+    while(posStartY <= viewportEndY && midIdx < m_messagePositionsStartY.size())
     {
-        result.emplace_back(posStartY, midIdx);
-        posStartY = m_messagePositionsStartY[++midIdx];
+        QMessagePosition newPos(posStartY, midIdx);
+        result.push_back(newPos);
+
+        if(++midIdx < m_messagePositionsStartY.size())
+        {
+            posStartY = m_messagePositionsStartY[midIdx];
+        }
     }
 
     return result;

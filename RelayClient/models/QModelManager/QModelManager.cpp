@@ -84,7 +84,7 @@ void QModelManager::AddMessageToRoom(RoomID roomID, PeerID peerID, const std::st
 {
     if(m_chatRoomMessages.contains(roomID))
     {
-        m_chatRoomMessages[roomID].emplaceFront(peerID, message);
+        m_chatRoomMessages[roomID].emplaceBack(peerID, message);
     }
     else
     {

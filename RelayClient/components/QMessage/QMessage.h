@@ -20,6 +20,7 @@ public:
     inline static const qsizetype UsernameWidth = 100;
     inline static const qsizetype MessageWidth = 300;
     inline static const qsizetype Margin = 11;
+    inline static const qsizetype TotalWidth = UsernameWidth + MessageWidth + (Margin * 2);
 
 private:
     Ui::QMessageClass ui;
