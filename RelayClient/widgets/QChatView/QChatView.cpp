@@ -7,8 +7,10 @@ QChatView::QChatView(QModelManager* manager, QWidget *parent)
     m_model = new QChatModel(this, m_manager);
     setWidget(m_model);
     setAlignment(Qt::AlignmentFlag::AlignBottom);
-    setMinimumWidth(QMessage::TotalWidth);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    setMinimumWidth(QMessage::TotalWidth + style()->pixelMetric(QStyle::PM_ScrollBarExtent));
 }
 
 QChatView::~QChatView()

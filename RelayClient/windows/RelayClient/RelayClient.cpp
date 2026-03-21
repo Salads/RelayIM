@@ -11,6 +11,9 @@ RelayClient::RelayClient(QWidget *parent)
     qRegisterMetaType<RoomID>();
     qRegisterMetaType<std::shared_ptr<std::vector<ChatMessage>>>();
 
+    setMinimumSize(c_minSize);
+    resize(c_minSize);
+
     m_registerDialog = new QRegisterDialog(&m_manager);
 
     QHBoxLayout* hLayoutMainContent = new QHBoxLayout(this->centralWidget()); // Main Content Layout (ChatRooms, Chat Area)
@@ -42,8 +45,6 @@ RelayClient::RelayClient(QWidget *parent)
     m_chatWidget = new QChatWidget(&m_manager);
 
     hLayoutMainContent->addWidget(m_chatWidget, 8);
-
-    this->setMinimumSize(550, 350);
 
     m_connectionStatus = new QConnectionStatus();
     ui.m_statusBar->addWidget(m_connectionStatus);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QResizeEvent>
 #include <QListView>
 #include <QPushButton>
 #include <QBoxLayout>
@@ -35,6 +36,8 @@ public slots:
 
 private:
     Ui::RelayClientClass ui;
+
+    const QSize c_minSize = QSize(650, 393);
 
     QModelManager m_manager;
 

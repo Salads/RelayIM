@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QScrollArea>
+#include <QStyle>
 #include "ui_QChatView.h"
 
 #include "ChatMessage.h"

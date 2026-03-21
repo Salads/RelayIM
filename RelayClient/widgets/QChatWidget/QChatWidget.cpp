@@ -27,6 +27,8 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     vLayoutMainContent->addWidget(m_roomNameLabel, 0);
     vLayoutMainContent->addWidget(m_chatListView, 7);
     vLayoutMainContent->addWidget(m_chatInput, 2);
+
+    setMinimumWidth(m_chatListView->minimumWidth());
 }
 
 void QChatWidget::SetRoomID(RoomID roomID)
