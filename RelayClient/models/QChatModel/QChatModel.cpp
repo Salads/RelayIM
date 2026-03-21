@@ -143,7 +143,7 @@ void QChatModel::PrecalculateMessagePositions()
 
     if(startIdx > 0)
     {
-        pixelPosY = m_messagePositionsEndY[startIdx - 1];
+        pixelPosY = m_messagePositionsEndY[startIdx - 1] + QMessage::Margin;
     }
 
     for(int i = startIdx; i < m_messages->size(); i++)
@@ -157,7 +157,7 @@ void QChatModel::PrecalculateMessagePositions()
         qDebug("\tNew Pos: %u (height=%u)", pixelPosY, nextYPosDiff);
 
         m_messagePositionsStartY.emplace_back(pixelPosY);
-        m_messagePositionsEndY.emplace_back(nextYPos);
+        m_messagePositionsEndY.emplace_back(pixelPosY + totalMessageHeight);
 
         pixelPosY = nextYPos;
         m_totalHeight = nextYPos;
@@ -204,7 +204,7 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
         return result;
     }
 
-    while(leftIdx < rightIdx)
+    while(leftIdx <= rightIdx)
     {
         midIdx = leftIdx + ((rightIdx - leftIdx) / 2);
         uint64_t midStartY = m_messagePositionsStartY[midIdx];
@@ -219,9 +219,9 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
         }
         else if(viewportStartY < midStartY)
         {
-            qDebug("\t\tCant go more left, we found it.");
             if(midIdx == 0)
             {
+                qDebug("\t\tCant go more left, we found it.");
                 break;
             }
 
@@ -230,9 +230,9 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
         }
         else if(viewportStartY > midStartY)
         {
-            qDebug("\t\tCant go more right, we found it.");
             if(midIdx == m_messagePositionsStartY.size() - 1)
             {
+                qDebug("\t\tCant go more right, we found it.");
                 break;
             }
 
@@ -255,7 +255,7 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
     //    }
     //}
 
-    qDebug("Gather Items from MidIdx");
+    qDebug("Gather Items from MidIdx - midIdx=%u", midIdx);
     uint64_t posStartY = m_messagePositionsStartY[midIdx];
     while(posStartY <= viewportEndY && midIdx < m_messagePositionsStartY.size())
     {
