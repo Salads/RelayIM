@@ -114,9 +114,6 @@
     <QtUic Include="widgets\QChatWidget\QChatWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="components\QMessage\QMessage.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="components\QChatInput\QChatInput.ui">
       <Filter>Form Files</Filter>
     </QtUic>

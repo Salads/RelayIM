@@ -3,21 +3,29 @@
 QMessage::QMessage(QWidget *parent)
     : QWidget(parent)
 {
-    ui.setupUi(this);
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    m_usernameLabel = new QLabel();
+    m_messageLabel = new QLabel();
 
-    ui.messageLabel->setWordWrap(true);
-    ui.messageLabel->setMaximumWidth(MessageWidth);
-    ui.messageLabel->setMinimumWidth(MessageWidth);
+    layout->addWidget(m_usernameLabel);
+    layout->addWidget(m_messageLabel);
 
-    ui.usernameLabel->setMaximumWidth(UsernameWidth);
-    ui.usernameLabel->setMinimumWidth(UsernameWidth);
+    m_messageLabel->setWordWrap(true);
+    m_messageLabel->setMinimumWidth(MessageWidth);
+    m_messageLabel->setMaximumWidth(MessageWidth);
+    setMaximumWidth(TotalWidth);
 
-    int totalWidth = MessageWidth + UsernameWidth;
-    setMinimumWidth(totalWidth);
-    setMaximumWidth(totalWidth);
+    m_usernameLabel->setFont(Font);
+    m_messageLabel->setFont(Font);
 
-    ui.usernameLabel->setFont(Font);
-    ui.messageLabel->setFont(Font);
+    QPalette pal = QPalette();
+    pal.setColor(QPalette::Window, "#669999");
+    m_usernameLabel->setAutoFillBackground(true);
+    m_usernameLabel->setPalette(pal);
+
+    pal.setColor(QPalette::Window, "#669999");
+    m_messageLabel->setAutoFillBackground(true);
+    m_messageLabel->setPalette(pal);
 }
 
 QMessage::~QMessage()
@@ -25,6 +33,13 @@ QMessage::~QMessage()
 
 void QMessage::SetContents(std::string username, std::string message)
 {
-    ui.usernameLabel->setText(QString::fromStdString(username) + ": ");
-    ui.messageLabel->setText(QString::fromStdString(message));
+    m_usernameLabel->setText(QString::fromStdString(username) + ": ");
+
+    QFontMetrics metrics(m_usernameLabel->font());
+    int width = metrics.horizontalAdvance(m_usernameLabel->text());
+    m_usernameLabel->setFixedWidth(width);
+    m_usernameLabel->setMaximumWidth(width);
+    m_usernameLabel->setMinimumWidth(width);
+
+    m_messageLabel->setText(QString::fromStdString(message));
 }

@@ -2,7 +2,8 @@
 
 #include <string>
 #include <QWidget>
-#include "ui_QMessage.h"
+#include <QLabel>
+#include <QBoxLayout>
 #include <qlineedit.h>
 
 class QMessage : public QWidget
@@ -23,6 +24,7 @@ public:
     inline static const qsizetype TotalWidth = UsernameWidth + MessageWidth + (Margin * 2);
 
 private:
-    Ui::QMessageClass ui;
+    QLabel* m_usernameLabel;
+    QLabel* m_messageLabel;
 };
 

@@ -92,6 +92,9 @@ void QChatModel::RenderObjects()
 
 void QChatModel::SetRoom(RoomID roomID)
 {
+    ClearMessagePositions();
+    ClearRenderObjects();
+
     m_roomID = roomID;
 
     if(roomID != INVALID_ROOM_ID)
@@ -104,6 +107,7 @@ void QChatModel::SetRoom(RoomID roomID)
     }
     
     PrecalculateMessagePositions();
+    RenderObjects();
 }
 
 void QChatModel::Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message)
@@ -124,25 +128,9 @@ void QChatModel::Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector
 uint32_t QChatModel::GetMessageHeight(const std::string& message)
 {
     QFontMetrics fm(QMessage::Font);
-    int lineHeight = fm.height();
-    int message1DWidth = fm.horizontalAdvance(QString::fromStdString(message));
-    int nLines = (message1DWidth / QMessage::MessageWidth) + 1;
-    int totalMessageHeight = nLines * lineHeight;
-
-    return totalMessageHeight;
+    return fm.boundingRect(QRect(0, 0, QMessage::TotalWidth, INT_MAX), Qt::AlignLeft | Qt::TextWordWrap, QString::fromStdString(message)).height();
 }
 
-/*
-    Messages and Rendering
-    ---------------------------------------
-    Messages come in, we _append_ to a vector. This means that "new" messages are at the back, and order is oldest->newest via index.
-    When rendering, we start from the top to the bottom, so that also means oldest->newest
-
-    When we store message positions, we iterate forwards in the messages list. So, this means we store these oldest->newest as well.
-    
-    When we calculate a new position for a new message, we don't have to modify every other position, because we simply increase the size of the parent
-    background widget that these messages are parented to. The oldest message will always have the same position, because origin is top-left.
-*/
 void QChatModel::PrecalculateMessagePositions()
 {
     if(m_roomID == INVALID_ROOM_ID)
