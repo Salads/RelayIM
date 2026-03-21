@@ -10,8 +10,8 @@ QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
 
     connect(m_manager, &QModelManager::Event_RoomUpdate_Message, this, &QChatModel::Slot_RoomUpdate_Message);
     connect(m_manager, &QModelManager::Event_RoomUpdate_FULL, this, &QChatModel::Slot_RoomUpdate_FULL);
-
-    //connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::RenderObjects);
+    connect(m_vBar, &QScrollBar::rangeChanged, this, &QChatModel::Slot_ScrollRangeChanged);
+    connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::Slot_ScrollValueChanged);
 
     QPalette pal = QPalette();
     pal.setColor(QPalette::Window, "#999999");
@@ -19,8 +19,23 @@ QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
     setPalette(pal);
 }
 
+void QChatModel::Slot_ScrollRangeChanged(int min, int max)
+{
+    RenderObjects();
+}
+
+void QChatModel::Slot_ScrollValueChanged(int value)
+{
+    RenderObjects();
+}
+
 void QChatModel::RenderObjects()
 {
+    if(m_roomID == INVALID_ROOM_ID)
+    {
+        return;
+    }
+
     float min = m_vBar->minimum();
     float max = m_vBar->maximum();
     float val = m_vBar->value();
@@ -28,12 +43,11 @@ void QChatModel::RenderObjects()
     uint64_t pixStartY = 0;
     uint64_t pixEndY = m_totalHeight;
 
-    // Scrollbar is visible, meaning we are larger than it.
-    if(min && max && val)
+    // Scrollbar has content larger than viewport
+    if(max > 0)
     {
-        float percentVal = (val - min) / (max - min);
-        uint64_t pixStartY = m_totalHeight * percentVal;
-        uint64_t pixEndY = pixStartY + m_vBar->pageStep();
+        pixStartY = val;
+        pixEndY = val + m_vBar->pageStep();
     }
 
     std::vector<QMessagePosition> positions = GetMessagesForRender(pixStartY, pixEndY);
@@ -51,7 +65,7 @@ void QChatModel::RenderObjects()
     }
 
     nObjects = m_messageObjects.size();
-    for(int i = 0; i < (nObjectsNeeded - nObjects); i++)
+    for(int i = nObjects; i > nObjectsNeeded; i--)
     {
         QMessage* messageObj = m_messageObjects.back();
         m_messageObjects.pop_back();
@@ -240,20 +254,6 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
             leftIdx = midIdx + 1;
         }
     }
-
-    // If we haven't found an intersection yet, this means we have a "clean" viewport, as in the first message is entirely visible and isn't partially shown.
-    // This means we just get the next one after the viewport's start y
-
-    //uint64_t midStartY = m_messagePositionsStartY[midIdx];
-    //uint64_t midEndY = m_messagePositionsEndY[midIdx];
-    //if(viewportStartY > midEndY) // The message we got is above, and completely hidden
-    //{
-    //    if(midIdx < m_messagePositionsStartY.size() - 1)
-    //    {
-    //        qDebug("Viewport Check - Message is above, get next one");
-    //        midIdx++;
-    //    }
-    //}
 
     qDebug("Gather Items from MidIdx - midIdx=%u", midIdx);
     uint64_t posStartY = m_messagePositionsStartY[midIdx];

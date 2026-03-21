@@ -46,6 +46,8 @@ public:
 public slots:
     void Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
     void Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
+    void Slot_ScrollValueChanged(int value);
+    void Slot_ScrollRangeChanged(int min, int max);
 
 private:
     /// <summary>
@@ -61,9 +63,6 @@ private:
 
     void ClearMessagePositions();
     void ClearRenderObjects();
-
-    size_t GetFirstMessageIdxForRender_Linear();
-    size_t GetFirstMessageIdxForRender_Binary();
 
 private:
 
