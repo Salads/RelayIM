@@ -24,7 +24,7 @@ public:
 
     inline static const int Margin = 0;
     inline static const int Padding = 0;
-    inline static const int Spacing = 20;
+    inline static const int Spacing = 5;
 
 private:
     QLabel* m_usernameLabel;

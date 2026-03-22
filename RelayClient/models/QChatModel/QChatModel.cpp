@@ -12,11 +12,6 @@ QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
     connect(m_manager, &QModelManager::Event_RoomUpdate_FULL, this, &QChatModel::Slot_RoomUpdate_FULL);
     connect(m_vBar, &QScrollBar::rangeChanged, this, &QChatModel::Slot_ScrollRangeChanged);
     connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::Slot_ScrollValueChanged);
-
-    QPalette pal = QPalette();
-    pal.setColor(QPalette::Window, "#999999");
-    setAutoFillBackground(true);
-    setPalette(pal);
 }
 
 void QChatModel::Slot_ScrollRangeChanged(int min, int max)

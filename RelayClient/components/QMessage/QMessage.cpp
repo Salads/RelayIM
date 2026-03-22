@@ -30,11 +30,6 @@ QMessage::QMessage(QWidget *parent)
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     setFocusPolicy(Qt::NoFocus);
-
-    QPalette pal = QPalette();
-    pal.setColor(QPalette::Window, "#669999");
-    setAutoFillBackground(true);
-    setPalette(pal);
 }
 
 QMessage::~QMessage()
