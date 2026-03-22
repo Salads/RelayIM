@@ -27,6 +27,7 @@ public:
 public:
     inline static const QFont Font = QFont("Arial");
 
+    inline static const int TextPadding = 10;
     inline static const int LeftPadding = 15;
     inline static const int Margin = 0;
     inline static const int Padding = 0;

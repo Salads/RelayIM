@@ -3,14 +3,8 @@
 QMessage::QMessage(QWidget *parent)
     : QWidget(parent)
 {
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(LeftPadding, 0, 0, 0);
-    m_usernameLabel = new QLabel();
-    m_messageLabel = new QLabel();
-
-    layout->addWidget(m_usernameLabel);
-    layout->addWidget(m_messageLabel);
-    layout->addStretch();
+    m_usernameLabel = new QLabel(this);
+    m_messageLabel = new QLabel(this);
 
     m_messageLabel->setWordWrap(true);
     m_messageLabel->setMargin(Margin);
@@ -53,6 +47,9 @@ void QMessage::SetContents(std::string username, std::string message, int viewpo
     m_messageLabel->setMaximumSize(constraints.m_messageSize);
     m_messageLabel->setFixedSize(constraints.m_messageSize);
 
+    m_usernameLabel->move(LeftPadding, 0);
+    m_messageLabel->move(LeftPadding + constraints.m_usernameSize.width() + TextPadding, 0);
+
     adjustSize(); // shrinkwrap
 }
 
@@ -62,7 +59,9 @@ QMessageTextConstraints QMessage::GetTextConstraints(std::string username, std::
     int usernameTextWidth = metrics.horizontalAdvance(QString::fromStdString(username));
 
     int usernameWidth = metrics.horizontalAdvance(QString::fromStdString(username), Qt::AlignLeft);
-    QRect messageBounds = metrics.boundingRect(QRect(0, 0, viewportWidth - usernameWidth - LeftPadding, INT_MAX), Qt::AlignLeft | Qt::TextWordWrap, QString::fromStdString(message));
+    QRect messageBounds = metrics.boundingRect(QRect(0, 0, viewportWidth - usernameWidth - (LeftPadding * 2) - (TextPadding * 2), INT_MAX), 
+                                               Qt::AlignLeft | Qt::TextWrapAnywhere, 
+                                               QString::fromStdString(message));
 
     QMessageTextConstraints result;
     result.m_usernameSize = QSize(usernameTextWidth, metrics.height());
