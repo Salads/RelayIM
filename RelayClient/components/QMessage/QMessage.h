@@ -18,10 +18,13 @@ public:
 
 public:
     inline static const QFont Font = QFont("Arial");
-    inline static const qsizetype UsernameWidth = 100;
-    inline static const qsizetype MessageWidth = 300;
-    inline static const qsizetype Margin = 11;
-    inline static const qsizetype TotalWidth = UsernameWidth + MessageWidth + (Margin * 2);
+    inline static const qsizetype MaxUsernameWidth = 100;
+    inline static const qsizetype FixedMessageWidth = 300;
+    inline static const qsizetype TotalWidth = MaxUsernameWidth + FixedMessageWidth;
+
+    inline static const int Margin = 0;
+    inline static const int Padding = 0;
+    inline static const int Spacing = 20;
 
 private:
     QLabel* m_usernameLabel;

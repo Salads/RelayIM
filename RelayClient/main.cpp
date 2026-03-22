@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setStyle("Fusion");
 
+#if 1
     // Set light mode stylesheet globally
     QPalette lightPalette;
     lightPalette.setColor(QPalette::Window, QColor(255, 255, 255));           // White background
@@ -27,13 +28,14 @@ int main(int argc, char *argv[])
     lightPalette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
     lightPalette.setColor(QPalette::Link, QColor(0, 0, 255));
     app.setPalette(lightPalette);
+#else
+    QFile file("styles.qss");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(file.readAll());
+    file.close();
 
-    //QFile file("styles.qss");
-    //file.open(QFile::ReadOnly);
-    //QString styleSheet = QLatin1String(file.readAll());
-    //app.setStyleSheet(styleSheet);
-
-    //file.close();
+    app.setStyleSheet(styleSheet);
+#endif
 
     RelayClient window;
     window.show();

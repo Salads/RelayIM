@@ -9,6 +9,7 @@
 #include <QList>
 #include <QFontMetrics>
 #include <QScrollBar>
+#include <QVBoxLayout>
 
 #include "ChatMessage.h"
 #include "models/QModelManager/QModelManager.h"
@@ -24,8 +25,9 @@ using std::vector;
 /// </summary>
 struct QMessagePosition
 {
-    QMessagePosition(uint64_t startY, qsizetype index);
+    QMessagePosition(uint64_t startY, uint64_t endY, qsizetype index);
     uint64_t m_startY; // Pixel position relative to parent
+    uint64_t m_endY;
     qsizetype m_index; // Index of message data in m_messages
 };
 
