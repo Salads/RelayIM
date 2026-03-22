@@ -43,7 +43,7 @@ public:
 
     void SetRoom(RoomID roomID);
 
-    std::vector<QMessagePosition> GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
+    void Refresh();
 
 public slots:
     void Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
@@ -59,12 +59,13 @@ private:
     /// </summary>
     void PrecalculateMessagePositions();
 
-    uint32_t GetMessageHeight(const std::string& message);
+    uint32_t GetMessageHeight(const std::string& username, const std::string& message);
 
     void RenderObjects();
 
     void ClearMessagePositions();
     void ClearRenderObjects();
+    std::vector<QMessagePosition> GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
 
 private:
 
@@ -81,5 +82,7 @@ private:
     QList<QMessage*> m_messageObjects;
 
     uint64_t m_totalHeight = 0;
+    
+    const int c_chatWindowMargin = 10;
 };
 

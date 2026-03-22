@@ -45,14 +45,11 @@ void QChatModel::RenderObjects()
         pixEndY = pixStartY + m_vBar->pageStep();
     }
 
-    //qDebug("Render - m_totalHeight(%u), pixStartY(%u), pixEndY(%u), pageStep(%u)", m_totalHeight, pixStartY, pixEndY, m_vBar->pageStep());
     std::vector<QMessagePosition> positions = GetMessagesForRender(pixStartY, pixEndY);
 
     // Make sure we have the exact amount of QMessage objects
     qsizetype nObjectsNeeded = positions.size();
     qsizetype nObjects = m_messageObjects.size();
-
-    //qDebug("QChatModel::RenderObjects - nPositions=%u, nObjects=%u", nObjectsNeeded, nObjects);
 
     for(int i = nObjects; i < nObjectsNeeded; i++)
     {
@@ -76,7 +73,6 @@ void QChatModel::RenderObjects()
     // Now we have the exact amount needed.
     Q_ASSERT(positions.size() == m_messageObjects.size());
 
-    qDebug("RenderObjects");
     for(int i = 0; i < positions.size(); i++)
     {
         QMessagePosition* pos = &positions[i];
@@ -85,11 +81,9 @@ void QChatModel::RenderObjects()
 
         std::string username = m_manager->GetUsernameByPeerID(message->m_senderID);
 
-        obj->SetContents(username, message->m_message);
+        obj->SetContents(username, message->m_message, m_chatView->GetViewportWidth());
         obj->move(0, pos->m_startY);
         obj->show();
-
-        qDebug("\tRendering QMessage(msg=%d->pos=%d) at (%u, %u), datasize=%u, objsize=%u", pos->m_index, i, 0, pos->m_startY, pos->m_endY - pos->m_startY, obj->height());
     }
 }
 
@@ -122,16 +116,13 @@ void QChatModel::Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::stri
 
 void QChatModel::Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
 {
-    ClearMessagePositions();
-    PrecalculateMessagePositions();
-    m_vBar->setValue(m_vBar->maximum());
-    RenderObjects();
+    Refresh();
 }
 
-uint32_t QChatModel::GetMessageHeight(const std::string& message)
+uint32_t QChatModel::GetMessageHeight(const std::string& username, const std::string& message)
 {
-    QFontMetrics fm(QMessage::Font);
-    return fm.boundingRect(QRect(0, 0, QMessage::TotalWidth, INT_MAX), Qt::AlignLeft | Qt::TextWordWrap, QString::fromStdString(message)).height();
+    QMessageTextConstraints constraints =  QMessage::GetTextConstraints(username, message, m_chatView->GetViewportWidth());
+    return constraints.m_messageSize.height();
 }
 
 void QChatModel::PrecalculateMessagePositions()
@@ -143,9 +134,7 @@ void QChatModel::PrecalculateMessagePositions()
 
     size_t startIdx = m_messagePositionsStartY.size();
     int spaceBetweenMessages = QMessage::Margin + QMessage::Spacing;
-    uint64_t pixelPosY = spaceBetweenMessages;
-
-    //qDebug("QChatModel::PrecalculateMessagePositions - nPos=%u", startIdx);
+    uint64_t pixelPosY = c_chatWindowMargin;
 
     if(startIdx > 0)
     {
@@ -156,25 +145,22 @@ void QChatModel::PrecalculateMessagePositions()
     {
         const ChatMessage* message = &m_messages->at(i);
 
-        uint64_t totalObjectHeight = GetMessageHeight(message->m_message);
+        uint64_t totalObjectHeight = GetMessageHeight(m_manager->GetUsernameByPeerID(message->m_senderID), message->m_message);
         uint64_t nextYPos = pixelPosY + totalObjectHeight + spaceBetweenMessages;
-
-        //qDebug("\tNew Pos: %u (height=%u)", pixelPosY, nextYPosDiff);
 
         m_messagePositionsStartY.emplace_back(pixelPosY);
         m_messagePositionsEndY.emplace_back(pixelPosY + totalObjectHeight);
 
         pixelPosY = nextYPos;
-        m_totalHeight = nextYPos;
+        m_totalHeight = nextYPos + c_chatWindowMargin;
     }
 
     setFixedHeight(m_totalHeight);
-    setMinimumSize(QMessage::TotalWidth, m_totalHeight);
+    setMinimumSize(m_chatView->GetViewportWidth(), m_totalHeight);
 }
 
 void QChatModel::ClearMessagePositions()
 {
-    //qDebug("QChatModel::ClearMessagePositions");
     ClearRenderObjects();
     m_messagePositionsStartY.clear();
     m_messagePositionsEndY.clear();
@@ -183,13 +169,20 @@ void QChatModel::ClearMessagePositions()
 
 void QChatModel::ClearRenderObjects()
 {
-    //qDebug("QChatModel::ClearRenderObjects");
     for(int i = 0; i < m_messageObjects.size(); i++)
     {
         delete m_messageObjects[i];
     }
 
     m_messageObjects.clear();
+}
+
+void QChatModel::Refresh()
+{
+    ClearMessagePositions();
+    PrecalculateMessagePositions();
+    m_vBar->setValue(m_vBar->maximum());
+    RenderObjects();
 }
 
 std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY)
@@ -201,11 +194,8 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
     qsizetype rightIdx = m_messagePositionsStartY.size() - 1;
     qsizetype midIdx = 0;
 
-    //qDebug("Start - LeftIdx=%u, RightIdx=%u, viewportStartY=%u, viewportEndY=%u, nPositions:%u", leftIdx, rightIdx, viewportStartY, viewportEndY, m_messagePositionsStartY.size());
-
     if(m_messagePositionsStartY.empty())
     {
-        //qDebug("End - No positions!");
         return result;
     }
 
@@ -215,38 +205,33 @@ std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewport
         uint64_t midStartY = m_messagePositionsStartY[midIdx];
         uint64_t midEndY = m_messagePositionsEndY[midIdx];
 
-        //qDebug("\tIteration - MidIdx=%u [%u, %u], LeftIdx=%u, RightIdx=%u", midIdx, midStartY, midEndY, leftIdx, rightIdx);
-
         if(viewportStartY >= midStartY && viewportStartY <= midEndY)
         {
-            //qDebug("\t\tFound Intersection");
             break;
         }
         else if(viewportStartY < midStartY)
         {
             if(midIdx == 0)
             {
-                //qDebug("\t\tCant go more left, we found it.");
                 break;
             }
 
-            //qDebug("\t\tUse Left Half");
             rightIdx = midIdx - 1;
         }
         else if(viewportStartY > midStartY)
         {
             if(midIdx == m_messagePositionsStartY.size() - 1)
             {
-                //qDebug("\t\tCant go more right, we found it.");
                 break;
             }
 
-            //qDebug("\t\tUse Right Half");
             leftIdx = midIdx + 1;
         }
     }
 
-    //qDebug("Gather Items from MidIdx - midIdx=%u", midIdx);
+    // If the scrollbar value is in between messages, we either got the correct one, or the message invisible above the top.
+    // So this is fine.
+
     uint64_t posStartY = m_messagePositionsStartY[midIdx];
     while(posStartY <= viewportEndY && midIdx < m_messagePositionsStartY.size())
     {

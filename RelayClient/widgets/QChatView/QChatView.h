@@ -19,6 +19,11 @@ public:
 
     void SetRoom(RoomID roomID);
 
+    int GetViewportWidth();
+
+protected:
+    void resizeEvent(QResizeEvent* event);
+
 private:
     Ui::QChatViewClass ui;
 
