@@ -2,7 +2,7 @@
 
 #include "RelayIMClient.h"
 #include "PacketReader.h"
-#include "BinaryWriter.h"
+#include "PacketWriter.h"
 #include "Logging.h"
 
 RelayIMClient::RelayIMClient(IRelayIMClientPacketHandler* handler)
@@ -169,7 +169,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
 void RelayIMClient::SendConnect(std::string desiredUsername)
 {
     PacketData packetData;
-    BinaryWriter writer(packetData);
+    PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_Connect);
     writer.WriteString(desiredUsername);
     writer.Finalize();
@@ -180,7 +180,7 @@ void RelayIMClient::SendConnect(std::string desiredUsername)
 void RelayIMClient::SendRequestAllChatRooms()
 {
     PacketData packetData;
-    BinaryWriter writer(packetData);
+    PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_ListChatRooms);
     writer.Finalize();
 
@@ -190,7 +190,7 @@ void RelayIMClient::SendRequestAllChatRooms()
 void RelayIMClient::SendJoinChatRoom(RoomID roomID)
 {
     PacketData packetData;
-    BinaryWriter writer(packetData);
+    PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_JoinChatRoom);
     writer.WriteUInt32(roomID);
     writer.Finalize();
@@ -201,7 +201,7 @@ void RelayIMClient::SendJoinChatRoom(RoomID roomID)
 void RelayIMClient::SendCreateChatRoom(std::string roomName)
 {
     PacketData packetData;
-    BinaryWriter writer(packetData);
+    PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_CreateChatRoom);
     writer.WriteString(roomName);
     writer.Finalize();
@@ -212,7 +212,7 @@ void RelayIMClient::SendCreateChatRoom(std::string roomName)
 void RelayIMClient::SendLeaveChatRoom(RoomID roomID)
 {
     PacketData packetData;
-    BinaryWriter writer(packetData);
+    PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_LeaveChatRoom);
     writer.WriteUInt32(roomID);
     writer.Finalize();
@@ -225,7 +225,7 @@ void RelayIMClient::SendMessageToRoom(RoomID roomID, std::string message)
     Log::Get()->ConditionalWriteLine(LOG_UI, "Sending '%s' to Room %u", message, roomID);
 
     PacketData packetData;
-    BinaryWriter writer(packetData);
+    PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_SendMessage);
     writer.WriteUInt32(roomID);
     writer.WriteString(message);

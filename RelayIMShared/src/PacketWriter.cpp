@@ -1,10 +1,10 @@
-#include "BinaryWriter.h"
+#include "PacketWriter.h"
 
-BinaryWriter::BinaryWriter(PacketData& buffer)
+PacketWriter::PacketWriter(PacketData& buffer)
     : m_buffer(&buffer)
 {}
 
-void BinaryWriter::WriteUInt8(uint8_t value)
+void PacketWriter::WriteUInt8(uint8_t value)
 {
     for (int i = 0; i < sizeof(uint8_t); i++)
     {
@@ -12,7 +12,7 @@ void BinaryWriter::WriteUInt8(uint8_t value)
     }
 }
 
-void BinaryWriter::WriteUInt16(uint16_t value)
+void PacketWriter::WriteUInt16(uint16_t value)
 {
     for(int i = 0; i < sizeof(uint16_t); i++)
     {
@@ -20,7 +20,7 @@ void BinaryWriter::WriteUInt16(uint16_t value)
     }
 }
 
-void BinaryWriter::WriteUInt32(uint32_t value)
+void PacketWriter::WriteUInt32(uint32_t value)
 {
     for (int i = 0; i < sizeof(uint32_t); i++)
     {
@@ -28,24 +28,24 @@ void BinaryWriter::WriteUInt32(uint32_t value)
     }
 }
 
-void BinaryWriter::WriteString(const std::string& string)
+void PacketWriter::WriteString(const std::string& string)
 {
     WriteUInt16(static_cast<uint16_t>(string.size()));
     m_buffer->insert(m_buffer->end(), string.begin(), string.end());
 }
 
-void BinaryWriter::WriteString(const char* str)
+void PacketWriter::WriteString(const char* str)
 {
     std::string strWrapper(str);
     WriteString(strWrapper);
 }
 
-void BinaryWriter::Finalize()
+void PacketWriter::Finalize()
 {
     *reinterpret_cast<uint16_t*>(m_buffer->data()) = static_cast<uint16_t>(m_buffer->size());
 }
 
-void BinaryWriter::RewindBytes(uint32_t numBytes)
+void PacketWriter::RewindBytes(uint32_t numBytes)
 {
     for (uint32_t i = 0; i < numBytes; i++)
     {
@@ -53,7 +53,7 @@ void BinaryWriter::RewindBytes(uint32_t numBytes)
     }
 }
 
-void BinaryWriter::WriteHeader(PacketType packetType)
+void PacketWriter::WriteHeader(PacketType packetType)
 {
     WriteUInt16(0); // Temporary packet size
     WriteUInt32(NETWORK_PASSCODE);

@@ -7,7 +7,7 @@
 #include "PacketType.h"
 #include "NetworkTypes.h"
 #include "PacketReader.h"
-#include "BinaryWriter.h"
+#include "PacketWriter.h"
 #include "Logging.h"
 
 RelayIMServer::RelayIMServer()
@@ -150,7 +150,7 @@ void RelayIMServer::ProcessClientPackets()
                 }
 
                 PacketData response;
-                BinaryWriter writer(response);
+                PacketWriter writer(response);
                 writer.WriteHeader(PacketType_ConnectResponse);
                 writer.WriteUInt8(PacketResponseReason::Success);
                 writer.WriteUInt32(peerID);
@@ -161,7 +161,7 @@ void RelayIMServer::ProcessClientPackets()
             else
             {
                 PacketData response;
-                BinaryWriter writer(response);
+                PacketWriter writer(response);
                 writer.WriteHeader(PacketType_ConnectResponse);
                 writer.WriteUInt8(PacketResponseReason::UsernameTaken);
                 writer.Finalize();
@@ -174,7 +174,7 @@ void RelayIMServer::ProcessClientPackets()
         {
             // Send PacketType_ListChatRooms_Result -> ARRAY[RoomID, RoomName]
             PacketData response;
-            BinaryWriter writer(response);
+            PacketWriter writer(response);
             writer.WriteHeader(PacketType_ListChatRooms_Result);
             writer.WriteUInt16(static_cast<uint16_t>(m_chatRooms.size()));
 
@@ -208,7 +208,7 @@ void RelayIMServer::ProcessClientPackets()
 
                 // Send JoinRoomResponse to joiner
                 std::vector<uint8_t> joinerResponse;
-                BinaryWriter joinerResponseWriter(joinerResponse);
+                PacketWriter joinerResponseWriter(joinerResponse);
                 joinerResponseWriter.WriteHeader(PacketType_JoinChatRoomResponse);
                 joinerResponseWriter.WriteUInt8(PacketResponseReason::Success);
                 joinerResponseWriter.WriteUInt32(roomID);
@@ -218,7 +218,7 @@ void RelayIMServer::ProcessClientPackets()
 
                 // Notify all clients (except joiner) of this chat room of the new client
                 std::vector<uint8_t> newUserResponse;
-                BinaryWriter newUserWriter(newUserResponse);
+                PacketWriter newUserWriter(newUserResponse);
                 newUserWriter.WriteHeader(PacketType_RoomUpdate_UserJoined);
                 newUserWriter.WriteUInt32(roomID);
                 newUserWriter.WriteUInt32(peerID);
@@ -233,7 +233,7 @@ void RelayIMServer::ProcessClientPackets()
 
                 // Send FULL update to newly joined client (arr users, arr messages)
                 std::vector<uint8_t> fullResponse;
-                BinaryWriter fullWriter(fullResponse);
+                PacketWriter fullWriter(fullResponse);
                 fullWriter.WriteHeader(PacketType_RoomUpdate_FULL);
                 fullWriter.WriteUInt32(roomID);
                 fullWriter.WriteUInt16(static_cast<uint16_t>(roomClients.size()));
@@ -268,7 +268,7 @@ void RelayIMServer::ProcessClientPackets()
             else
             {
                 PacketData response;
-                BinaryWriter writer(response);
+                PacketWriter writer(response);
                 writer.WriteHeader(PacketType_JoinChatRoomResponse);
                 writer.WriteUInt8(PacketResponseReason::ChatRoomDoesntExist);
                 writer.Finalize();
@@ -293,7 +293,7 @@ void RelayIMServer::ProcessClientPackets()
                 m_chatRooms[newRoomID]->AddClient(peerID);
 
                 PacketData response;
-                BinaryWriter writer(response);
+                PacketWriter writer(response);
                 writer.WriteHeader(PacketType_CreateChatRoomResponse);
                 writer.WriteUInt8(PacketResponseReason::Success);
                 writer.WriteUInt32(newRoomID);
@@ -305,7 +305,7 @@ void RelayIMServer::ProcessClientPackets()
             else
             {
                 PacketData response;
-                BinaryWriter writer(response);
+                PacketWriter writer(response);
                 writer.WriteHeader(PacketType_CreateChatRoomResponse);
                 writer.WriteUInt8(PacketResponseReason::ChatRoomNameTaken);
                 writer.Finalize();
@@ -326,7 +326,7 @@ void RelayIMServer::ProcessClientPackets()
             {
                 // Notify chat room members of leaving user
                 std::vector<uint8_t> responsePacket;
-                BinaryWriter writer(responsePacket);
+                PacketWriter writer(responsePacket);
                 writer.WriteHeader(PacketType_RoomUpdate_UserLeft);
                 writer.WriteUInt32(roomID);
                 writer.WriteUInt32(peerID);
@@ -367,7 +367,7 @@ void RelayIMServer::ProcessClientPackets()
 
                 // Notify all clients in chat room about the message
                 std::vector<uint8_t> messagePacket;
-                BinaryWriter writer(messagePacket);
+                PacketWriter writer(messagePacket);
                 writer.WriteHeader(PacketType_RoomUpdate_MSG);
                 writer.WriteUInt32(roomID);
                 writer.WriteUInt32(peerID);

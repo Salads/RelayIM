@@ -158,7 +158,7 @@
     <ClInclude Include="include\PacketReader.h" />
     <ClInclude Include="include\PacketHeader.h" />
     <ClInclude Include="include\PacketType.h" />
-    <ClInclude Include="include\BinaryWriter.h" />
+    <ClInclude Include="include\PacketWriter.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\Util.h" />
   </ItemGroup>
@@ -169,7 +169,7 @@
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\NetworkPacker.cpp" />
     <ClCompile Include="src\PacketReader.cpp" />
-    <ClCompile Include="src\BinaryWriter.cpp" />
+    <ClCompile Include="src\PacketWriter.cpp" />
     <ClCompile Include="src\NetworkPacket.cpp" />
     <ClCompile Include="src\PacketType.cpp" />
     <ClCompile Include="src\Util.cpp" />

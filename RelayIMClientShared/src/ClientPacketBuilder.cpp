@@ -1,10 +1,10 @@
 #include "ClientPacketBuilder.h"
-#include "BinaryWriter.h"
+#include "PacketWriter.h"
 
 PacketData ClientPacketBuilder::BuildConnectPacket(std::string userName)
 {
     PacketData result;
-    BinaryWriter writer(result);
+    PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_Connect);
     writer.WriteString(userName);
@@ -16,7 +16,7 @@ PacketData ClientPacketBuilder::BuildConnectPacket(std::string userName)
 PacketData ClientPacketBuilder::BuildListChatRoomsPacket()
 {
     PacketData result;
-    BinaryWriter writer(result);
+    PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_ListChatRooms);
     writer.Finalize();
@@ -27,7 +27,7 @@ PacketData ClientPacketBuilder::BuildListChatRoomsPacket()
 PacketData ClientPacketBuilder::BuildJoinChatRoomPacket(RoomID roomID)
 {
     PacketData result;
-    BinaryWriter writer(result);
+    PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_JoinChatRoom);
     writer.WriteUInt32(roomID);
@@ -39,7 +39,7 @@ PacketData ClientPacketBuilder::BuildJoinChatRoomPacket(RoomID roomID)
 PacketData ClientPacketBuilder::BuildCreateChatRoomPacket(std::string roomName)
 {
     PacketData result;
-    BinaryWriter writer(result);
+    PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_CreateChatRoom);
     writer.WriteString(roomName);
@@ -51,7 +51,7 @@ PacketData ClientPacketBuilder::BuildCreateChatRoomPacket(std::string roomName)
 PacketData ClientPacketBuilder::BuildLeaveChatRoomPacket(RoomID roomID)
 {
     PacketData result;
-    BinaryWriter writer(result);
+    PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_LeaveChatRoom);
     writer.WriteUInt32(roomID);
@@ -63,7 +63,7 @@ PacketData ClientPacketBuilder::BuildLeaveChatRoomPacket(RoomID roomID)
 PacketData ClientPacketBuilder::BuildSendMessagePacket(RoomID roomID, std::string message)
 {
     PacketData result;
-    BinaryWriter writer(result);
+    PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_SendMessage);
     writer.WriteUInt32(roomID);

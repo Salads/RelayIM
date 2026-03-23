@@ -2,7 +2,7 @@
 #include <WinSock2.h>
 
 #include "ClientNetworkInterface.h"
-#include "BinaryWriter.h"
+#include "PacketWriter.h"
 #include "PacketReader.h"
 #include "NetworkTypes.h"
 #include "Types.h"
