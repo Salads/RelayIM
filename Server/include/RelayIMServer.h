@@ -13,10 +13,12 @@
 #include "ChatClient.h"
 #include "ServerNetworkInterface.h"
 #include "NetworkPacket.h"
+#include "IServerPacketHandler.h"
 
-class RelayIMServer
+class RelayIMServer : public IServerPacketHandler
 {
 public:
+    RelayIMServer();
     bool Initialize();
     bool Start();
     void Stop();
@@ -34,6 +36,10 @@ private:
 
     bool IsUsernameTaken(std::string& newUsername);
     bool IsRoomnameTaken(std::string& newRoomname);
+
+    void OnNewClient(PeerID newPeerID) override;
+    void OnClientDisconnected(PeerID peerID) override;
+    void OnPacketReceived(PeerID peerID, std::unique_ptr<NetworkPacket> packet) override;
 
 private:
     bool m_isInitialized = false;

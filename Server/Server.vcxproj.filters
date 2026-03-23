@@ -13,5 +13,6 @@
     <ClInclude Include="include\ChatRoom.h" />
     <ClInclude Include="include\ServerNetworkInterface.h" />
     <ClInclude Include="include\PeerClient.h" />
+    <ClInclude Include="include\IServerPacketHandler.h" />
   </ItemGroup>
 </Project>

@@ -6,6 +6,10 @@
 using std::cout;
 using std::endl;
 
+ServerNetworkInterface::ServerNetworkInterface(IServerPacketHandler* handler)
+    : m_handler(handler)
+{}
+
 bool ServerNetworkInterface::Initialize()
 {
     WSADATA wsaData;
@@ -114,10 +118,7 @@ void ServerNetworkInterface::ListenForClients()
             PeerID newClientID = newPeerClient->m_peerID;
 
             m_peerClients.emplace(newClientID, std::move(newPeerClient));
-
-            if (OnNewClient) {
-                OnNewClient(newClientID);
-            }
+            m_handler->OnNewClient(newClientID);
         }
     }
 }
@@ -139,11 +140,7 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
         if (recvResult == 0)
         {
             MarkPeerClientForDeletion(client->m_peerID);
-
-            if (OnClientDisconnected) 
-            {
-                OnClientDisconnected(client->m_peerID);
-            }
+            m_handler->OnClientDisconnected(client->m_peerID);
 
             break;
         }
@@ -152,11 +149,7 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
             PrintWSAError("recv failed");
 
             MarkPeerClientForDeletion(client->m_peerID);
-
-            if (OnClientDisconnected) 
-            {
-                OnClientDisconnected(client->m_peerID);
-            }
+            m_handler->OnClientDisconnected(client->m_peerID);
 
             break;
         }
@@ -186,11 +179,8 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
                 newPacketData->insert(newPacketData->end(), client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
                 client->m_receiveBuffer.erase(client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
 
-                if (OnPacketReceived)
-                {
-                    std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(client->m_peerID, std::move(newPacketData));
-                    OnPacketReceived(client->m_peerID, std::move(newPacket));
-                }
+                std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(client->m_peerID, std::move(newPacketData));
+                m_handler->OnPacketReceived(client->m_peerID, std::move(newPacket));
             }
             else
             {

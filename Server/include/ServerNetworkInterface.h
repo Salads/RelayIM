@@ -15,10 +15,13 @@
 #include "ChatClient.h"
 #include "PeerClient.h"
 #include "NetworkPacket.h"
+#include "IServerPacketHandler.h"
 
 class ServerNetworkInterface : public NetworkInterface
 {
 public:
+    ServerNetworkInterface(IServerPacketHandler* handler);
+
     bool Initialize() override;
     void Shutdown() override;
 
@@ -28,10 +31,6 @@ public:
 
     void SendToClient(PeerID, PacketData* packet);
     void DeleteDisconnectedClients();
-
-    std::function<void(PeerID)> OnNewClient; // New client connected (socket, no data received)
-    std::function<void(PeerID, std::unique_ptr<NetworkPacket> newPacket)> OnPacketReceived; // client receive thread has constructed a new packet
-    std::function<void(PeerID)> OnClientDisconnected; // socket received 0, client disconnected (socket)
 
 private:
     void MarkPeerClientForDeletion(PeerID peerID);
@@ -50,4 +49,6 @@ private:
 
     std::queue<std::unique_ptr<PeerClient>> m_deletedPeerClients;
     std::mutex m_deletedPeerClientsMutex;
+
+    IServerPacketHandler* m_handler;
 };

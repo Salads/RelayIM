@@ -10,6 +10,10 @@
 #include "BinaryWriter.h"
 #include "Logging.h"
 
+RelayIMServer::RelayIMServer()
+    : m_serverNetwork(this)
+{}
+
 bool RelayIMServer::Initialize()
 {
     if (GetIsInitialized()) { return true; }
@@ -20,25 +24,25 @@ bool RelayIMServer::Initialize()
         return false;
     }
 
-    m_serverNetwork.OnNewClient = [this](PeerID newPeerID) 
-    {
-        HandleNewClient(newPeerID);
-    };
-
-    m_serverNetwork.OnClientDisconnected = [this](PeerID peerID)
-    {
-        std::lock_guard<std::mutex> lock(m_clientsMutex);
-        m_clients.erase(peerID);
-    };
-
-    m_serverNetwork.OnPacketReceived = [this](PeerID peerID, std::unique_ptr<NetworkPacket> packet)
-    {
-        this->AddPacketToQueue(std::move(packet));
-    };
-
     std::cout << "Server Initialized" << std::endl;
     m_isInitialized = true;
     return true;
+}
+
+void RelayIMServer::OnNewClient(PeerID newPeerID)
+{
+    HandleNewClient(newPeerID);
+}
+
+void RelayIMServer::OnClientDisconnected(PeerID peerID)
+{
+    std::lock_guard<std::mutex> lock(m_clientsMutex);
+    m_clients.erase(peerID);
+}
+
+void RelayIMServer::OnPacketReceived(PeerID peerID, std::unique_ptr<NetworkPacket> packet)
+{
+    this->AddPacketToQueue(std::move(packet));
 }
 
 bool RelayIMServer::Start()
