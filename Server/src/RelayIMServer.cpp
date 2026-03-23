@@ -176,18 +176,14 @@ void RelayIMServer::ProcessClientPackets()
             PacketData response;
             BinaryWriter writer(response);
             writer.WriteHeader(PacketType_ListChatRooms_Result);
+            writer.WriteUInt16(static_cast<uint16_t>(m_chatRooms.size()));
 
+            for(const auto& [roomID, chatRoom] : m_chatRooms)
             {
-                std::lock_guard lock(m_chatRoomsMutex);
-                writer.WriteUInt16(static_cast<uint16_t>(m_chatRooms.size()));
+                writer.WriteUInt32(roomID);
 
-                for (const auto& [roomID, chatRoom] : m_chatRooms)
-                {
-                    writer.WriteUInt32(roomID);
-
-                    std::string roomName = chatRoom->GetRoomName();
-                    writer.WriteString(roomName);
-                }
+                std::string roomName = chatRoom->GetRoomName();
+                writer.WriteString(roomName);
             }
 
             writer.Finalize();
@@ -202,13 +198,7 @@ void RelayIMServer::ProcessClientPackets()
                 break;
             }
 
-            bool roomExists = false;
-            {
-                std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                roomExists = m_chatRooms.contains(roomID);
-            }
-
-            if (roomExists)
+            if (m_chatRooms.contains(roomID))
             {
                 std::string joiningUsername;
                 {
@@ -216,67 +206,63 @@ void RelayIMServer::ProcessClientPackets()
                     joiningUsername = m_clients[peerID]->m_username;
                 }
 
+                // Send JoinRoomResponse to joiner
+                std::vector<uint8_t> joinerResponse;
+                BinaryWriter joinerResponseWriter(joinerResponse);
+                joinerResponseWriter.WriteHeader(PacketType_JoinChatRoomResponse);
+                joinerResponseWriter.WriteUInt8(PacketResponseReason::Success);
+                joinerResponseWriter.WriteUInt32(roomID);
+                joinerResponseWriter.WriteString(m_chatRooms[roomID]->GetRoomName());
+                joinerResponseWriter.Finalize();
+                m_serverNetwork.SendToClient(peerID, &joinerResponse);
+
+                // Notify all clients (except joiner) of this chat room of the new client
+                std::vector<uint8_t> newUserResponse;
+                BinaryWriter newUserWriter(newUserResponse);
+                newUserWriter.WriteHeader(PacketType_RoomUpdate_UserJoined);
+                newUserWriter.WriteUInt32(roomID);
+                newUserWriter.WriteUInt32(peerID);
+                newUserWriter.WriteString(joiningUsername);
+                newUserWriter.Finalize();
+
+                std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
+                for(PeerID roomClient : roomClients)
                 {
-                    std::lock_guard lock(m_chatRoomsMutex);
-
-                    // Send JoinRoomResponse to joiner
-                    std::vector<uint8_t> joinerResponse;
-                    BinaryWriter joinerResponseWriter(joinerResponse);
-                    joinerResponseWriter.WriteHeader(PacketType_JoinChatRoomResponse);
-                    joinerResponseWriter.WriteUInt8(PacketResponseReason::Success);
-                    joinerResponseWriter.WriteUInt32(roomID);
-                    joinerResponseWriter.WriteString(m_chatRooms[roomID]->GetRoomName());
-                    joinerResponseWriter.Finalize();
-                    m_serverNetwork.SendToClient(peerID, &joinerResponse);
-                    
-                    // Notify all clients (except joiner) of this chat room of the new client
-                    std::vector<uint8_t> newUserResponse;
-                    BinaryWriter newUserWriter(newUserResponse);
-                    newUserWriter.WriteHeader(PacketType_RoomUpdate_UserJoined);
-                    newUserWriter.WriteUInt32(roomID);
-                    newUserWriter.WriteUInt32(peerID);
-                    newUserWriter.WriteString(joiningUsername);
-                    newUserWriter.Finalize();
-
-                    std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
-                    for (PeerID roomClient : roomClients)
-                    {
-                        m_serverNetwork.SendToClient(roomClient, &newUserResponse);
-                    }
-
-                    // Send FULL update to newly joined client (arr users, arr messages)
-                    std::vector<uint8_t> fullResponse;
-                    BinaryWriter fullWriter(fullResponse);
-                    fullWriter.WriteHeader(PacketType_RoomUpdate_FULL);
-                    fullWriter.WriteUInt32(roomID);
-                    fullWriter.WriteUInt16(static_cast<uint16_t>(roomClients.size()));
-
-                    {
-                        std::lock_guard lock(m_clientsMutex);
-                        for (PeerID roomClient : roomClients)
-                        {
-                            fullWriter.WriteUInt32(roomClient);
-                            fullWriter.WriteString(m_clients[peerID].get()->m_username);
-                        }
-                    }
-
-                    ChatRoom* chatRoom = m_chatRooms[roomID].get();
-                    const std::vector<ChatMessage>* messages = chatRoom->GetMessages();
-
-                    uint16_t nMessages = static_cast<uint16_t>(messages->size());
-                    fullWriter.WriteUInt16(nMessages);
-
-                    for (int i = 0; i < nMessages; i++)
-                    {
-                        const ChatMessage& message = messages->at(i);
-                        fullWriter.WriteUInt32(message.m_senderID);
-                        fullWriter.WriteString(message.m_message);
-                    }
-
-                    fullWriter.Finalize();
-                    m_serverNetwork.SendToClient(peerID, &fullResponse);
-                    m_chatRooms[roomID]->AddClient(peerID);
+                    m_serverNetwork.SendToClient(roomClient, &newUserResponse);
                 }
+
+                // Send FULL update to newly joined client (arr users, arr messages)
+                std::vector<uint8_t> fullResponse;
+                BinaryWriter fullWriter(fullResponse);
+                fullWriter.WriteHeader(PacketType_RoomUpdate_FULL);
+                fullWriter.WriteUInt32(roomID);
+                fullWriter.WriteUInt16(static_cast<uint16_t>(roomClients.size()));
+
+                {
+                    std::lock_guard lock(m_clientsMutex);
+                    for(PeerID roomClient : roomClients)
+                    {
+                        fullWriter.WriteUInt32(roomClient);
+                        fullWriter.WriteString(m_clients[peerID].get()->m_username);
+                    }
+                }
+
+                ChatRoom* chatRoom = m_chatRooms[roomID].get();
+                const std::vector<ChatMessage>* messages = chatRoom->GetMessages();
+
+                uint16_t nMessages = static_cast<uint16_t>(messages->size());
+                fullWriter.WriteUInt16(nMessages);
+
+                for(int i = 0; i < nMessages; i++)
+                {
+                    const ChatMessage& message = messages->at(i);
+                    fullWriter.WriteUInt32(message.m_senderID);
+                    fullWriter.WriteString(message.m_message);
+                }
+
+                fullWriter.Finalize();
+                m_serverNetwork.SendToClient(peerID, &fullResponse);
+                m_chatRooms[roomID]->AddClient(peerID);
 
             }
             else
@@ -303,11 +289,8 @@ void RelayIMServer::ProcessClientPackets()
             {
                 RoomID newRoomID = m_nextRoomID++;
                 std::unique_ptr<ChatRoom> newChatRoom = std::make_unique<ChatRoom>(newRoomID, roomName);
-                {
-                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                    m_chatRooms[newRoomID] = std::move(newChatRoom);
-                    m_chatRooms[newRoomID]->AddClient(peerID);
-                }
+                m_chatRooms[newRoomID] = std::move(newChatRoom);
+                m_chatRooms[newRoomID]->AddClient(peerID);
 
                 PacketData response;
                 BinaryWriter writer(response);
@@ -339,13 +322,7 @@ void RelayIMServer::ProcessClientPackets()
                 break;
             }
 
-            bool roomExists = false;
-            {
-                std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                roomExists = m_chatRooms.contains(roomID);
-            }
-
-            if (roomExists)
+            if (m_chatRooms.contains(roomID))
             {
                 // Notify chat room members of leaving user
                 std::vector<uint8_t> responsePacket;
@@ -355,14 +332,10 @@ void RelayIMServer::ProcessClientPackets()
                 writer.WriteUInt32(peerID);
                 writer.Finalize();
 
+                std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
+                for(PeerID roomClient : roomClients)
                 {
-                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                    std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
-
-                    for (PeerID roomClient : roomClients)
-                    {
-                        m_serverNetwork.SendToClient(roomClient, &responsePacket);
-                    }
+                    m_serverNetwork.SendToClient(roomClient, &responsePacket);
                 }
 
                 m_chatRooms[roomID]->RemoveClient(peerID);
@@ -384,23 +357,13 @@ void RelayIMServer::ProcessClientPackets()
                 break;
             }
 
-            bool roomExists = false;
-            {
-                std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                roomExists = m_chatRooms.contains(roomID);
-            }
-
-            if (roomExists)
+            if (m_chatRooms.contains(roomID))
             {
                 ChatMessage newMessage(peerID, message);
 
                 // Add message to chat room, get all clients in chat room
-                std::vector<PeerID> chatRoomClients;
-                {
-                    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
-                    m_chatRooms[roomID]->AddMessage(newMessage);
-                    chatRoomClients = m_chatRooms[roomID]->GetClients();
-                }
+                std::vector<PeerID> chatRoomClients = m_chatRooms[roomID]->GetClients();
+                m_chatRooms[roomID]->AddMessage(newMessage);
 
                 // Notify all clients in chat room about the message
                 std::vector<uint8_t> messagePacket;
@@ -436,7 +399,6 @@ void RelayIMServer::AddPacketToQueue(std::unique_ptr<NetworkPacket> newPacket)
 
 bool RelayIMServer::IsRoomnameTaken(std::string& newRoomname)
 {
-    std::lock_guard<std::mutex> lock(m_chatRoomsMutex);
     for (auto &[roomID, chatRoom] : m_chatRooms)
     {
         if (chatRoom->GetRoomName() == newRoomname)

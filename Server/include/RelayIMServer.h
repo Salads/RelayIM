@@ -56,7 +56,6 @@ private:
     std::unordered_set<std::string> m_usedChatRoomNames;
 
     std::unordered_map<RoomID, std::unique_ptr<ChatRoom>> m_chatRooms;
-    std::mutex m_chatRoomsMutex;
 
     std::queue<std::unique_ptr<NetworkPacket>> m_incomingPackets;
     std::mutex m_incomingPacketsMutex;
