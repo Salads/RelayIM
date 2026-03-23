@@ -18,6 +18,8 @@ public:
     QRegisterDialog(QModelManager* manager, QWidget *parent = nullptr);
     ~QRegisterDialog();
 
+    bool GetRegistered();
+
 private slots:
     void Slot_RegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username);
     void Slot_OkButtonClicked(bool checked);
@@ -29,5 +31,7 @@ private:
     QPushButton* m_OKButton;
 
     QLabel* m_usernameResultLabel;
+
+    bool m_registerSuccess = false;
 };
 

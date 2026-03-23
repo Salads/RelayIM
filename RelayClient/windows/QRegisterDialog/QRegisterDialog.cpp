@@ -73,6 +73,7 @@ void QRegisterDialog::Slot_RegisterResponse(PacketResponseReason reason, PeerID 
     qDebug() << "Register Response - " << ResponseTypeToString(reason);
     if(reason == PacketResponseReason::Success)
     {
+        m_registerSuccess = true;
         close();
     }
     else
@@ -80,6 +81,11 @@ void QRegisterDialog::Slot_RegisterResponse(PacketResponseReason reason, PeerID 
         m_usernameResultLabel->setStyleSheet("QLabel { color: red }");
         m_usernameResultLabel->setText("Username Taken");
         m_OKButton->setText("Register");
-        m_OKButton->setDisabled(true);
+        m_OKButton->setDisabled(false);
     }
+}
+
+bool QRegisterDialog::GetRegistered()
+{
+    return m_registerSuccess;
 }

@@ -37,9 +37,31 @@ int main(int argc, char *argv[])
     app.setStyleSheet(styleSheet);
 #endif
 
-    RelayClient window;
+    QModelManager modelManager;
+    RelayClient window(&modelManager);
+    QRegisterDialog registerDialog(&modelManager);
+    if(window.TryConnect())
+    {
+        registerDialog.exec();
+        if(registerDialog.GetRegistered())
+        {
+            window.SetStatusUI(QConnectionStatus::Status::ConnectedRegistered);
+            window.UpdateWindowTitle();
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        QErrorMessage diag;
+        diag.showMessage("Could not connect to server. Exiting...");
+        diag.exec();
+        return -1;
+    }
+
     window.show();
-    window.TryConnect();
 
     int execResult = app.exec(); 
     Log::Destroy();

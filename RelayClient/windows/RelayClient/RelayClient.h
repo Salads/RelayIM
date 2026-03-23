@@ -20,10 +20,18 @@ class RelayClient : public QMainWindow
     Q_OBJECT
 
 public:
-    RelayClient(QWidget *parent = nullptr);
+    RelayClient(QModelManager* manager, QWidget *parent = nullptr);
     ~RelayClient();
 
-    void TryConnect();
+    /// <summary>
+    /// Purely a socket-level connect, without registering a username
+    /// </summary>
+    /// <returns>true if Successful</returns>
+    bool TryConnect();
+
+    void SetStatusUI(QConnectionStatus::Status status);
+
+    void UpdateWindowTitle();
 
 private:
     void InitializeSignalConnections();
@@ -39,7 +47,7 @@ private:
 
     const QSize c_minSize = QSize(650, 393);
 
-    QModelManager m_manager;
+    QModelManager* m_manager;
 
     QListView* m_roomsListView;
     QChatWidget* m_chatWidget;
@@ -48,7 +56,5 @@ private:
     QPushButton* m_leaveChatRoomButton;
 
     QConnectionStatus* m_connectionStatus;
-
-    QRegisterDialog* m_registerDialog;
 };
 
