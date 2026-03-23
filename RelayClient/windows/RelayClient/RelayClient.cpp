@@ -11,6 +11,8 @@ RelayClient::RelayClient(QWidget *parent)
     qRegisterMetaType<RoomID>();
     qRegisterMetaType<std::shared_ptr<std::vector<ChatMessage>>>();
 
+    setWindowTitle("Relay IM");
+
     setMinimumSize(c_minSize);
     resize(c_minSize);
 
