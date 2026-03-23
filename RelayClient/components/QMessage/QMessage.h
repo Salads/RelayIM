@@ -3,6 +3,7 @@
 #include <string>
 #include <QWidget>
 #include <QLabel>
+#include <QTextEdit>
 #include <QBoxLayout>
 #include <qlineedit.h>
 
@@ -35,6 +36,6 @@ public:
 
 private:
     QLabel* m_usernameLabel;
-    QLabel* m_messageLabel;
+    QTextEdit* m_messageEdit;
 };
 

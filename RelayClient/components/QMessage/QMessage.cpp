@@ -4,12 +4,19 @@ QMessage::QMessage(QWidget *parent)
     : QWidget(parent)
 {
     m_usernameLabel = new QLabel(this);
-    m_messageLabel = new QLabel(this);
+    m_messageEdit = new QTextEdit(this);
 
-    m_messageLabel->setWordWrap(true);
-    m_messageLabel->setMargin(Margin);
-    m_messageLabel->setContentsMargins(Padding, Padding, Padding, Padding);
-    m_messageLabel->setAlignment(Qt::AlignmentFlag::AlignLeft);
+    m_messageEdit->setContentsMargins(Padding, Padding, Padding, Padding);
+    m_messageEdit->setAlignment(Qt::AlignmentFlag::AlignLeft);
+    m_messageEdit->setCursorWidth(0);
+    m_messageEdit->setReadOnly(true);
+    m_messageEdit->setFrameStyle(QFrame::NoFrame);
+    m_messageEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_messageEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_messageEdit->setTextInteractionFlags(Qt::NoTextInteraction);
+    m_messageEdit->setAutoFillBackground(false);
+    m_messageEdit->setLineWrapMode(QTextEdit::LineWrapMode::WidgetWidth);
+    m_messageEdit->document()->setDocumentMargin(0);
 
     m_usernameLabel->setMargin(Margin);
     m_usernameLabel->setContentsMargins(Padding, Padding, Padding, Padding);
@@ -17,7 +24,7 @@ QMessage::QMessage(QWidget *parent)
     setContentsMargins(Padding, Padding, Padding, Padding);
 
     m_usernameLabel->setFont(Font);
-    m_messageLabel->setFont(Font);
+    m_messageEdit->setFont(Font);
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     setFocusPolicy(Qt::NoFocus);
@@ -35,7 +42,7 @@ QMessage::~QMessage()
 void QMessage::SetContents(std::string username, std::string message, int viewportWidth)
 {
     m_usernameLabel->setText(QString::fromStdString(username) + ": ");
-    m_messageLabel->setText(QString::fromStdString(message));
+    m_messageEdit->setText(QString::fromStdString(message));
 
     QMessageTextConstraints constraints = GetTextConstraints(username, message, viewportWidth);
 
@@ -43,12 +50,12 @@ void QMessage::SetContents(std::string username, std::string message, int viewpo
     m_usernameLabel->setMaximumSize(constraints.m_usernameSize);
     m_usernameLabel->setFixedSize(constraints.m_usernameSize);
 
-    m_messageLabel->setMinimumSize(constraints.m_messageSize);
-    m_messageLabel->setMaximumSize(constraints.m_messageSize);
-    m_messageLabel->setFixedSize(constraints.m_messageSize);
+    m_messageEdit->setMinimumSize(constraints.m_messageSize);
+    m_messageEdit->setMaximumSize(constraints.m_messageSize);
+    m_messageEdit->setFixedSize(constraints.m_messageSize);
 
     m_usernameLabel->move(LeftPadding, 0);
-    m_messageLabel->move(LeftPadding + constraints.m_usernameSize.width() + TextPadding, 0);
+    m_messageEdit->move(LeftPadding + constraints.m_usernameSize.width() + TextPadding, 0);
 
     adjustSize(); // shrinkwrap
 }
