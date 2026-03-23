@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setStyle("Fusion");
 
-#if 1
+#if 0
     // Set light mode stylesheet globally
     QPalette lightPalette;
     lightPalette.setColor(QPalette::Window, QColor(255, 255, 255));           // White background
