@@ -9,41 +9,28 @@
 #include "PacketType.h"
 #include "ClientPacketBuilder.h"
 #include "Util.h"
-#include "RelayIMClient.h"
+#include "SimpleClientTestPacketHandler.h"
 
 int main()
 {
     Log::Initialize("simple-client-test.log");
-    RelayIMClient client;
+    SimpleClientTestPacketHandler handler;
 
-    if (!client.Initialize())
+    if (!handler.Initialize())
     {
         std::cerr << "Failed to initialize client." << std::endl;
         return 1;
     }
 
-    // TODO(Salads): Hook all client network interface callbacks
-
-    if (!client.Connect())
+    if (!handler.Connect())
     {
         std::cout << "Client failed to connect." << std::endl;
         return 1;
     }
 
-    client.SendConnect("Test Username");
+    bool success = handler.TestStandardSequence();
+    std::cout << "Final Result: " << success << std::endl;
+    while(true) {};
 
-    client.SendRequestAllChatRooms();
-
-    client.SendCreateChatRoom("Hello Test Room");
-
-    client.SendJoinChatRoom(0);
-
-    client.SendMessageToRoom(0, "Test Message! Very Cool!");
-
-    client.SendLeaveChatRoom(0);
-
-    while (true) {}
-
-    client.Shutdown();
     Log::Destroy();
 }
