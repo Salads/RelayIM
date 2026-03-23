@@ -158,6 +158,7 @@
     <ClInclude Include="include\ClientPacketBuilder.h" />
     <ClInclude Include="include\ClientUser.h" />
     <ClInclude Include="include\IClientPacketHandler.h" />
+    <ClInclude Include="include\IRelayIMClientPacketHandler.h" />
     <ClInclude Include="include\RelayIMClient.h" />
     <ClInclude Include="src\ClientUser.cpp" />
   </ItemGroup>

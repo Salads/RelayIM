@@ -3,7 +3,7 @@
 #include "models/QModelManager/QModelManager.h"
 
 QModelManager::QModelManager(QObject* parent)
-    : QObject(parent)
+    : QObject(parent), m_client(this)
 {}
 
 QModelManager::~QModelManager()
@@ -119,47 +119,6 @@ void QModelManager::InitializeClientCallbacks()
 {
     if (m_callbacksInitialized) { return; }
 
-    m_client.OnRegisterResponse = [this](PacketResponseReason reason, PeerID peerID, std::string username)
-    {
-        qDebug() << "About to emit signal";
-        emit NetEvent_RegisterResponse(reason, peerID, username, QPrivateSignal());
-        qDebug() << "Signal emitted";
-    };
-
-    m_client.OnListChatRoomsResponse = [this](std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
-    {
-        emit NetEvent_ListChatRoomsResponse(chatRooms, QPrivateSignal());
-    };
-
-    m_client.OnJoinRoomResponse = [this](PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
-    {
-        emit NetEvent_JoinRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
-    };
-
-    m_client.OnCreateRoomResponse = [this](PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
-    {
-        emit NetEvent_CreateRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
-    };
-
-    m_client.OnRoomUpdate_NewMessage = [this](RoomID roomID, PeerID peerID, std::string message)
-    {
-        emit NetEvent_RoomUpdate_Message(roomID, peerID, message, QPrivateSignal());
-    };
-
-    m_client.OnRoomUpdate_FullUpdate = [this](RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
-    {
-        emit NetEvent_RoomUpdate_FULL(roomID, messages, QPrivateSignal());
-    };
-
-    m_client.OnRoomUpdate_UserJoined = [this](RoomID roomID, PeerID newPeerID, std::string newName)
-    {
-        emit NetEvent_RoomUpdate_UserJoined(roomID, newPeerID, newName, QPrivateSignal());
-    };
-
-    m_client.OnRoomUpdate_UserLeft = [this](RoomID roomID, PeerID peerID)
-    {
-        emit NetEvent_RoomUpdate_UserLeft(roomID, peerID, QPrivateSignal());
-    };
 
     connect(this, &QModelManager::NetEvent_RegisterResponse,      this, &QModelManager::NetSlot_RegisterResponse,      static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
     connect(this, &QModelManager::NetEvent_ListChatRoomsResponse, this, &QModelManager::NetSlot_ListChatRoomsResponse, static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
@@ -171,6 +130,46 @@ void QModelManager::InitializeClientCallbacks()
     connect(this, &QModelManager::NetEvent_RoomUpdate_UserLeft,   this, &QModelManager::NetSlot_RoomUpdate_UserLeft,   static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
 
     m_callbacksInitialized = true;
+}
+
+void QModelManager::OnRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username)
+{
+    emit NetEvent_RegisterResponse(reason, peerID, username, QPrivateSignal());
+}
+
+void QModelManager::OnListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
+{
+    emit NetEvent_ListChatRoomsResponse(chatRooms, QPrivateSignal());
+}
+
+void QModelManager::OnJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+{
+    emit NetEvent_JoinRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
+}
+
+void QModelManager::OnCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+{
+    emit NetEvent_CreateRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
+}
+
+void QModelManager::OnRoomUpdate_NewMessage(RoomID roomID, PeerID peerID, std::string message)
+{
+    emit NetEvent_RoomUpdate_Message(roomID, peerID, message, QPrivateSignal());
+}
+
+void QModelManager::OnRoomUpdate_FullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
+{
+    emit NetEvent_RoomUpdate_FULL(roomID, messages, QPrivateSignal());
+}
+
+void QModelManager::OnRoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName)
+{
+    emit NetEvent_RoomUpdate_UserJoined(roomID, newPeerID, newName, QPrivateSignal());
+}
+
+void QModelManager::OnRoomUpdate_UserLeft(RoomID roomID, PeerID peerID)
+{
+    emit NetEvent_RoomUpdate_UserLeft(roomID, peerID, QPrivateSignal());
 }
 
 PeerID QModelManager::GetLocalPeerID()

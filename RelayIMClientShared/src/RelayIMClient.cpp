@@ -5,8 +5,8 @@
 #include "BinaryWriter.h"
 #include "Logging.h"
 
-RelayIMClient::RelayIMClient()
-    : m_clientNetwork(this)
+RelayIMClient::RelayIMClient(IRelayIMClientPacketHandler* handler)
+    : m_clientNetwork(this), m_handler(handler)
 {}
 
 bool RelayIMClient::Initialize()
@@ -57,10 +57,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
             reader.ReadString(username);
         }
         
-        if(OnRegisterResponse)
-        {
-            OnRegisterResponse(responseReason, peerID, username);
-        }
+        m_handler->OnRegisterResponse(responseReason, peerID, username);
 
     } break;
     case PacketType_ListChatRooms_Result:
@@ -76,10 +73,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
             rooms->emplace_back(roomID, roomName);
         }
 
-        if (OnListChatRoomsResponse)
-        {
-            OnListChatRoomsResponse(std::move(rooms));
-        }
+        m_handler->OnListChatRoomsResponse(std::move(rooms));
 
     } break;
     case PacketType_JoinChatRoomResponse:
@@ -94,10 +88,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
             reader.ReadString(newRoomname);
         }
 
-        if(OnJoinRoomResponse)
-        {
-            OnJoinRoomResponse(result, newRoomID, newRoomname);
-        }
+        m_handler->OnJoinRoomResponse(result, newRoomID, newRoomname);
 
     } break;
     case PacketType_CreateChatRoomResponse:
@@ -112,10 +103,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
             reader.ReadString(newRoomname);
         }
 
-        if(OnCreateRoomResponse)
-        {
-            OnCreateRoomResponse(result, newRoomID, newRoomname);
-        }
+        m_handler->OnCreateRoomResponse(result, newRoomID, newRoomname);
 
     } break;
     case PacketType_RoomUpdate_MSG:
@@ -124,10 +112,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
         PeerID peerID = INVALID_PEER_ID;   reader.ReadUInt32(peerID);
         std::string message; reader.ReadString(message);
 
-        if (OnRoomUpdate_NewMessage)
-        {
-            OnRoomUpdate_NewMessage(roomID, peerID, message);
-        }
+        m_handler->OnRoomUpdate_NewMessage(roomID, peerID, message);
         
     } break;
     case PacketType_RoomUpdate_FULL:
@@ -141,10 +126,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
             PeerID userID; reader.ReadUInt32(userID);
             std::string username; reader.ReadString(username);
 
-            if (OnRoomUpdate_UserJoined)
-            {
-                OnRoomUpdate_UserJoined(roomID, userID, username);
-            }
+            m_handler->OnRoomUpdate_UserJoined(roomID, userID, username);
         }
 
         std::unique_ptr<std::vector<ChatMessage>> messages = std::make_unique<std::vector<ChatMessage>>();
@@ -157,10 +139,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
             messages->emplace_back(userID, message);
         }
 
-        if (OnRoomUpdate_FullUpdate)
-        {
-            OnRoomUpdate_FullUpdate(roomID, std::move(messages));
-        }
+        m_handler->OnRoomUpdate_FullUpdate(roomID, std::move(messages));
 
     } break;
     case PacketType_RoomUpdate_UserJoined:
@@ -169,10 +148,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
         PeerID peerID = INVALID_PEER_ID; reader.ReadUInt32(peerID);
         std::string username; reader.ReadString(username);
 
-        if (OnRoomUpdate_UserJoined)
-        {
-            OnRoomUpdate_UserJoined(roomID, peerID, username);
-        }
+        m_handler->OnRoomUpdate_UserJoined(roomID, peerID, username);
 
     } break;
     case PacketType_RoomUpdate_UserLeft:
@@ -180,10 +156,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
         RoomID roomID = INVALID_ROOM_ID; reader.ReadUInt32(roomID);
         PeerID peerID = INVALID_PEER_ID; reader.ReadUInt32(peerID);
 
-        if (OnRoomUpdate_UserLeft)
-        {
-            OnRoomUpdate_UserLeft(roomID, peerID);
-        }
+        m_handler->OnRoomUpdate_UserLeft(roomID, peerID);
 
     } break;
     default:

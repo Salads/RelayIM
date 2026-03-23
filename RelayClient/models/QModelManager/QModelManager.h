@@ -8,8 +8,9 @@
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
 #include "models/QChatRoomMessagesModel/QChatRoomMessagesModel.h"
 #include "Logging.h"
+#include "IRelayIMClientPacketHandler.h"
 
-class QModelManager : public QObject
+class QModelManager : public QObject, IRelayIMClientPacketHandler
 {
     Q_OBJECT  // Required for signals/slots
 
@@ -51,6 +52,30 @@ public:
 
     std::string GetUsernameByPeerID(PeerID peerID);
     std::string GetRoomnameByRoomID(RoomID roomID);
+
+    // Local Client registration result
+    void OnRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username) override;
+
+    // Requested information of all existing chat rooms result
+    void OnListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms) override;
+
+    // Local Client join existing chat room result
+    void OnJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName) override;
+
+    // Local Client create chat room result (also joins room)
+    void OnCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName) override;
+
+    // Any Client has sent a message to a chat room
+    void OnRoomUpdate_NewMessage(RoomID roomID, PeerID peerID, std::string message) override;
+
+    // Local Client joined a existing chat room with messages/clients
+    void OnRoomUpdate_FullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages) override;
+
+    // Remote Client has joined a chat room we're in.
+    void OnRoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName) override;
+
+    // Remote Client has left a chat room we're in.
+    void OnRoomUpdate_UserLeft(RoomID roomID, PeerID peerID) override;
     
 
 signals:
