@@ -9,11 +9,12 @@
 #include "ClientChatRoom.h"
 #include "ChatRoomInfo.h"
 #include "ClientUser.h"
+#include "IClientPacketHandler.h"
 
-class RelayIMClient
+class RelayIMClient : public IClientPacketHandler
 {
 public:
-    
+    RelayIMClient();
     bool Initialize();
     bool Connect();
     void Shutdown();
@@ -50,7 +51,8 @@ public:
     std::function<void(RoomID, PeerID)> OnRoomUpdate_UserLeft;
 
 private:
-    void HandleServerPacket(std::unique_ptr<NetworkPacket> serverPacket);
+    void OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket) override;
+    void OnServerDisconnected() override;
 
 private:
 

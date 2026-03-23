@@ -1,9 +1,8 @@
 #include "ClientNetworkInterface.h"
-#include "Util.h"
 
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-#include <iostream>
+ClientNetworkInterface::ClientNetworkInterface(IClientPacketHandler* handler)
+    : m_handler(handler)
+{}
 
 bool ClientNetworkInterface::Initialize()
 {
@@ -74,20 +73,14 @@ void ClientNetworkInterface::ReceiveLoop()
         if (recvResult == 0)
         {
             std::cout << "Server disconnected" << std::endl;
-
-            if (OnServerDisconnected) {
-                OnServerDisconnected();
-            }
+            m_handler->OnServerDisconnected();
 
             break;
         }
         else if (recvResult == SOCKET_ERROR)
         {
             PrintWSAError("recv failed");
-
-            if (OnServerDisconnected) {
-                OnServerDisconnected();
-            }
+            m_handler->OnServerDisconnected();
 
             break;
         }
@@ -117,13 +110,8 @@ void ClientNetworkInterface::ReceiveLoop()
                 newPacketData->insert(newPacketData->end(), m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
                 m_receiveBuffer.erase(m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
 
-                if (OnPacketReceived)
-                {
-                    // Clients don't need to know the peer id, since we know incoming traffic is from the server.
-                    // We're just reusing the NetworkPacket class here in the client, with a junk peer id.
-                    std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(INVALID_PEER_ID, std::move(newPacketData));
-                    OnPacketReceived(std::move(newPacket));
-                }
+                std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(INVALID_PEER_ID, std::move(newPacketData));
+                m_handler->OnPacketReceived(std::move(newPacket));
             }
             else
             {

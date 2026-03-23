@@ -5,17 +5,16 @@
 #include "BinaryWriter.h"
 #include "Logging.h"
 
+RelayIMClient::RelayIMClient()
+    : m_clientNetwork(this)
+{}
+
 bool RelayIMClient::Initialize()
 {
     if (!m_clientNetwork.Initialize())
     {
         return false;
     }
-
-    m_clientNetwork.OnPacketReceived = [this](std::unique_ptr<NetworkPacket> packet)
-    {
-        HandleServerPacket(std::move(packet));
-    };
 
     return true;
 }
@@ -30,7 +29,12 @@ void RelayIMClient::Shutdown()
     m_clientNetwork.Shutdown();
 }
 
-void RelayIMClient::HandleServerPacket(std::unique_ptr<NetworkPacket> serverPacket)
+void RelayIMClient::OnServerDisconnected()
+{
+    // TODO(Salads): OnServerDisconnected
+}
+
+void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket)
 {
     std::unique_ptr<NetworkPacket> packet = std::move(serverPacket);
     PacketReader reader(packet.get());
