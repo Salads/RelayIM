@@ -103,13 +103,13 @@ void QChatModel::SetRoom(RoomID roomID)
         m_messages = nullptr;
     }
     
-    PrecalculateMessagePositions();
+    PrecalculateMessagePositions(false);
     RenderObjects();
 }
 
 void QChatModel::Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message)
 {
-    PrecalculateMessagePositions();
+    PrecalculateMessagePositions(false);
     m_vBar->setValue(m_vBar->maximum());
     RenderObjects();
 }
@@ -125,14 +125,30 @@ uint32_t QChatModel::GetMessageHeight(const std::string& username, const std::st
     return constraints.m_messageSize.height();
 }
 
-void QChatModel::PrecalculateMessagePositions()
+bool QChatModel::GetMessageMultiline(const std::string& username, const std::string& message)
+{
+    QMessageTextConstraints constraints = QMessage::GetTextConstraints(username, message, m_chatView->GetViewportWidth());
+    return constraints.m_messageSize.height() > constraints.m_usernameSize.height();
+}
+
+void QChatModel::PrecalculateMessagePositions(bool fromFirstMultiline)
 {
     if(m_roomID == INVALID_ROOM_ID)
     {
         return;
     }
 
+    if(fromFirstMultiline && m_firstMultilineMessageIdx == -1)
+    {
+        return; // There are no multiline messages for our resize, so there's no need to recalculate.
+    }
+
     size_t startIdx = m_messagePositionsStartY.size();
+    if(fromFirstMultiline && m_firstMultilineMessageIdx != -1)
+    {
+        startIdx = m_firstMultilineMessageIdx;
+    }
+
     int spaceBetweenMessages = QMessage::Margin + QMessage::Spacing;
     uint64_t pixelPosY = c_chatWindowMargin;
 
@@ -145,11 +161,24 @@ void QChatModel::PrecalculateMessagePositions()
     {
         const ChatMessage* message = &m_messages->at(i);
 
+        if(m_firstMultilineMessageIdx == -1 && GetMessageMultiline(m_manager->GetUsernameByPeerID(message->m_senderID), message->m_message))
+        {
+            m_firstMultilineMessageIdx = i;
+        }
+
         uint64_t totalObjectHeight = GetMessageHeight(m_manager->GetUsernameByPeerID(message->m_senderID), message->m_message);
         uint64_t nextYPos = pixelPosY + totalObjectHeight + spaceBetweenMessages;
 
-        m_messagePositionsStartY.emplace_back(pixelPosY);
-        m_messagePositionsEndY.emplace_back(pixelPosY + totalObjectHeight);
+        if(m_messagePositionsStartY.size() <= i)
+        {
+            m_messagePositionsStartY.emplace_back(pixelPosY);
+            m_messagePositionsEndY.emplace_back(pixelPosY + totalObjectHeight);
+        }
+        else
+        {
+            m_messagePositionsStartY[i] = pixelPosY;
+            m_messagePositionsEndY[i] = pixelPosY + totalObjectHeight;
+        }
 
         pixelPosY = nextYPos;
         m_totalHeight = nextYPos + c_chatWindowMargin;
@@ -164,6 +193,7 @@ void QChatModel::ClearMessagePositions()
     ClearRenderObjects();
     m_messagePositionsStartY.clear();
     m_messagePositionsEndY.clear();
+    m_firstMultilineMessageIdx = -1;
     m_totalHeight = 0;
 }
 
@@ -180,8 +210,14 @@ void QChatModel::ClearRenderObjects()
 void QChatModel::Refresh()
 {
     ClearMessagePositions();
-    PrecalculateMessagePositions();
+    PrecalculateMessagePositions(false);
     m_vBar->setValue(m_vBar->maximum());
+    RenderObjects();
+}
+
+void QChatModel::HandleResize()
+{
+    PrecalculateMessagePositions(true);
     RenderObjects();
 }
 

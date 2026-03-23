@@ -44,6 +44,8 @@ public:
     void SetRoom(RoomID roomID);
 
     void Refresh();
+    void HandleResize();
+    void RenderObjects();
 
 public slots:
     void Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
@@ -57,11 +59,10 @@ private:
     /// 
     /// Does not clear positions already calculated, just makes sure we have a position for every message.
     /// </summary>
-    void PrecalculateMessagePositions();
+    void PrecalculateMessagePositions(bool fromFirstMultiline);
 
     uint32_t GetMessageHeight(const std::string& username, const std::string& message);
-
-    void RenderObjects();
+    bool GetMessageMultiline(const std::string& username, const std::string& message);
 
     void ClearMessagePositions();
     void ClearRenderObjects();
@@ -80,6 +81,8 @@ private:
     vector<uint64_t> m_messagePositionsEndY;
     QList<ChatMessage>* m_messages;
     QList<QMessage*> m_messageObjects;
+
+    int64_t m_firstMultilineMessageIdx = -1;
 
     uint64_t m_totalHeight = 0;
     

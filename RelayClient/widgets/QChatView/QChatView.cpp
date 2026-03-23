@@ -28,6 +28,14 @@ int QChatView::GetViewportWidth()
 void QChatView::resizeEvent(QResizeEvent* event)
 {
     QScrollArea::resizeEvent(event);
-    m_model->Refresh();
+
+    if(event->oldSize().width() != event->size().width())
+    {
+        m_model->HandleResize();
+    }
+    else if(event->oldSize().height() != event->size().height())
+    {
+        m_model->RenderObjects();
+    }
 }
 

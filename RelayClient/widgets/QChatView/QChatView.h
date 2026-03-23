@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QScrollArea>
 #include <QStyle>
+#include <QResizeEvent>
 #include "ui_QChatView.h"
 
 #include "ChatMessage.h"
