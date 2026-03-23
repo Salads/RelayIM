@@ -44,6 +44,8 @@ RelayClient::RelayClient(QModelManager* manager, QWidget *parent)
     ui.m_statusBar->addWidget(m_connectionStatus);
     ui.m_statusBar->setStyleSheet("QStatusBar { background: gray }"); // TEMP(Salads): status bar QSS
 
+    m_leaveChatRoomButton->setEnabled(false); // First load = no rooms. When we get rooms, the current should automatically be changed.
+
     m_manager->Initialize();
     InitializeSignalConnections();
 }
