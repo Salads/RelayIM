@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "NetworkTypes.h"
+#include "RoomID.h"
 
 /*
     NOTE(Salads): Just a way to keep the code for building packets on the client in a single place.

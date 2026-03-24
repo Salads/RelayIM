@@ -132,7 +132,7 @@ void QChatRoomsDialog::Slot_JoinRoomButtonClicked(bool checked)
     QModelIndex currentIdx = m_joinableRoomsListView->currentIndex();
     if(currentIdx.isValid())
     {
-        RoomID roomID = m_model.data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt();
+        RoomID roomID(m_model.data(currentIdx, QChatRoomsModel::Role::RoomIDRole).toUInt());
         m_manager->GetClient()->SendJoinChatRoom(roomID);
         m_joinRoomButton->setText("Joining...");
         m_joinRoomButton->setDisabled(true);

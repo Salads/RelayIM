@@ -30,7 +30,7 @@ PacketData ClientPacketBuilder::BuildJoinChatRoomPacket(RoomID roomID)
     PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_JoinChatRoom);
-    writer.WriteUInt32(roomID);
+    writer.WriteRoomID(roomID);
     writer.Finalize();
 
     return result;
@@ -54,7 +54,7 @@ PacketData ClientPacketBuilder::BuildLeaveChatRoomPacket(RoomID roomID)
     PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_LeaveChatRoom);
-    writer.WriteUInt32(roomID);
+    writer.WriteRoomID(roomID);
     writer.Finalize();
 
     return result;
@@ -66,7 +66,7 @@ PacketData ClientPacketBuilder::BuildSendMessagePacket(RoomID roomID, std::strin
     PacketWriter writer(result);
 
     writer.WriteHeader(PacketType_SendMessage);
-    writer.WriteUInt32(roomID);
+    writer.WriteRoomID(roomID);
     writer.WriteString(message);
     writer.Finalize();
 

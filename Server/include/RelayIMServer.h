@@ -14,6 +14,8 @@
 #include "ServerNetworkInterface.h"
 #include "NetworkPacket.h"
 #include "IServerPacketHandler.h"
+#include "RoomID.h"
+#include "PeerID.h"
 
 class RelayIMServer : public IServerPacketHandler
 {

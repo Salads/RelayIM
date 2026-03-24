@@ -26,7 +26,7 @@ QVariant QChatRoomsModel::data(const QModelIndex& index, int role) const
     {
         case Role::RoomIDRole:
         {
-            return info->m_roomID;
+            return static_cast<uint32_t>(info->m_roomID);
         }
         case Role::RoomnameRole:
         {
@@ -34,7 +34,8 @@ QVariant QChatRoomsModel::data(const QModelIndex& index, int role) const
         }
         case Qt::DisplayRole:
         {
-            return QString::fromStdString(info->m_roomname + std::string(" (id ") + std::to_string(info->m_roomID) + std::string(")"));
+            uint32_t roomID = static_cast<uint32_t>(info->m_roomID);
+            return QString::fromStdString(info->m_roomname + std::string(" (id ") + std::to_string(roomID) + std::string(")"));
         }
         default:
         {

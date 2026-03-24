@@ -18,7 +18,8 @@ QVariant QChatRoomMessagesModel::data(const QModelIndex& index, int role) const
 
     if (role == PeerIDRole)
     {
-        return m_messages[index.row()].m_senderID;
+        uint32_t peerID = static_cast<uint32_t>(m_messages[index.row()].m_senderID);
+        return peerID;
     }
     else if (role == MessageRole)
     {
@@ -32,20 +33,21 @@ QVariant QChatRoomMessagesModel::data(const QModelIndex& index, int role) const
         }
         else
         {
-            return QString::fromStdString(std::to_string(m_messages[index.row()].m_senderID) + std::string(": ") + m_messages[index.row()].m_message);
+            uint32_t peerID = static_cast<uint32_t>(m_messages[index.row()].m_senderID);
+            return QString::fromStdString(std::to_string(peerID) + std::string(": ") + m_messages[index.row()].m_message);
         }
     }
 
     return QVariant();
 }
 
-void QChatRoomMessagesModel::Initialize(QMap<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info)
+void QChatRoomMessagesModel::Initialize(QHash<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info)
 {
     m_knownUsers = knownUsers;
     m_info = *info.get();
 }
 
-void QChatRoomMessagesModel::Initialize(QMap<PeerID, std::string>* knownUsers, RoomID roomID, std::string chatRoomName)
+void QChatRoomMessagesModel::Initialize(QHash<PeerID, std::string>* knownUsers, RoomID roomID, std::string chatRoomName)
 {
     m_knownUsers = knownUsers;
     m_info.m_roomID = roomID;

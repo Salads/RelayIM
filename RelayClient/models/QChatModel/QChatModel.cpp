@@ -94,7 +94,7 @@ void QChatModel::SetRoom(RoomID roomID)
 
     m_roomID = roomID;
 
-    if(roomID != INVALID_ROOM_ID)
+    if(roomID != RoomID())
     {
         m_messages = m_manager->GetMessagesForRoom(roomID);
     }
@@ -157,7 +157,7 @@ void QChatModel::PrecalculateMessagePositions(bool fromFirstMultiline)
         pixelPosY = m_messagePositionsEndY[startIdx - 1] + spaceBetweenMessages;
     }
 
-    for(int i = startIdx; i < m_messages->size(); i++)
+    for(size_t i = startIdx; i < m_messages->size(); i++)
     {
         const ChatMessage* message = &m_messages->at(i);
 

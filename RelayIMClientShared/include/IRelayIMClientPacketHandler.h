@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "NetworkTypes.h"
 #include "ChatRoomInfo.h"

@@ -153,7 +153,7 @@ void RelayIMServer::ProcessClientPackets()
                 PacketWriter writer(response);
                 writer.WriteHeader(PacketType_ConnectResponse);
                 writer.WriteUInt8(PacketResponseReason::Success);
-                writer.WriteUInt32(peerID);
+                writer.WritePeerID(peerID);
                 writer.WriteString(newUsername);
                 writer.Finalize();
                 m_serverNetwork.SendToClient(peerID, &response);
@@ -180,7 +180,7 @@ void RelayIMServer::ProcessClientPackets()
 
             for(const auto& [roomID, chatRoom] : m_chatRooms)
             {
-                writer.WriteUInt32(roomID);
+                writer.WriteRoomID(roomID);
 
                 std::string roomName = chatRoom->GetRoomName();
                 writer.WriteString(roomName);
@@ -192,8 +192,8 @@ void RelayIMServer::ProcessClientPackets()
         } break;
         case PacketType_JoinChatRoom:
         {
-            uint32_t roomID = 0;
-            if (!reader.ReadUInt32(roomID))
+            RoomID roomID;
+            if (!reader.ReadRoomID(roomID))
             {
                 break;
             }
@@ -211,7 +211,7 @@ void RelayIMServer::ProcessClientPackets()
                 PacketWriter joinerResponseWriter(joinerResponse);
                 joinerResponseWriter.WriteHeader(PacketType_JoinChatRoomResponse);
                 joinerResponseWriter.WriteUInt8(PacketResponseReason::Success);
-                joinerResponseWriter.WriteUInt32(roomID);
+                joinerResponseWriter.WriteRoomID(roomID);
                 joinerResponseWriter.WriteString(m_chatRooms[roomID]->GetRoomName());
                 joinerResponseWriter.Finalize();
                 m_serverNetwork.SendToClient(peerID, &joinerResponse);
@@ -220,8 +220,8 @@ void RelayIMServer::ProcessClientPackets()
                 std::vector<uint8_t> newUserResponse;
                 PacketWriter newUserWriter(newUserResponse);
                 newUserWriter.WriteHeader(PacketType_RoomUpdate_UserJoined);
-                newUserWriter.WriteUInt32(roomID);
-                newUserWriter.WriteUInt32(peerID);
+                newUserWriter.WriteRoomID(roomID);
+                newUserWriter.WritePeerID(peerID);
                 newUserWriter.WriteString(joiningUsername);
                 newUserWriter.Finalize();
 
@@ -235,14 +235,14 @@ void RelayIMServer::ProcessClientPackets()
                 std::vector<uint8_t> fullResponse;
                 PacketWriter fullWriter(fullResponse);
                 fullWriter.WriteHeader(PacketType_RoomUpdate_FULL);
-                fullWriter.WriteUInt32(roomID);
+                fullWriter.WriteRoomID(roomID);
                 fullWriter.WriteUInt16(static_cast<uint16_t>(roomClients.size()));
 
                 {
                     std::lock_guard lock(m_clientsMutex);
                     for(PeerID roomClient : roomClients)
                     {
-                        fullWriter.WriteUInt32(roomClient);
+                        fullWriter.WritePeerID(roomClient);
                         fullWriter.WriteString(m_clients[peerID].get()->m_username);
                     }
                 }
@@ -256,7 +256,7 @@ void RelayIMServer::ProcessClientPackets()
                 for(int i = 0; i < nMessages; i++)
                 {
                     const ChatMessage& message = messages->at(i);
-                    fullWriter.WriteUInt32(message.m_senderID);
+                    fullWriter.WritePeerID(message.m_senderID);
                     fullWriter.WriteString(message.m_message);
                 }
 
@@ -287,7 +287,7 @@ void RelayIMServer::ProcessClientPackets()
 
             if (!IsRoomnameTaken(roomName))
             {
-                RoomID newRoomID = m_nextRoomID++;
+                RoomID newRoomID(m_nextRoomID++);
                 std::unique_ptr<ChatRoom> newChatRoom = std::make_unique<ChatRoom>(newRoomID, roomName);
                 m_chatRooms[newRoomID] = std::move(newChatRoom);
                 m_chatRooms[newRoomID]->AddClient(peerID);
@@ -296,7 +296,7 @@ void RelayIMServer::ProcessClientPackets()
                 PacketWriter writer(response);
                 writer.WriteHeader(PacketType_CreateChatRoomResponse);
                 writer.WriteUInt8(PacketResponseReason::Success);
-                writer.WriteUInt32(newRoomID);
+                writer.WriteRoomID(newRoomID);
                 writer.WriteString(roomName);
                 writer.Finalize();
                 m_serverNetwork.SendToClient(peerID, &response);
@@ -316,8 +316,8 @@ void RelayIMServer::ProcessClientPackets()
         }
         case PacketType_LeaveChatRoom:
         {
-            uint32_t roomID = INVALID_ROOM_ID;
-            if (!reader.ReadUInt32(roomID))
+            RoomID roomID;
+            if (!reader.ReadRoomID(roomID))
             {
                 break;
             }
@@ -328,8 +328,8 @@ void RelayIMServer::ProcessClientPackets()
                 std::vector<uint8_t> responsePacket;
                 PacketWriter writer(responsePacket);
                 writer.WriteHeader(PacketType_RoomUpdate_UserLeft);
-                writer.WriteUInt32(roomID);
-                writer.WriteUInt32(peerID);
+                writer.WriteRoomID(roomID);
+                writer.WritePeerID(peerID);
                 writer.Finalize();
 
                 std::vector<PeerID> roomClients = m_chatRooms[roomID]->GetClients();
@@ -345,8 +345,8 @@ void RelayIMServer::ProcessClientPackets()
         }
         case PacketType_SendMessage:
         {
-            uint32_t roomID = INVALID_ROOM_ID;
-            if (!reader.ReadUInt32(roomID))
+            RoomID roomID;
+            if (!reader.ReadRoomID(roomID))
             {
                 break;
             }
@@ -369,8 +369,8 @@ void RelayIMServer::ProcessClientPackets()
                 std::vector<uint8_t> messagePacket;
                 PacketWriter writer(messagePacket);
                 writer.WriteHeader(PacketType_RoomUpdate_MSG);
-                writer.WriteUInt32(roomID);
-                writer.WriteUInt32(peerID);
+                writer.WriteRoomID(roomID);
+                writer.WritePeerID(peerID);
                 writer.WriteString(message);
                 writer.Finalize();
 

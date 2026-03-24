@@ -12,6 +12,7 @@
 #include "NetworkPacket.h"
 #include "Util.h"
 #include "IClientPacketHandler.h"
+#include "PeerID.h"
 
 class ClientNetworkInterface : public NetworkInterface
 {

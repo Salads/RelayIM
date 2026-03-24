@@ -4,6 +4,34 @@ PacketReader::PacketReader(const NetworkPacket* data)
     : m_data(data->m_data.get()), m_cursor(m_data->data()), m_end(m_data->data() + m_data->size())
 {}
 
+bool PacketReader::ReadRoomID(RoomID& out)
+{
+    uint32_t val = 0;
+    if(!ReadUInt32(val))
+    {
+        return false;
+    }
+    else
+    {
+        out = val;
+        return true;
+    }
+}
+
+bool PacketReader::ReadPeerID(PeerID& out)
+{
+    uint32_t val = 0;
+    if(!ReadUInt32(val))
+    {
+        return false;
+    }
+    else
+    {
+        out = val;
+        return true;
+    }
+}
+
 bool PacketReader::ReadUInt8(uint8_t& outValue)
 {
     if (m_cursor + sizeof(uint8_t) > m_end)

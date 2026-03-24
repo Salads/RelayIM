@@ -47,13 +47,13 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     case PacketType_ConnectResponse:
     {
         PacketResponseReason responseReason;
-        PeerID peerID = INVALID_PEER_ID;
+        PeerID peerID;
         std::string username;
 
         reader.ReadPacketResponseReason(responseReason);
         if (responseReason == PacketResponseReason::Success)
         {
-            reader.ReadUInt32(peerID);
+            reader.ReadPeerID(peerID);
             reader.ReadString(username);
         }
         
@@ -67,7 +67,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
         uint16_t nRooms = 0; reader.ReadUInt16(nRooms);
         for (int i = 0; i < nRooms; i++)
         {
-            uint32_t roomID = INVALID_ROOM_ID; reader.ReadUInt32(roomID);
+            RoomID roomID; reader.ReadRoomID(roomID);
             std::string roomName; reader.ReadString(roomName);
 
             rooms->emplace_back(roomID, roomName);
@@ -79,12 +79,12 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     case PacketType_JoinChatRoomResponse:
     {
         PacketResponseReason result; reader.ReadPacketResponseReason(result);
-        RoomID newRoomID = INVALID_ROOM_ID;
+        RoomID newRoomID;
         std::string newRoomname;
 
         if (result == PacketResponseReason::Success)
         {
-            reader.ReadUInt32(newRoomID);
+            reader.ReadRoomID(newRoomID);
             reader.ReadString(newRoomname);
         }
 
@@ -94,12 +94,12 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     case PacketType_CreateChatRoomResponse:
     {
         PacketResponseReason result; reader.ReadPacketResponseReason(result);
-        RoomID newRoomID = INVALID_ROOM_ID;
+        RoomID newRoomID;
         std::string newRoomname;
 
         if (result == PacketResponseReason::Success)
         {
-            reader.ReadUInt32(newRoomID);
+            reader.ReadRoomID(newRoomID);
             reader.ReadString(newRoomname);
         }
 
@@ -108,8 +108,8 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     } break;
     case PacketType_RoomUpdate_MSG:
     {
-        RoomID roomID = INVALID_ROOM_ID;   reader.ReadUInt32(roomID);
-        PeerID peerID = INVALID_PEER_ID;   reader.ReadUInt32(peerID);
+        RoomID roomID;   reader.ReadRoomID(roomID);
+        PeerID peerID;   reader.ReadPeerID(peerID);
         std::string message; reader.ReadString(message);
 
         m_handler->OnRoomUpdate_NewMessage(roomID, peerID, message);
@@ -117,13 +117,13 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     } break;
     case PacketType_RoomUpdate_FULL:
     {
-        RoomID roomID = INVALID_ROOM_ID;   reader.ReadUInt32(roomID);
+        RoomID roomID;   reader.ReadRoomID(roomID);
 
         // ARRAY of users in chat room (some users might not have sent a message)
         uint16_t nUsers = 0; reader.ReadUInt16(nUsers);
         for (int i = 0; i < nUsers; i++)
         {
-            PeerID userID; reader.ReadUInt32(userID);
+            PeerID userID; reader.ReadPeerID(userID);
             std::string username; reader.ReadString(username);
 
             m_handler->OnRoomUpdate_UserJoined(roomID, userID, username);
@@ -133,7 +133,7 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
         uint16_t nMessages = 0; reader.ReadUInt16(nMessages);
         for (int i = 0; i < nMessages; i++)
         {
-            PeerID userID; reader.ReadUInt32(userID);
+            PeerID userID; reader.ReadPeerID(userID);
             std::string message; reader.ReadString(message);
 
             messages->emplace_back(userID, message);
@@ -144,8 +144,8 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     } break;
     case PacketType_RoomUpdate_UserJoined:
     {
-        RoomID roomID = INVALID_ROOM_ID; reader.ReadUInt32(roomID);
-        PeerID peerID = INVALID_PEER_ID; reader.ReadUInt32(peerID);
+        RoomID roomID; reader.ReadRoomID(roomID);
+        PeerID peerID; reader.ReadPeerID(peerID);
         std::string username; reader.ReadString(username);
 
         m_handler->OnRoomUpdate_UserJoined(roomID, peerID, username);
@@ -153,8 +153,8 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     } break;
     case PacketType_RoomUpdate_UserLeft:
     {
-        RoomID roomID = INVALID_ROOM_ID; reader.ReadUInt32(roomID);
-        PeerID peerID = INVALID_PEER_ID; reader.ReadUInt32(peerID);
+        RoomID roomID; reader.ReadRoomID(roomID);
+        PeerID peerID; reader.ReadPeerID(peerID);
 
         m_handler->OnRoomUpdate_UserLeft(roomID, peerID);
 
@@ -192,7 +192,7 @@ void RelayIMClient::SendJoinChatRoom(RoomID roomID)
     PacketData packetData;
     PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_JoinChatRoom);
-    writer.WriteUInt32(roomID);
+    writer.WriteRoomID(roomID);
     writer.Finalize();
 
     m_clientNetwork.Send(packetData);
@@ -214,7 +214,7 @@ void RelayIMClient::SendLeaveChatRoom(RoomID roomID)
     PacketData packetData;
     PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_LeaveChatRoom);
-    writer.WriteUInt32(roomID);
+    writer.WriteRoomID(roomID);
     writer.Finalize();
 
     m_clientNetwork.Send(packetData);
@@ -227,7 +227,7 @@ void RelayIMClient::SendMessageToRoom(RoomID roomID, std::string message)
     PacketData packetData;
     PacketWriter writer(packetData);
     writer.WriteHeader(PacketType_SendMessage);
-    writer.WriteUInt32(roomID);
+    writer.WriteRoomID(roomID);
     writer.WriteString(message);
     writer.Finalize();
 

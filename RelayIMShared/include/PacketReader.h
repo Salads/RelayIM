@@ -1,16 +1,21 @@
 #pragma once
 
-#include <vector>
-#include <string>
-
 #include "NetworkTypes.h"
 #include "PacketHeader.h"
 #include "NetworkPacket.h"
+#include "RoomID.h"
+#include "PeerID.h"
+
+#include <vector>
+#include <string>
 
 class PacketReader
 {
 public:
     PacketReader(const NetworkPacket *data);
+
+    bool ReadRoomID(RoomID& out);
+    bool ReadPeerID(PeerID& out);
 
     bool ReadUInt8(uint8_t& outValue);
     bool ReadUInt16(uint16_t& outValue);

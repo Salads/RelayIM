@@ -1,11 +1,13 @@
 #pragma once
 
+#include "ChatMessage.h"
+#include "Types.h"
+#include "RoomID.h"
+#include "PeerID.h"
+
 #include <string>
 #include <vector>
 #include <unordered_set>
-
-#include "ChatMessage.h"
-#include "Types.h"
 
 class ChatRoom
 {

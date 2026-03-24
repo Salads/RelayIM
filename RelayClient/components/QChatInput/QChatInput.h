@@ -22,6 +22,6 @@ private:
 
     QModelManager* m_manager;
 
-    RoomID m_roomID = INVALID_ROOM_ID;
+    RoomID m_roomID;
 };
 

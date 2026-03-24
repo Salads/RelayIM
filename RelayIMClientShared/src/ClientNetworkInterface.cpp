@@ -110,7 +110,7 @@ void ClientNetworkInterface::ReceiveLoop()
                 newPacketData->insert(newPacketData->end(), m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
                 m_receiveBuffer.erase(m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
 
-                std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(INVALID_PEER_ID, std::move(newPacketData));
+                std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(PeerID(), std::move(newPacketData));
                 m_handler->OnPacketReceived(std::move(newPacket));
             }
             else

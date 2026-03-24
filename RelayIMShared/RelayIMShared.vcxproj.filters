@@ -18,9 +18,6 @@
     <ClInclude Include="include\PacketType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\NetworkPacker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ChatClientStatus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,11 +51,14 @@
     <ClInclude Include="include\ChatRoomInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\RoomID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PeerID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\NetworkPacker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -14,6 +14,8 @@
 #include "ChatMessage.h"
 #include "models/QModelManager/QModelManager.h"
 #include "components/QMessage/QMessage.h"
+#include "RoomID.h"
+#include "PeerID.h"
 
 class QChatView;
 //#include "widgets/QChatView/QChatView.h"
@@ -75,7 +77,7 @@ private:
 
     QScrollBar* m_vBar;
 
-    RoomID m_roomID = INVALID_ROOM_ID;
+    RoomID m_roomID;
 
     vector<uint64_t> m_messagePositionsStartY;
     vector<uint64_t> m_messagePositionsEndY;

@@ -8,15 +8,17 @@
 
 #include "ChatClientStatus.h"
 #include "NetworkTypes.h"
+#include "PeerID.h"
+#include "RoomID.h"
 
 class ChatClient
 {
 public:
-    ChatClient(uint32_t peerID)
+    ChatClient(PeerID peerID)
         : m_peerID(peerID) {}
 public:
 
-    PeerID m_peerID = INVALID_PEER_ID;
+    PeerID m_peerID;
     std::string m_username;
     std::vector<RoomID> m_chatRooms;
 

@@ -1,14 +1,19 @@
 #pragma once
 
+#include "NetworkTypes.h"
+#include "RoomID.h"
+#include "PeerID.h"
+
 #include <vector>
 #include <string>
-
-#include "NetworkTypes.h"
 
 class PacketWriter
 {
 public:
     PacketWriter(PacketData &buffer);
+
+    void WriteRoomID(const RoomID& roomID);
+    void WritePeerID(const PeerID& peerID);
 
     void WriteUInt8(uint8_t value);
     void WriteUInt16(uint16_t value);

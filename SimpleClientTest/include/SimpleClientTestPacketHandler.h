@@ -3,10 +3,13 @@
 #include "IRelayIMClientPacketHandler.h"
 #include "RelayImClient.h"
 #include "Util.h"
+#include "RoomID.h"
+#include "PeerID.h"
 
 #include <vector>
 #include <string>
 #include <atomic>
+#include <memory>
 
 class SimpleClientTestPacketHandler : public IRelayIMClientPacketHandler
 {

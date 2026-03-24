@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QMutexLocker>
 #include <QAbstractItemModel>
+#include <QHash>
 
 #include "RelayIMClient.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
@@ -120,11 +121,11 @@ private:
 
     bool m_callbacksInitialized = false;
 
-    PeerID m_localPeerID = INVALID_PEER_ID; 
+    PeerID m_localPeerID; 
 
-    QMap<PeerID, std::string> m_knownUsers;
-    QMap<PeerID, QSet<RoomID>> m_userRooms;
+    QHash<PeerID, std::string> m_knownUsers;
+    QHash<PeerID, QSet<RoomID>> m_userRooms;
 
     QChatRoomsModel m_joinedChatRoomsModel;
-    QMap<RoomID, QList<ChatMessage>> m_chatRoomMessages;
+    QHash<RoomID, QList<ChatMessage>> m_chatRoomMessages;
 };

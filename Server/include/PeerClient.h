@@ -6,7 +6,7 @@
 #include <condition_variable>
 
 #include "Types.h"
-#include "NetworkTypes.h"
+#include "PeerID.h"
 
 class PeerClient
 {
@@ -26,7 +26,7 @@ private:
 public:
     std::atomic_bool m_delete = false;
 
-    PeerID m_peerID = INVALID_PEER_ID;
+    PeerID m_peerID;
     SOCKET m_clientSocket;
     std::thread m_receiveThread;
     std::vector<uint8_t> m_receiveBuffer;

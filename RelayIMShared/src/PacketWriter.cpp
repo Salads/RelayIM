@@ -4,6 +4,16 @@ PacketWriter::PacketWriter(PacketData& buffer)
     : m_buffer(&buffer)
 {}
 
+void PacketWriter::WriteRoomID(const RoomID& roomID)
+{
+    WriteUInt32(static_cast<uint32_t>(roomID));
+}
+
+void PacketWriter::WritePeerID(const PeerID& peerID)
+{
+    WriteUInt32(static_cast<uint32_t>(peerID));
+}
+
 void PacketWriter::WriteUInt8(uint8_t value)
 {
     for (int i = 0; i < sizeof(uint8_t); i++)

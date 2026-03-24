@@ -2,6 +2,9 @@
 
 #include "Types.h"
 #include "NetworkTypes.h"
+#include "PeerID.h"
+
+#include <memory>
 
 struct NetworkPacket
 {

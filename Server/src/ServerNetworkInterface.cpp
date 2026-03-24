@@ -110,7 +110,7 @@ void ServerNetworkInterface::ListenForClients()
             return;
         }
 
-        std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(m_nextClientID++, newClientSocket);
+        std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(PeerID(m_nextClientID++), newClientSocket);
         newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::ReceiveLoopForClient, this, newPeerClient.get(), newClientSocket);
         newPeerClient->m_sendThread = std::thread(&ServerNetworkInterface::SendLoopForClient, this, newPeerClient.get(), newClientSocket);
         {

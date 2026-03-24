@@ -2,8 +2,8 @@
 
 #include <string>
 #include <unordered_set>
-
-#include "Types.h"
+#include "PeerID.h"
+#include "RoomID.h"
 
 class ClientUser
 {

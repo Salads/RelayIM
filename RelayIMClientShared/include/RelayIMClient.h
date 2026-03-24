@@ -11,6 +11,8 @@
 #include "ClientUser.h"
 #include "IClientPacketHandler.h"
 #include "IRelayIMClientPacketHandler.h"
+#include "RoomID.h"
+#include "PeerID.h"
 
 class RelayIMClient : public IClientPacketHandler
 {

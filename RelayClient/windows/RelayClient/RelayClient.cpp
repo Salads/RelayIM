@@ -86,7 +86,7 @@ void RelayClient::InitializeSignalConnections()
         QModelIndex currentIndex = m_roomsListView->currentIndex();
         if(currentIndex.isValid())
         {
-            RoomID roomID = m_manager->GetModelForRooms()->data(currentIndex, QChatRoomsModel::Role::RoomIDRole).toUInt();
+            RoomID roomID(m_manager->GetModelForRooms()->data(currentIndex, QChatRoomsModel::Role::RoomIDRole).toUInt());
             m_manager->GetClient()->SendLeaveChatRoom(roomID);
         }
     });
@@ -98,7 +98,7 @@ void RelayClient::InitializeSignalConnections()
 
         if(isSomethingSelected)
         {
-            RoomID roomID = m_manager->GetModelForRooms()->data(current, QChatRoomsModel::Role::RoomIDRole).toUInt();
+            RoomID roomID(m_manager->GetModelForRooms()->data(current, QChatRoomsModel::Role::RoomIDRole).toUInt());
             m_chatWidget->SetRoomID(roomID);
         }
     });
@@ -126,7 +126,7 @@ void RelayClient::Slot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID)
     {
         if(m_chatWidget->GetRoomID() == roomID)
         {
-            m_chatWidget->SetRoomID(INVALID_PEER_ID);
+            m_chatWidget->SetRoomID(RoomID());
         }
     }
 }

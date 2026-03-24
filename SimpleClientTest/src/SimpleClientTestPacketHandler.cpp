@@ -49,13 +49,13 @@ bool SimpleClientTestPacketHandler::TestStandardSequence()
     m_success = true;
     m_currentSequenceIdx = 0;
 
-    m_client.SendConnect("TestUsername");  WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendCreateChatRoom("r1");     WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendCreateChatRoom("r2");     WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendMessageToRoom(0, "test"); WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendLeaveChatRoom(0);         WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendRequestAllChatRooms();    WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendJoinChatRoom(0);          WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendConnect("TestUsername");          WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendCreateChatRoom("r1");             WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendCreateChatRoom("r2");             WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendMessageToRoom(RoomID(0), "test"); WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendLeaveChatRoom(RoomID(0));         WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendRequestAllChatRooms();            WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.SendJoinChatRoom(RoomID(0));          WaitForNextSequenceStep(); if(!m_success) { return false; }
 
     return m_success;
 }

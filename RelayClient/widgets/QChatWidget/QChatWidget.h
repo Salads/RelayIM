@@ -29,6 +29,6 @@ private:
     QChatView* m_chatListView;
     QChatInput* m_chatInput;
 
-    RoomID m_currentRoomID = INVALID_PEER_ID;
+    RoomID m_currentRoomID;
 };
 
