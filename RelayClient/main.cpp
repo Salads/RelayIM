@@ -30,11 +30,13 @@ int main(int argc, char *argv[])
     app.setPalette(lightPalette);
 #else
     QFile file("styles.qss");
-    file.open(QFile::ReadOnly);
-    QString styleSheet = QLatin1String(file.readAll());
-    file.close();
-
-    app.setStyleSheet(styleSheet);
+    if(file.open(QFile::ReadOnly))
+    {
+        QString styleSheet = QLatin1String(file.readAll());
+        app.setStyleSheet(styleSheet);
+        file.close();
+    }
+    
 #endif
 
     QModelManager modelManager;
