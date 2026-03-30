@@ -157,7 +157,7 @@ void QChatModel::PrecalculateMessagePositions(bool fromFirstMultiline)
         pixelPosY = m_messagePositionsEndY[startIdx - 1] + spaceBetweenMessages;
     }
 
-    for(size_t i = startIdx; i < m_messages->size(); i++)
+    for(qsizetype i = startIdx; i < m_messages->size(); i++)
     {
         const ChatMessage* message = &m_messages->at(i);
 
