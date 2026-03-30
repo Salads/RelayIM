@@ -6,7 +6,6 @@ class NetworkInterface
 public: 
     virtual bool initializeInterface() = 0;
     virtual void shutdownInterface() = 0;
-    bool getIsInitialized() const { return m_isInitialized; }
 
 protected:
     bool m_isInitialized = false;

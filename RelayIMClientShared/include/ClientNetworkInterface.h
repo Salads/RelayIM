@@ -21,8 +21,9 @@ class ClientNetworkInterface : public NetworkInterface
 public:
     ClientNetworkInterface(ClientAbstractPacketHandler* handler);
     bool initializeInterface() override;
-    bool connectToServer();
     void shutdownInterface() override;
+
+    bool connectToServer();
 
     void receiveLoop();
 
