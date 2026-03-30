@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Types.h"
-#include "NetworkTypes.h"
+#include "PacketData.h"
 #include "PeerID.h"
 
 #include <memory>

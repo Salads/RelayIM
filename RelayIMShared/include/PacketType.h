@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include <cstdint>
 
 const char* PacketTypeToString(uint8_t type);
 
@@ -24,24 +24,6 @@ enum PacketType : uint8_t
 {
 #define X(name) name,
     PACKET_TYPES
-#undef X
-};
-
-const char* ResponseTypeToString(uint8_t type);
-
-#define PACKET_RESPONSE_REASONS \
-    X(Success)               \
-    X(UsernameTaken)         \
-    X(UsernameInvalid)       \
-    X(ChatRoomDoesntExist)   \
-    X(ChatRoomNameTaken)     \
-    X(ChatRoomNameInvalid)   \
-    X(Unspecified)               
-
-enum PacketResponseReason : uint8_t
-{
-#define X(name) name,
-    PACKET_RESPONSE_REASONS
 #undef X
 };
 

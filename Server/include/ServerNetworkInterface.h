@@ -11,11 +11,13 @@
 
 #include "Util.h"
 #include "NetworkInterface.h"
-#include "Types.h"
+#include "PacketData.h"
 #include "ChatClient.h"
 #include "PeerClient.h"
 #include "NetworkPacket.h"
 #include "IServerPacketHandler.h"
+#include "NetworkConfig.h"
+#include "PacketType.h"
 
 class ServerNetworkInterface : public NetworkInterface
 {

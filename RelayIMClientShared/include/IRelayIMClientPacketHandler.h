@@ -3,9 +3,9 @@
 #include <string>
 #include <memory>
 
-#include "NetworkTypes.h"
 #include "ChatRoomInfo.h"
 #include "ChatMessage.h"
+#include "PacketResponseReason.h"
 
 /// <summary>
 /// Implements the handling functions for different application-level packets.

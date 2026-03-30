@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Types.h"
+#include <cstdint>
+#include "PacketType.h"
 
 #pragma pack(push, 1)
 struct PacketHeader

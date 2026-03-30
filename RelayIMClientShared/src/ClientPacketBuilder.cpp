@@ -1,5 +1,4 @@
 #include "ClientPacketBuilder.h"
-#include "PacketWriter.h"
 
 PacketData ClientPacketBuilder::BuildConnectPacket(std::string userName)
 {

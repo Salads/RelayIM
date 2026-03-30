@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "NetworkTypes.h"
 #include "NetworkPacket.h"
 
 class IClientPacketHandler

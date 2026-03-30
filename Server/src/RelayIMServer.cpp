@@ -5,7 +5,6 @@
 
 #include "Util.h"
 #include "PacketType.h"
-#include "NetworkTypes.h"
 #include "PacketReader.h"
 #include "PacketWriter.h"
 #include "Logging.h"

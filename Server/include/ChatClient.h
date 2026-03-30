@@ -7,7 +7,6 @@
 #include <string>
 
 #include "ChatClientStatus.h"
-#include "NetworkTypes.h"
 #include "PeerID.h"
 #include "RoomID.h"
 

@@ -21,7 +21,7 @@
     <ClInclude Include="include\ChatClientStatus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\NetworkTypes.h">
+    <ClInclude Include="include\NetworkConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\NetworkInterface.h">
@@ -36,7 +36,7 @@
     <ClInclude Include="include\PacketWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Types.h">
+    <ClInclude Include="include\PacketData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PacketHeader.h">
@@ -55,6 +55,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\PeerID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PacketResponseReason.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ChatRoomInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PacketResponsReason.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

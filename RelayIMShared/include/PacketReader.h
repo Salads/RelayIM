@@ -1,10 +1,10 @@
 #pragma once
 
-#include "NetworkTypes.h"
 #include "PacketHeader.h"
 #include "NetworkPacket.h"
 #include "RoomID.h"
 #include "PeerID.h"
+#include "PacketResponseReason.h"
 
 #include <vector>
 #include <string>

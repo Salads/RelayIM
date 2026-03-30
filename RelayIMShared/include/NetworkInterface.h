@@ -1,6 +1,5 @@
 #pragma once
 
-#include "NetworkTypes.h"
 
 class NetworkInterface
 {

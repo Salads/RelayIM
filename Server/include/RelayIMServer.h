@@ -8,7 +8,7 @@
 #include <mutex>
 #include <queue>
 
-#include "Types.h"
+#include "PacketData.h"
 #include "ChatRoom.h"
 #include "ChatClient.h"
 #include "ServerNetworkInterface.h"

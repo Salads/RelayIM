@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <unordered_set>
-#include "NetworkTypes.h"
 #include "ChatMessage.h"
 #include "RoomID.h"
 #include "PeerID.h"

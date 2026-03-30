@@ -4,7 +4,7 @@
 #include <string>
 #include <functional>
 
-#include "Types.h"
+#include "PacketData.h"
 #include "ClientNetworkInterface.h"
 #include "ClientChatRoom.h"
 #include "ChatRoomInfo.h"
@@ -13,6 +13,7 @@
 #include "IRelayIMClientPacketHandler.h"
 #include "RoomID.h"
 #include "PeerID.h"
+#include "PacketHeader.h"
 
 class RelayIMClient : public IClientPacketHandler
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ChatMessage.h"
-#include "Types.h"
+#include "PacketData.h"
 #include "RoomID.h"
 #include "PeerID.h"
 

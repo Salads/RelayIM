@@ -4,10 +4,6 @@
 #include "ClientNetworkInterface.h"
 #include "PacketWriter.h"
 #include "PacketReader.h"
-#include "NetworkTypes.h"
-#include "Types.h"
-#include "PacketType.h"
-#include "ClientPacketBuilder.h"
 #include "Util.h"
 #include "SimpleClientTestPacketHandler.h"
 

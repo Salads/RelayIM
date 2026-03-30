@@ -10,6 +10,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include "ui_QChatRoomsDialog.h"
+#include "PacketResponseReason.h"
 
 #include "models/QModelManager/QModelManager.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"

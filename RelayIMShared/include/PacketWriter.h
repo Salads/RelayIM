@@ -1,11 +1,14 @@
 #pragma once
 
-#include "NetworkTypes.h"
 #include "RoomID.h"
 #include "PeerID.h"
+#include "PacketType.h"
+#include "PacketData.h"
+#include "NetworkConfig.h"
 
 #include <vector>
 #include <string>
+
 
 class PacketWriter
 {

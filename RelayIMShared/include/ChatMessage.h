@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include "NetworkTypes.h"
 #include "PeerID.h"
 
 struct ChatMessage

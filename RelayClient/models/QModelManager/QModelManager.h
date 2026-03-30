@@ -10,6 +10,7 @@
 #include "models/QChatRoomMessagesModel/QChatRoomMessagesModel.h"
 #include "Logging.h"
 #include "IRelayIMClientPacketHandler.h"
+#include "PacketResponseReason.h"
 
 class QModelManager : public QObject, IRelayIMClientPacketHandler
 {

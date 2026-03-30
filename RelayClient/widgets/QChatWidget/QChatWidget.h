@@ -4,7 +4,7 @@
 #include <QListView>
 #include <QLabel>
 
-#include "Types.h"
+#include "PacketData.h"
 #include "components/QChatInput/QChatInput.h"
 #include "models/QModelManager/QModelManager.h"
 #include "widgets/QChatView/QChatView.h"

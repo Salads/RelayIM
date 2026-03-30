@@ -5,7 +5,7 @@
 #include <vector>
 #include <condition_variable>
 
-#include "Types.h"
+#include "PacketData.h"
 #include "PeerID.h"
 
 class PeerClient
