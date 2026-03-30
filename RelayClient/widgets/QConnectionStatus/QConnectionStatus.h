@@ -15,7 +15,7 @@ public:
     QConnectionStatus(QWidget *parent = nullptr);
     ~QConnectionStatus();
 
-    void SetStatus(QConnectionStatus::Status status);
+    void setStatus(QConnectionStatus::Status status);
 
 protected:
     void paintEvent(QPaintEvent*);

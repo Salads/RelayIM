@@ -8,7 +8,7 @@
 #include "NetworkInterface.h"
 #include "NetworkPacket.h"
 #include "Util.h"
-#include "IClientPacketHandler.h"
+#include "ClientAbstractPacketHandler.h"
 #include "PeerID.h"
 #include "NetworkConfig.h"
 #include "PacketType.h"
@@ -19,14 +19,14 @@
 class ClientNetworkInterface : public NetworkInterface
 {
 public:
-    ClientNetworkInterface(IClientPacketHandler* handler);
-    bool Initialize() override;
-    bool Connect();
-    void Shutdown() override;
+    ClientNetworkInterface(ClientAbstractPacketHandler* handler);
+    bool initializeInterface() override;
+    bool connectToServer();
+    void shutdownInterface() override;
 
-    void ReceiveLoop();
+    void receiveLoop();
 
-    void Send(PacketData &data);
+    void sendPacket(PacketData &data);
 
 private:
 
@@ -39,7 +39,7 @@ private:
 
     std::thread m_receiveThread;
 
-    IClientPacketHandler* m_handler;
+    ClientAbstractPacketHandler* m_handler;
 };
 
 #endif // CLIENTNETWORKINTERFACE_H

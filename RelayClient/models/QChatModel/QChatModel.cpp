@@ -8,26 +8,26 @@ QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
     m_vBar = view->verticalScrollBar();
     m_chatView->setWidget(this);
 
-    connect(m_manager, &QModelManager::Event_RoomUpdate_Message, this, &QChatModel::Slot_RoomUpdate_Message);
-    connect(m_manager, &QModelManager::Event_RoomUpdate_FULL, this, &QChatModel::Slot_RoomUpdate_FULL);
-    connect(m_vBar, &QScrollBar::rangeChanged, this, &QChatModel::Slot_ScrollRangeChanged);
-    connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::Slot_ScrollValueChanged);
-    connect(m_chatView, &QChatView::onResize, this, &QChatModel::HandleResize);
+    connect(m_manager, &QModelManager::eventRoomUpdateMessage, this, &QChatModel::slotRoomUpdateMessage);
+    connect(m_manager, &QModelManager::eventRoomUpdateFull, this, &QChatModel::slotRoomUpdateFull);
+    connect(m_vBar, &QScrollBar::rangeChanged, this, &QChatModel::slotScrollRangeChanged);
+    connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::slotScrollValueChanged);
+    connect(m_chatView, &QChatView::onResize, this, &QChatModel::handleResize);
 }
 
-void QChatModel::Slot_ScrollRangeChanged(int min, int max)
+void QChatModel::slotScrollRangeChanged(int min, int max)
 {
-    RenderObjects();
+    renderObjects();
 }
 
-void QChatModel::Slot_ScrollValueChanged(int value)
+void QChatModel::slotScrollValueChanged(int value)
 {
-    RenderObjects();
+    renderObjects();
 }
 
-void QChatModel::RenderObjects()
+void QChatModel::renderObjects()
 {
-    if(m_roomID == INVALID_ROOM_ID)
+    if(m_roomId == INVALID_ROOM_ID)
     {
         return;
     }
@@ -46,7 +46,7 @@ void QChatModel::RenderObjects()
         pixEndY = pixStartY + m_vBar->pageStep();
     }
 
-    QVector<QMessagePosition> positions = GetMessagesForRender(pixStartY, pixEndY);
+    QVector<QMessagePosition> positions = getMessagesForRender(pixStartY, pixEndY);
 
     // Make sure we have the exact amount of QMessage objects
     qsizetype nObjectsNeeded = positions.size();
@@ -80,61 +80,61 @@ void QChatModel::RenderObjects()
         ChatMessage* message = &(*m_messages)[pos->m_index];
         QMessage* obj = m_messageObjects[i];
 
-        std::string username = m_manager->GetUsernameByPeerID(message->m_senderID);
+        std::string username = m_manager->getUsernameByPeerId(message->m_senderId);
 
-        obj->SetContents(username, message->m_message, m_chatView->GetViewportWidth());
+        obj->setContents(username, message->m_message, m_chatView->getViewportWidth());
         obj->move(0, pos->m_startY);
         obj->show();
     }
 }
 
-void QChatModel::SetRoom(RoomID roomID)
+void QChatModel::setRoom(RoomID roomID)
 {
-    ClearMessagePositions();
-    ClearRenderObjects();
+    clearMessagePositions();
+    clearRenderObjects();
 
-    m_roomID = roomID;
+    m_roomId = roomID;
 
     if(roomID != RoomID())
     {
-        m_messages = m_manager->GetMessagesForRoom(roomID);
+        m_messages = m_manager->getMessagesForRoom(roomID);
     }
     else
     {
         m_messages = nullptr;
     }
     
-    PrecalculateMessagePositions(false);
-    RenderObjects();
+    precalculateMessagePositions(false);
+    renderObjects();
 }
 
-void QChatModel::Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message)
+void QChatModel::slotRoomUpdateMessage(RoomID roomID, PeerID peerID, std::string message)
 {
-    PrecalculateMessagePositions(false);
+    precalculateMessagePositions(false);
     m_vBar->setValue(m_vBar->maximum());
-    RenderObjects();
+    renderObjects();
 }
 
-void QChatModel::Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
+void QChatModel::slotRoomUpdateFull(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
 {
-    Refresh();
+    refresh();
 }
 
-uint32_t QChatModel::GetMessageHeight(const std::string& username, const std::string& message)
+uint32_t QChatModel::getMessageHeight(const std::string& username, const std::string& message)
 {
-    QMessageTextConstraints constraints =  QMessage::GetTextConstraints(username, message, m_chatView->GetViewportWidth());
+    QMessageTextConstraints constraints =  QMessage::getTextConstraints(username, message, m_chatView->getViewportWidth());
     return constraints.m_messageSize.height();
 }
 
-bool QChatModel::GetMessageMultiline(const std::string& username, const std::string& message)
+bool QChatModel::getMessageMultiline(const std::string& username, const std::string& message)
 {
-    QMessageTextConstraints constraints = QMessage::GetTextConstraints(username, message, m_chatView->GetViewportWidth());
+    QMessageTextConstraints constraints = QMessage::getTextConstraints(username, message, m_chatView->getViewportWidth());
     return constraints.m_messageSize.height() > constraints.m_usernameSize.height();
 }
 
-void QChatModel::PrecalculateMessagePositions(bool fromFirstMultiline)
+void QChatModel::precalculateMessagePositions(bool fromFirstMultiline)
 {
-    if(m_roomID == INVALID_ROOM_ID)
+    if(m_roomId == INVALID_ROOM_ID)
     {
         return;
     }
@@ -162,12 +162,12 @@ void QChatModel::PrecalculateMessagePositions(bool fromFirstMultiline)
     {
         const ChatMessage* message = &m_messages->at(i);
 
-        if(m_firstMultilineMessageIdx == -1 && GetMessageMultiline(m_manager->GetUsernameByPeerID(message->m_senderID), message->m_message))
+        if(m_firstMultilineMessageIdx == -1 && getMessageMultiline(m_manager->getUsernameByPeerId(message->m_senderId), message->m_message))
         {
             m_firstMultilineMessageIdx = i;
         }
 
-        uint64_t totalObjectHeight = GetMessageHeight(m_manager->GetUsernameByPeerID(message->m_senderID), message->m_message);
+        uint64_t totalObjectHeight = getMessageHeight(m_manager->getUsernameByPeerId(message->m_senderId), message->m_message);
         uint64_t nextYPos = pixelPosY + totalObjectHeight + spaceBetweenMessages;
 
         if(m_messagePositionsStartY.size() <= i)
@@ -186,19 +186,19 @@ void QChatModel::PrecalculateMessagePositions(bool fromFirstMultiline)
     }
 
     setFixedHeight(m_totalHeight);
-    setMinimumSize(m_chatView->GetViewportWidth(), m_totalHeight);
+    setMinimumSize(m_chatView->getViewportWidth(), m_totalHeight);
 }
 
-void QChatModel::ClearMessagePositions()
+void QChatModel::clearMessagePositions()
 {
-    ClearRenderObjects();
+    clearRenderObjects();
     m_messagePositionsStartY.clear();
     m_messagePositionsEndY.clear();
     m_firstMultilineMessageIdx = -1;
     m_totalHeight = 0;
 }
 
-void QChatModel::ClearRenderObjects()
+void QChatModel::clearRenderObjects()
 {
     for(int i = 0; i < m_messageObjects.size(); i++)
     {
@@ -208,21 +208,21 @@ void QChatModel::ClearRenderObjects()
     m_messageObjects.clear();
 }
 
-void QChatModel::Refresh()
+void QChatModel::refresh()
 {
-    ClearMessagePositions();
-    PrecalculateMessagePositions(false);
+    clearMessagePositions();
+    precalculateMessagePositions(false);
     m_vBar->setValue(m_vBar->maximum());
-    RenderObjects();
+    renderObjects();
 }
 
-void QChatModel::HandleResize(QSize oldSize, QSize newSize)
+void QChatModel::handleResize(QSize oldSize, QSize newSize)
 {
-    PrecalculateMessagePositions(true);
-    RenderObjects();
+    precalculateMessagePositions(true);
+    renderObjects();
 }
 
-QVector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY)
+QVector<QMessagePosition> QChatModel::getMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY)
 {
     QVector<QMessagePosition> result;
 

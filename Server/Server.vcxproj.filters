@@ -14,5 +14,6 @@
     <ClInclude Include="include\ServerNetworkInterface.h" />
     <ClInclude Include="include\PeerClient.h" />
     <ClInclude Include="include\IServerPacketHandler.h" />
+    <ClInclude Include="include\ServerAbstractPacketHandler.h" />
   </ItemGroup>
 </Project>

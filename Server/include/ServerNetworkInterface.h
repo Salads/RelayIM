@@ -15,7 +15,7 @@
 #include "ChatClient.h"
 #include "PeerClient.h"
 #include "NetworkPacket.h"
-#include "IServerPacketHandler.h"
+#include "ServerAbstractPacketHandler.h"
 #include "NetworkConfig.h"
 #include "PacketType.h"
 #include "PeerID.h"
@@ -26,20 +26,20 @@
 class ServerNetworkInterface : public NetworkInterface
 {
 public:
-    ServerNetworkInterface(IServerPacketHandler* handler);
+    ServerNetworkInterface(ServerAbstractPacketHandler* handler);
 
-    bool Initialize() override;
-    void Shutdown() override;
+    bool initializeInterface() override;
+    void shutdownInterface() override;
 
-    void ListenForClients();
-    void ReceiveLoopForClient(PeerClient* client, SOCKET peerSocket);
-    void SendLoopForClient(PeerClient* client, SOCKET peerSocket);
+    void listenForClients();
+    void receiveLoopForClient(PeerClient* client, SOCKET peerSocket);
+    void sendLoopForClient(PeerClient* client, SOCKET peerSocket);
 
-    void SendToClient(PeerID, PacketData* packet);
-    void DeleteDisconnectedClients();
+    void sendToClient(PeerID, PacketData* packet);
+    void deleteDisconnectedClients();
 
 private:
-    void MarkPeerClientForDeletion(PeerID peerID);
+    void markPeerClientForDeletion(PeerID peerID);
 
 private:
     addrinfo* m_listenSocketInfo = nullptr;
@@ -56,7 +56,7 @@ private:
     std::queue<std::unique_ptr<PeerClient>> m_deletedPeerClients;
     std::mutex m_deletedPeerClientsMutex;
 
-    IServerPacketHandler* m_handler;
+    ServerAbstractPacketHandler* m_handler;
 };
 
 #endif // SERVERNETWORKINTERFACE_H

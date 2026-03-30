@@ -4,9 +4,9 @@
 class NetworkInterface
 {
 public: 
-    virtual bool Initialize() = 0;
-    virtual void Shutdown() = 0;
-    bool GetIsInitialized() const { return m_isInitialized; }
+    virtual bool initializeInterface() = 0;
+    virtual void shutdownInterface() = 0;
+    bool getIsInitialized() const { return m_isInitialized; }
 
 protected:
     bool m_isInitialized = false;

@@ -4,17 +4,17 @@ PacketWriter::PacketWriter(PacketData& buffer)
     : m_buffer(&buffer)
 {}
 
-void PacketWriter::WriteRoomID(const RoomID& roomID)
+void PacketWriter::writeRoomId(const RoomID& roomID)
 {
-    WriteUInt32(static_cast<uint32_t>(roomID));
+    writeUInt32(static_cast<uint32_t>(roomID));
 }
 
-void PacketWriter::WritePeerID(const PeerID& peerID)
+void PacketWriter::writePeerId(const PeerID& peerID)
 {
-    WriteUInt32(static_cast<uint32_t>(peerID));
+    writeUInt32(static_cast<uint32_t>(peerID));
 }
 
-void PacketWriter::WriteUInt8(uint8_t value)
+void PacketWriter::writeUInt8(uint8_t value)
 {
     for (int i = 0; i < sizeof(uint8_t); i++)
     {
@@ -22,7 +22,7 @@ void PacketWriter::WriteUInt8(uint8_t value)
     }
 }
 
-void PacketWriter::WriteUInt16(uint16_t value)
+void PacketWriter::writeUInt16(uint16_t value)
 {
     for(int i = 0; i < sizeof(uint16_t); i++)
     {
@@ -30,7 +30,7 @@ void PacketWriter::WriteUInt16(uint16_t value)
     }
 }
 
-void PacketWriter::WriteUInt32(uint32_t value)
+void PacketWriter::writeUInt32(uint32_t value)
 {
     for (int i = 0; i < sizeof(uint32_t); i++)
     {
@@ -38,24 +38,24 @@ void PacketWriter::WriteUInt32(uint32_t value)
     }
 }
 
-void PacketWriter::WriteString(const std::string& string)
+void PacketWriter::writeString(const std::string& string)
 {
-    WriteUInt16(static_cast<uint16_t>(string.size()));
+    writeUInt16(static_cast<uint16_t>(string.size()));
     m_buffer->insert(m_buffer->end(), string.begin(), string.end());
 }
 
-void PacketWriter::WriteString(const char* str)
+void PacketWriter::writeString(const char* str)
 {
     std::string strWrapper(str);
-    WriteString(strWrapper);
+    writeString(strWrapper);
 }
 
-void PacketWriter::Finalize()
+void PacketWriter::finalize()
 {
     *reinterpret_cast<uint16_t*>(m_buffer->data()) = static_cast<uint16_t>(m_buffer->size());
 }
 
-void PacketWriter::RewindBytes(uint32_t numBytes)
+void PacketWriter::rewindBytes(uint32_t numBytes)
 {
     for (uint32_t i = 0; i < numBytes; i++)
     {
@@ -63,10 +63,10 @@ void PacketWriter::RewindBytes(uint32_t numBytes)
     }
 }
 
-void PacketWriter::WriteHeader(PacketType packetType)
+void PacketWriter::writeHeader(PacketType packetType)
 {
-    WriteUInt16(0); // Temporary packet size
-    WriteUInt32(NETWORK_PASSCODE);
-    WriteUInt8(NETWORK_VERSION);
-    WriteUInt8(packetType);
+    writeUInt16(0); // Temporary packet size
+    writeUInt32(NETWORK_PASSCODE);
+    writeUInt8(NETWORK_VERSION);
+    writeUInt8(packetType);
 }

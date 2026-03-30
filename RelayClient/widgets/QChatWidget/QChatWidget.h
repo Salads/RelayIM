@@ -17,8 +17,8 @@ class QChatWidget : public QWidget
 public:
     QChatWidget(QModelManager* manager, QWidget *parent = nullptr);
 
-    void SetRoomID(RoomID roomID);
-    RoomID GetRoomID();
+    void setRoomId(RoomID roomID);
+    RoomID getRoomId();
 
 private:
     QModelManager* m_manager;

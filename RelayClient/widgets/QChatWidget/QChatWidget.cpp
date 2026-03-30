@@ -26,7 +26,7 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     setMinimumWidth(m_chatListView->minimumWidth());
 }
 
-void QChatWidget::SetRoomID(RoomID roomID)
+void QChatWidget::setRoomId(RoomID roomID)
 {
     if(roomID == INVALID_ROOM_ID)
     {
@@ -34,16 +34,16 @@ void QChatWidget::SetRoomID(RoomID roomID)
     }
     else
     {
-        std::string roomname = m_manager->GetRoomnameByRoomID(roomID);
+        std::string roomname = m_manager->getRoomnameByRoomId(roomID);
         m_roomNameLabel->setText(QString::fromStdString("# " + roomname));
     }
 
-    m_chatModel->SetRoom(roomID);
-    m_chatInput->SetRoomID(roomID);
+    m_chatModel->setRoom(roomID);
+    m_chatInput->setRoomId(roomID);
     m_currentRoomID = roomID;
 }
 
-RoomID QChatWidget::GetRoomID()
+RoomID QChatWidget::getRoomId()
 {
     return m_currentRoomID;
 }

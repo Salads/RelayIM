@@ -17,7 +17,7 @@ public:
     QChatView(QModelManager* manager, QWidget *parent = nullptr);
     ~QChatView();
 
-    int GetViewportWidth();
+    int getViewportWidth();
 
 signals:
     void onResize(QSize oldSize, QSize newSize);

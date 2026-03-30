@@ -38,17 +38,17 @@ class QChatModel : public QWidget
 public:
     QChatModel(QChatView* view, QModelManager* manager, QWidget* parent = nullptr);
 
-    void SetRoom(RoomID roomID);
+    void setRoom(RoomID roomID);
 
-    void Refresh();
-    void HandleResize(QSize oldSize, QSize newSize);
-    void RenderObjects();
+    void refresh();
+    void handleResize(QSize oldSize, QSize newSize);
+    void renderObjects();
 
 public slots:
-    void Slot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
-    void Slot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
-    void Slot_ScrollValueChanged(int value);
-    void Slot_ScrollRangeChanged(int min, int max);
+    void slotRoomUpdateMessage(RoomID roomID, PeerID peerID, std::string message);
+    void slotRoomUpdateFull(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
+    void slotScrollValueChanged(int value);
+    void slotScrollRangeChanged(int min, int max);
 
 private:
     /// <summary>
@@ -56,14 +56,14 @@ private:
     /// 
     /// Does not clear positions already calculated, just makes sure we have a position for every message.
     /// </summary>
-    void PrecalculateMessagePositions(bool fromFirstMultiline);
+    void precalculateMessagePositions(bool fromFirstMultiline);
 
-    uint32_t GetMessageHeight(const std::string& username, const std::string& message);
-    bool GetMessageMultiline(const std::string& username, const std::string& message);
+    uint32_t getMessageHeight(const std::string& username, const std::string& message);
+    bool getMessageMultiline(const std::string& username, const std::string& message);
 
-    void ClearMessagePositions();
-    void ClearRenderObjects();
-    QVector<QMessagePosition> GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
+    void clearMessagePositions();
+    void clearRenderObjects();
+    QVector<QMessagePosition> getMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
 
 private:
 
@@ -72,7 +72,7 @@ private:
 
     QScrollBar* m_vBar;
 
-    RoomID m_roomID;
+    RoomID m_roomId;
 
     QVector<uint64_t> m_messagePositionsStartY;
     QVector<uint64_t> m_messagePositionsEndY;

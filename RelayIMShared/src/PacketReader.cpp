@@ -4,10 +4,10 @@ PacketReader::PacketReader(const NetworkPacket* data)
     : m_data(data->m_data.get()), m_cursor(m_data->data()), m_end(m_data->data() + m_data->size())
 {}
 
-bool PacketReader::ReadRoomID(RoomID& out)
+bool PacketReader::readRoomID(RoomID& out)
 {
     uint32_t val = 0;
-    if(!ReadUInt32(val))
+    if(!readUInt32(val))
     {
         return false;
     }
@@ -18,10 +18,10 @@ bool PacketReader::ReadRoomID(RoomID& out)
     }
 }
 
-bool PacketReader::ReadPeerID(PeerID& out)
+bool PacketReader::readPeerID(PeerID& out)
 {
     uint32_t val = 0;
-    if(!ReadUInt32(val))
+    if(!readUInt32(val))
     {
         return false;
     }
@@ -32,7 +32,7 @@ bool PacketReader::ReadPeerID(PeerID& out)
     }
 }
 
-bool PacketReader::ReadUInt8(uint8_t& outValue)
+bool PacketReader::readUInt8(uint8_t& outValue)
 {
     if (m_cursor + sizeof(uint8_t) > m_end)
     {
@@ -44,7 +44,7 @@ bool PacketReader::ReadUInt8(uint8_t& outValue)
     return true;
 }
 
-bool PacketReader::ReadUInt16(uint16_t& outValue)
+bool PacketReader::readUInt16(uint16_t& outValue)
 {
     if (m_cursor + sizeof(uint16_t) > m_end)
     {
@@ -56,7 +56,7 @@ bool PacketReader::ReadUInt16(uint16_t& outValue)
     return true;
 }
 
-bool PacketReader::ReadUInt32(uint32_t& outValue)
+bool PacketReader::readUInt32(uint32_t& outValue)
 {
     if (m_cursor + sizeof(uint32_t) > m_end)
     {
@@ -68,10 +68,10 @@ bool PacketReader::ReadUInt32(uint32_t& outValue)
     return true;
 }
 
-bool PacketReader::ReadString(std::string& outString)
+bool PacketReader::readString(std::string& outString)
 {
     uint16_t stringLength = 0;
-    if (!ReadUInt16(stringLength))
+    if (!readUInt16(stringLength))
     {
         return false;
     }
@@ -86,7 +86,7 @@ bool PacketReader::ReadString(std::string& outString)
     return true;
 }
 
-bool PacketReader::ReadHeader(PacketHeader& outHeader)
+bool PacketReader::readHeader(PacketHeader& outHeader)
 {
     if (m_cursor + sizeof(PacketHeader) > m_end)
     {
@@ -99,10 +99,10 @@ bool PacketReader::ReadHeader(PacketHeader& outHeader)
     return true;
 }
 
-bool PacketReader::ReadPacketResponseReason(PacketResponseReason& reason)
+bool PacketReader::readPacketResponseReason(PacketResponseReason& reason)
 {
     uint8_t data = 0;
-    bool result = ReadUInt8(data);
+    bool result = readUInt8(data);
     reason = static_cast<PacketResponseReason>(data);
     return result;
 }

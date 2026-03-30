@@ -12,7 +12,7 @@
 
 int main(int argc, char *argv[])
 {
-    Log::Initialize("client.log");
+    Log::initialize("client.log");
     //Log::Initialize("client-" + GetLocalTimestamp() + ".log");
     QApplication app(argc, argv);
     app.setStyle("Fusion");
@@ -45,13 +45,13 @@ int main(int argc, char *argv[])
     QModelManager modelManager;
     RelayClient window(&modelManager);
     QRegisterDialog registerDialog(&modelManager);
-    if(window.TryConnect())
+    if(window.tryConnect())
     {
         registerDialog.exec();
-        if(registerDialog.GetRegistered())
+        if(registerDialog.getRegistered())
         {
-            window.SetStatusUI(QConnectionStatus::Status::ConnectedRegistered);
-            window.UpdateWindowTitle();
+            window.setStatusUI(QConnectionStatus::Status::ConnectedRegistered);
+            window.updateWindowTitle();
         }
         else
         {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     window.show();
 
     int execResult = app.exec(); 
-    Log::Destroy();
+    Log::destroy();
 
     return execResult;
 }

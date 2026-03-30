@@ -10,25 +10,25 @@
 class RoomID
 {
 public:
-    explicit RoomID(uint32_t id = INVALID_ROOM_ID) : m_roomID(id) {}
+    explicit RoomID(uint32_t id = INVALID_ROOM_ID) : m_roomId(id) {}
 
-    explicit operator uint32_t() const { return m_roomID; }
+    explicit operator uint32_t() const { return m_roomId; }
 
-    RoomID& operator=(uint32_t rhs) { m_roomID = rhs; return *this; }
+    RoomID& operator=(uint32_t rhs) { m_roomId = rhs; return *this; }
 
-    bool operator==(const RoomID& rhs) const { return m_roomID == rhs.m_roomID; }
-    bool operator==(const uint32_t& rhs) const { return m_roomID == rhs; }
+    bool operator==(const RoomID& rhs) const { return m_roomId == rhs.m_roomId; }
+    bool operator==(const uint32_t& rhs) const { return m_roomId == rhs; }
 
-    bool operator!=(const RoomID& rhs) const { return m_roomID != rhs.m_roomID; }
-    bool operator!=(const uint32_t& rhs) const { return m_roomID != rhs; }
+    bool operator!=(const RoomID& rhs) const { return m_roomId != rhs.m_roomId; }
+    bool operator!=(const uint32_t& rhs) const { return m_roomId != rhs; }
 
     friend std::ostream& operator<<(std::ostream& os, const RoomID& id)
     {
-        return os << id.m_roomID;
+        return os << id.m_roomId;
     }
 
 private:
-    uint32_t m_roomID;
+    uint32_t m_roomId;
 };
 
 namespace std

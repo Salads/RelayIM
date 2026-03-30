@@ -15,21 +15,21 @@ class PacketWriter
 public:
     PacketWriter(PacketData &buffer);
 
-    void WriteRoomID(const RoomID& roomID);
-    void WritePeerID(const PeerID& peerID);
+    void writeRoomId(const RoomID& roomID);
+    void writePeerId(const PeerID& peerID);
 
-    void WriteUInt8(uint8_t value);
-    void WriteUInt16(uint16_t value);
-    void WriteUInt32(uint32_t value);
-    void WriteString(const std::string &string);
-    void WriteString(const char* str);
+    void writeUInt8(uint8_t value);
+    void writeUInt16(uint16_t value);
+    void writeUInt32(uint32_t value);
+    void writeString(const std::string &string);
+    void writeString(const char* str);
 
-    void WriteHeader(PacketType packetType);
+    void writeHeader(PacketType packetType);
 
-    void RewindBytes(uint32_t numBytes);
+    void rewindBytes(uint32_t numBytes);
 
     // Updates the first two bytes to be the total size of the buffer.
-    void Finalize();
+    void finalize();
 
 private:
     std::vector<uint8_t> *m_buffer;

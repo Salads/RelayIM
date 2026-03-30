@@ -17,7 +17,7 @@ void Shutdown()
     std::cout << "Stopping server..." << std::endl;
     std::cout.flush();
 
-    g_server.Stop();
+    g_server.stop();
 
     std::cout << "Stopped server!" << std::endl;
     std::cout.flush();
@@ -49,7 +49,7 @@ void InputThreadFunc()
 
 int main()
 {    
-    Log::Initialize("server.log");
+    Log::initialize("server.log");
     if (!SetConsoleCtrlHandler(CtrlHandler, true))
     {
         std::cerr << "Failed to set Console Window Control Handler" << std::endl;
@@ -58,23 +58,18 @@ int main()
 
     std::thread inputESCThread(InputThreadFunc);
 
-    if (!g_server.Initialize())
+    if (!g_server.initializeServer())
     {
         std::cerr << "Failed to initialize server" << std::endl;
         return 1;
     }
-     
-    if (!g_server.Initialize())
-    {
-        return 1;
-    }
 
-    g_server.Start();
+    g_server.start();
 
     while (g_running)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        g_server.Update();
+        g_server.update();
     };
 
     if (inputESCThread.joinable())
@@ -83,7 +78,7 @@ int main()
     }
 
     Shutdown();
-    Log::Destroy();
+    Log::destroy();
     
     return 0;
 }

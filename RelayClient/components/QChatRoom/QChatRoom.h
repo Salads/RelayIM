@@ -14,7 +14,7 @@ public:
     QChatRoom(QWidget *parent = nullptr);
     ~QChatRoom();
 
-    void Initialize(int roomId, const std::string roomName);
+    void initialize(int roomId, const std::string roomName);
 
 private:
     QLabel* m_roomNameLabel;

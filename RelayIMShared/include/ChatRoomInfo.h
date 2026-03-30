@@ -10,7 +10,7 @@ struct ChatRoomInfo
     ChatRoomInfo();
     ChatRoomInfo(RoomID roomID, std::string roomname);
 
-    RoomID m_roomID;
+    RoomID m_roomId;
     std::string m_roomname;
 };
 

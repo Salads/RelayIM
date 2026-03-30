@@ -19,11 +19,11 @@ public:
     QRegisterDialog(QModelManager* manager, QWidget *parent = nullptr);
     ~QRegisterDialog();
 
-    bool GetRegistered();
+    bool getRegistered();
 
 private slots:
-    void Slot_RegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username);
-    void Slot_OkButtonClicked(bool checked);
+    void slotRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username);
+    void slotOkButtonClicked(bool checked);
 
 private:
     QLineEdit* m_usernameLineEdit;

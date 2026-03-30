@@ -10,7 +10,7 @@ QChatInput::QChatInput(QModelManager *manager, QWidget* parent)
 
 void QChatInput::keyPressEvent(QKeyEvent* event)
 {
-    if(m_roomID == INVALID_ROOM_ID) { return; }
+    if(m_roomId == INVALID_ROOM_ID) { return; }
 
     if(event->key() == Qt::Key_Return)
     {
@@ -25,7 +25,7 @@ void QChatInput::keyPressEvent(QKeyEvent* event)
             QString currentTextTrimmed = currentText.trimmed();
             if(!currentTextTrimmed.isEmpty())
             {
-                m_manager->GetClient()->SendMessageToRoom(m_roomID, currentText.toStdString());
+                m_manager->getClient()->sendMessageToRoom(m_roomId, currentText.toStdString());
                 clear();
             }
         }
@@ -36,7 +36,7 @@ void QChatInput::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void QChatInput::SetRoomID(RoomID roomID)
+void QChatInput::setRoomId(RoomID roomID)
 {
-    m_roomID = roomID;
+    m_roomId = roomID;
 }

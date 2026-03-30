@@ -1,6 +1,6 @@
 #include "Util.h"
 
-void PrintWSAError(const char* message)
+void printWSAError(const char* message)
 {
     char buffer[256];
     FormatMessageA(
@@ -15,7 +15,7 @@ void PrintWSAError(const char* message)
     std::cerr << message << ": " << buffer << std::endl;
 }
 
-std::string GetLocalTimestamp()
+std::string getLocalTimestamp()
 {
     using namespace std::chrono;
 

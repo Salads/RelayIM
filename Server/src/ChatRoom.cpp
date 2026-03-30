@@ -1,36 +1,36 @@
 #include "ChatRoom.h"
 
 ChatRoom::ChatRoom(RoomID roomID, std::string roomName)
-    : m_roomID(roomID), m_roomName(std::move(roomName))
+    : m_roomId(roomID), m_roomName(std::move(roomName))
 {}
 
-void ChatRoom::AddClient(PeerID peerID)
+void ChatRoom::addClient(PeerID peerID)
 {
     m_clients.insert(peerID);
 }
 
-void ChatRoom::RemoveClient(PeerID peerID)
+void ChatRoom::removeClient(PeerID peerID)
 {
     m_clients.erase(peerID);
 }
 
-void ChatRoom::AddMessage(const ChatMessage& message)
+void ChatRoom::addMessage(const ChatMessage& message)
 {
     m_messages.push_back(message);
 }
 
-std::string ChatRoom::GetRoomName()
+std::string ChatRoom::getRoomName()
 {
     return m_roomName;
 }
 
-std::vector<PeerID> ChatRoom::GetClients()
+std::vector<PeerID> ChatRoom::getClients()
 {
     std::vector<PeerID> result(m_clients.begin(), m_clients.end());
     return result;
 }
 
-const std::vector<ChatMessage>* ChatRoom::GetMessages()
+const std::vector<ChatMessage>* ChatRoom::getMessages()
 {
     return &m_messages;
 }

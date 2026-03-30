@@ -5,5 +5,5 @@ ChatRoomInfo::ChatRoomInfo()
 {}
 
 ChatRoomInfo::ChatRoomInfo(RoomID roomID, std::string roomname)
-    : m_roomID(roomID), m_roomname(roomname)
+    : m_roomId(roomID), m_roomname(roomname)
 {}

@@ -26,20 +26,20 @@ QRegisterDialog::QRegisterDialog(QModelManager* manager, QWidget* parent)
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_OKButton);
 
-    connect(m_modelManager, &QModelManager::Event_RegisterResponse, this, &QRegisterDialog::Slot_RegisterResponse);
-    connect(m_OKButton, &QPushButton::clicked, this, &QRegisterDialog::Slot_OkButtonClicked);
+    connect(m_modelManager, &QModelManager::eventRegisterResponse, this, &QRegisterDialog::slotRegisterResponse);
+    connect(m_OKButton, &QPushButton::clicked, this, &QRegisterDialog::slotOkButtonClicked);
 }
 
 QRegisterDialog::~QRegisterDialog()
 {}
 
-void QRegisterDialog::Slot_OkButtonClicked(bool checked)
+void QRegisterDialog::slotOkButtonClicked(bool checked)
 {
     std::string desiredUsername = m_usernameLineEdit->text().toStdString();
-    PacketResponseReason usernameCheckResult = m_modelManager->CheckDesiredUsername(desiredUsername);
+    PacketResponseReason usernameCheckResult = m_modelManager->checkDesiredUsername(desiredUsername);
     if(usernameCheckResult == PacketResponseReason::Success)
     {
-        m_modelManager->GetClient()->SendConnect(m_usernameLineEdit->text().toStdString());
+        m_modelManager->getClient()->sendConnect(m_usernameLineEdit->text().toStdString());
         m_OKButton->setText("Registering...");
         m_OKButton->setDisabled(true);
     }
@@ -68,9 +68,9 @@ void QRegisterDialog::Slot_OkButtonClicked(bool checked)
     qDebug() << "Register button callback finished";
 }
 
-void QRegisterDialog::Slot_RegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username)
+void QRegisterDialog::slotRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username)
 {
-    qDebug() << "Register Response - " << ResponseTypeToString(reason);
+    qDebug() << "Register Response - " << responseTypeToString(reason);
     if(reason == PacketResponseReason::Success)
     {
         m_registerSuccess = true;
@@ -85,7 +85,7 @@ void QRegisterDialog::Slot_RegisterResponse(PacketResponseReason reason, PeerID 
     }
 }
 
-bool QRegisterDialog::GetRegistered()
+bool QRegisterDialog::getRegistered()
 {
     return m_registerSuccess;
 }

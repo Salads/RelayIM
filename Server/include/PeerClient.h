@@ -17,21 +17,21 @@ class PeerClient
 {
 public:
     PeerClient(PeerID clientID, SOCKET clientSocket)
-        : m_peerID(clientID), m_clientSocket(clientSocket) {}
+        : m_peerId(clientID), m_clientSocket(clientSocket) {}
 
     ~PeerClient();
 
-    void Send(PacketData *packet);
-    bool GetMarkedForDeletion();
-    void MarkForDeletion(bool mark);
+    void send(PacketData *packet);
+    bool getMarkedForDeletion();
+    void markForDeletion(bool mark);
 
 private:
-    void ClearSendBuffer();
+    void clearSendBuffer();
 
 public:
     std::atomic_bool m_delete = false;
 
-    PeerID m_peerID;
+    PeerID m_peerId;
     SOCKET m_clientSocket;
     std::thread m_receiveThread;
     std::vector<uint8_t> m_receiveBuffer;

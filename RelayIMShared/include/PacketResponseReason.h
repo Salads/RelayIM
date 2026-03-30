@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-const char* ResponseTypeToString(uint8_t type);
+const char* responseTypeToString(uint8_t type);
 
 #define PACKET_RESPONSE_REASONS \
     X(Success)               \

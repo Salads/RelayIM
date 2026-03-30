@@ -14,11 +14,11 @@ public:
     QChatInput(QModelManager* manager, QWidget* parent = nullptr);
 
     void keyPressEvent(QKeyEvent* event) override;
-    void SetRoomID(RoomID roomID);
+    void setRoomId(RoomID roomID);
 
 private:
     QModelManager* m_manager;
-    RoomID m_roomID;
+    RoomID m_roomId;
 };
 
 #endif // QCHATINPUT_H

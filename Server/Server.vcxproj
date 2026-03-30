@@ -30,6 +30,7 @@
     <ClInclude Include="include\ChatRoom.h" />
     <ClInclude Include="include\IServerPacketHandler.h" />
     <ClInclude Include="include\PeerClient.h" />
+    <ClInclude Include="include\ServerAbstractPacketHandler.h" />
     <ClInclude Include="include\ServerNetworkInterface.h" />
     <ClInclude Include="include\RelayIMServer.h" />
   </ItemGroup>

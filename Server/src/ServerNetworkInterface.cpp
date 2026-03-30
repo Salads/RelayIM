@@ -6,16 +6,16 @@
 using std::cout;
 using std::endl;
 
-ServerNetworkInterface::ServerNetworkInterface(IServerPacketHandler* handler)
+ServerNetworkInterface::ServerNetworkInterface(ServerAbstractPacketHandler* handler)
     : m_handler(handler)
 {}
 
-bool ServerNetworkInterface::Initialize()
+bool ServerNetworkInterface::initializeInterface()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaStartupError) {
-        PrintWSAError("WSAStartup failed");
+        printWSAError("WSAStartup failed");
         return false;
     }
 
@@ -32,7 +32,7 @@ bool ServerNetworkInterface::Initialize()
     // Compatability translation between desired and actual support
     int getadderinfoError = getaddrinfo(NULL, DEFAULT_PORT, &hints, &m_listenSocketInfo);
     if (getadderinfoError) {
-        PrintWSAError("getaddrinfo failed");
+        printWSAError("getaddrinfo failed");
         WSACleanup();
         return false;
     }
@@ -40,7 +40,7 @@ bool ServerNetworkInterface::Initialize()
     // Closest socket we can get to the desired socket
     m_listenSocket = socket(m_listenSocketInfo->ai_family, m_listenSocketInfo->ai_socktype, m_listenSocketInfo->ai_protocol);
     if (m_listenSocket == INVALID_SOCKET) {
-        PrintWSAError("socket failed");
+        printWSAError("socket failed");
         freeaddrinfo(m_listenSocketInfo);
         WSACleanup();
         return false;
@@ -49,7 +49,7 @@ bool ServerNetworkInterface::Initialize()
     // Setup the TCP listening socket
     int bindError = bind(m_listenSocket, m_listenSocketInfo->ai_addr, (int)m_listenSocketInfo->ai_addrlen);
     if (bindError == SOCKET_ERROR) {
-        PrintWSAError("bind failed");
+        printWSAError("bind failed");
         freeaddrinfo(m_listenSocketInfo);
         closesocket(m_listenSocket);
         WSACleanup();
@@ -58,7 +58,7 @@ bool ServerNetworkInterface::Initialize()
 
     // Start listening on the socket. This is how the server will actually know about incoming data.
     if (listen(m_listenSocket, SOMAXCONN) == SOCKET_ERROR) {
-        PrintWSAError("listen failed");
+        printWSAError("listen failed");
         freeaddrinfo(m_listenSocketInfo);
         closesocket(m_listenSocket);
         WSACleanup();
@@ -66,13 +66,13 @@ bool ServerNetworkInterface::Initialize()
     }
 
     m_running = true;
-    m_listenThread = std::thread(&ServerNetworkInterface::ListenForClients, this);
+    m_listenThread = std::thread(&ServerNetworkInterface::listenForClients, this);
     m_isInitialized = true;
 
     return true;
 }
 
-void ServerNetworkInterface::Shutdown()
+void ServerNetworkInterface::shutdownInterface()
 {
     m_running = false;
 
@@ -99,37 +99,37 @@ void ServerNetworkInterface::Shutdown()
     WSACleanup();
 }
 
-void ServerNetworkInterface::ListenForClients()
+void ServerNetworkInterface::listenForClients()
 {
     while (m_running)
     {
         SOCKET newClientSocket = INVALID_SOCKET;
         newClientSocket = accept(m_listenSocket, NULL, NULL); // blocking
         if (newClientSocket == INVALID_SOCKET) {
-            PrintWSAError("accept failed");
+            printWSAError("accept failed");
             return;
         }
 
         std::unique_ptr<PeerClient> newPeerClient = std::make_unique<PeerClient>(PeerID(m_nextClientID++), newClientSocket);
-        newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::ReceiveLoopForClient, this, newPeerClient.get(), newClientSocket);
-        newPeerClient->m_sendThread = std::thread(&ServerNetworkInterface::SendLoopForClient, this, newPeerClient.get(), newClientSocket);
+        newPeerClient->m_receiveThread = std::thread(&ServerNetworkInterface::receiveLoopForClient, this, newPeerClient.get(), newClientSocket);
+        newPeerClient->m_sendThread = std::thread(&ServerNetworkInterface::sendLoopForClient, this, newPeerClient.get(), newClientSocket);
         {
             std::lock_guard<std::mutex> lock(m_peerClientsMutex);
-            PeerID newClientID = newPeerClient->m_peerID;
+            PeerID newClientID = newPeerClient->m_peerId;
 
             m_peerClients.emplace(newClientID, std::move(newPeerClient));
-            m_handler->OnNewClient(newClientID);
+            m_handler->onNewClient(newClientID);
         }
     }
 }
 
-void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET peerSocket)
+void ServerNetworkInterface::receiveLoopForClient(PeerClient *client, SOCKET peerSocket)
 {
     uint8_t receiveBuffer[NETWORK_BUFLEN];
 
     while (m_running)
     {
-        if (client->GetMarkedForDeletion())
+        if (client->getMarkedForDeletion())
         {
             break;
         }
@@ -139,17 +139,17 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
         int recvResult = recv(peerSocket, (char*)receiveBuffer, NETWORK_BUFLEN, 0); // Thread blocks here until data is received or the connection is closed
         if (recvResult == 0)
         {
-            MarkPeerClientForDeletion(client->m_peerID);
-            m_handler->OnClientDisconnected(client->m_peerID);
+            markPeerClientForDeletion(client->m_peerId);
+            m_handler->onClientDisconnected(client->m_peerId);
 
             break;
         }
         else if(recvResult == SOCKET_ERROR) // Client disconnected forcibly, or some Winsock2 error. Either way, client should be disconnected.
         {
-            PrintWSAError("recv failed");
+            printWSAError("recv failed");
 
-            MarkPeerClientForDeletion(client->m_peerID);
-            m_handler->OnClientDisconnected(client->m_peerID);
+            markPeerClientForDeletion(client->m_peerId);
+            m_handler->onClientDisconnected(client->m_peerId);
 
             break;
         }
@@ -179,8 +179,8 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
                 newPacketData->insert(newPacketData->end(), client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
                 client->m_receiveBuffer.erase(client->m_receiveBuffer.begin(), client->m_receiveBuffer.begin() + packetSize);
 
-                std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(client->m_peerID, std::move(newPacketData));
-                m_handler->OnPacketReceived(client->m_peerID, std::move(newPacket));
+                std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(client->m_peerId, std::move(newPacketData));
+                m_handler->onPacketReceived(client->m_peerId, std::move(newPacket));
             }
             else
             {
@@ -191,7 +191,7 @@ void ServerNetworkInterface::ReceiveLoopForClient(PeerClient *client, SOCKET pee
     } // while(m_running)
 }
 
-void ServerNetworkInterface::DeleteDisconnectedClients()
+void ServerNetworkInterface::deleteDisconnectedClients()
 {
     {
         std::lock_guard lock(m_deletedPeerClientsMutex);
@@ -204,7 +204,7 @@ void ServerNetworkInterface::DeleteDisconnectedClients()
     }
 }
 
-void ServerNetworkInterface::MarkPeerClientForDeletion(PeerID peerID)
+void ServerNetworkInterface::markPeerClientForDeletion(PeerID peerID)
 {
     {
         std::lock(m_deletedPeerClientsMutex, m_peerClientsMutex);
@@ -212,24 +212,24 @@ void ServerNetworkInterface::MarkPeerClientForDeletion(PeerID peerID)
         std::lock_guard lk2(m_peerClientsMutex, std::adopt_lock);
 
         std::unique_ptr<PeerClient> deletedClient = std::move(m_peerClients[peerID]);
-        deletedClient->MarkForDeletion(true);
+        deletedClient->markForDeletion(true);
         deletedClient->m_sendThreadCV.notify_one();
         m_peerClients.erase(peerID);
         m_deletedPeerClients.push(std::move(deletedClient));
     }
 }
 
-void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSocket)
+void ServerNetworkInterface::sendLoopForClient(PeerClient* client, SOCKET peerSocket)
 {
-    while (m_running && !client->GetMarkedForDeletion())
+    while (m_running && !client->getMarkedForDeletion())
     {
         // Wait untill we have data to send
         std::unique_lock<std::mutex> lock(client->m_sendBufferMutex);
         client->m_sendThreadCV.wait(lock, [this, client]() {
-            return !m_running || !client->m_sendBuffer.empty() || client->GetMarkedForDeletion();
+            return !m_running || !client->m_sendBuffer.empty() || client->getMarkedForDeletion();
         });
 
-        if (!m_running || client->GetMarkedForDeletion())
+        if (!m_running || client->getMarkedForDeletion())
         {
             break;
         }
@@ -237,7 +237,7 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
         int sendResult = send(peerSocket, (char*)client->m_sendBuffer.data(), (int)client->m_sendBuffer.size(), 0);
         if (sendResult == SOCKET_ERROR)
         {
-            PrintWSAError("send failed");
+            printWSAError("send failed");
         }
         else
         {
@@ -246,7 +246,7 @@ void ServerNetworkInterface::SendLoopForClient(PeerClient* client, SOCKET peerSo
     }
 }
 
-void ServerNetworkInterface::SendToClient(PeerID clientPeerID, PacketData* packet)
+void ServerNetworkInterface::sendToClient(PeerID clientPeerID, PacketData* packet)
 {
     PeerClient* client;
     {
@@ -257,8 +257,8 @@ void ServerNetworkInterface::SendToClient(PeerID clientPeerID, PacketData* packe
     if (client)
     {
         uint8_t* type = packet->data() + 7; // 8th Byte is packet type
-        Log::Get()->ConditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "SEND(%s) to Peer(%u)", PacketTypeToString(*type), clientPeerID);
-        client->Send(packet);
+        Log::get()->conditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "SEND(%s) to Peer(%u)", packetTypeToString(*type), clientPeerID);
+        client->send(packet);
     }
 }
 

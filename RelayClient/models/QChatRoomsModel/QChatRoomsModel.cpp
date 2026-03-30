@@ -23,7 +23,7 @@ QVariant QChatRoomsModel::data(const QModelIndex& index, int role) const
     {
         case Role::RoomIDRole:
         {
-            return static_cast<uint32_t>(info->m_roomID);
+            return static_cast<uint32_t>(info->m_roomId);
         }
         case Role::RoomnameRole:
         {
@@ -31,7 +31,7 @@ QVariant QChatRoomsModel::data(const QModelIndex& index, int role) const
         }
         case Qt::DisplayRole:
         {
-            uint32_t roomID = static_cast<uint32_t>(info->m_roomID);
+            uint32_t roomID = static_cast<uint32_t>(info->m_roomId);
             return QString::fromStdString(info->m_roomname + std::string(" (id ") + std::to_string(roomID) + std::string(")"));
         }
         default:
@@ -49,11 +49,11 @@ QHash<int, QByteArray> QChatRoomsModel::roleNames() const
     return names;
 }
 
-qsizetype QChatRoomsModel::FindRoom(RoomID roomID)
+qsizetype QChatRoomsModel::findRoom(RoomID roomID)
 {
     for (qsizetype i = 0; i < m_chatRooms.size(); i++)
     {
-        if (m_chatRooms[i].m_roomID == roomID)
+        if (m_chatRooms[i].m_roomId == roomID)
         {
             return i;
         }
@@ -62,7 +62,7 @@ qsizetype QChatRoomsModel::FindRoom(RoomID roomID)
     return -1;
 }
 
-bool QChatRoomsModel::RoomExists(const std::string& roomname)
+bool QChatRoomsModel::roomExists(const std::string& roomname)
 {
     for(int i = 0; i < m_chatRooms.size(); i++)
     {
@@ -75,7 +75,7 @@ bool QChatRoomsModel::RoomExists(const std::string& roomname)
     return false;
 }
 
-void QChatRoomsModel::ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData)
+void QChatRoomsModel::replaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData)
 {
     std::vector<ChatRoomInfo>* vec = newData.get();
 
@@ -99,19 +99,19 @@ void QChatRoomsModel::ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newD
     }
 }
 
-void QChatRoomsModel::AddJoinedChatRoom(RoomID roomID, QString roomname)
+void QChatRoomsModel::addJoinedChatRoom(RoomID roomID, QString roomname)
 {
-    if(FindRoom(roomID) != -1) { return; }
+    if(findRoom(roomID) != -1) { return; }
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     m_chatRooms.emplaceBack(roomID, roomname.toStdString());
     endInsertRows();
 }
 
-void QChatRoomsModel::RemoveJoinedChatRoom(RoomID roomID)
+void QChatRoomsModel::removeJoinedChatRoom(RoomID roomID)
 {
     // Find the index of the room we want to remove.
-    qsizetype idx = FindRoom(roomID);
+    qsizetype idx = findRoom(roomID);
     if (idx == -1)
     {
         return;
@@ -122,9 +122,9 @@ void QChatRoomsModel::RemoveJoinedChatRoom(RoomID roomID)
     endRemoveRows();
 }
 
-std::shared_ptr<ChatRoomInfo> QChatRoomsModel::GetChatRoomInfo(RoomID roomID)
+std::shared_ptr<ChatRoomInfo> QChatRoomsModel::getChatRoomInfo(RoomID roomID)
 {
-    qsizetype idx = FindRoom(roomID);
+    qsizetype idx = findRoom(roomID);
     if (idx != -1)
     {
         return std::make_shared<ChatRoomInfo>(m_chatRooms[idx]);

@@ -8,36 +8,36 @@
 #include "PacketData.h"
 #include "ClientNetworkInterface.h"
 #include "ChatRoomInfo.h"
-#include "IClientPacketHandler.h"
-#include "IRelayIMClientPacketHandler.h"
+#include "ClientAbstractPacketHandler.h"
+#include "RelayIMClientAbstractPacketHandler.h"
 #include "RoomID.h"
 #include "PeerID.h"
 #include "PacketHeader.h"
 #include "PacketWriter.h"
 #include "PacketReader.h"
 
-class RelayIMClient : public IClientPacketHandler
+class RelayIMClient : public ClientAbstractPacketHandler
 {
 public:
-    RelayIMClient(IRelayIMClientPacketHandler* handler);
-    bool Initialize();
-    bool Connect();
-    void Shutdown();
+    RelayIMClient(RelayIMClientAbstractPacketHandler* handler);
+    bool initialize();
+    bool connectToServer();
+    void shutdownClient();
     
-    void SendConnect(std::string desiredUsername);
-    void SendRequestAllChatRooms();
-    void SendJoinChatRoom(RoomID roomID);
-    void SendCreateChatRoom(std::string roomName);
-    void SendLeaveChatRoom(RoomID roomID);
-    void SendMessageToRoom(RoomID roomID, std::string message);
+    void sendConnect(std::string desiredUsername);
+    void sendRequestAllChatRooms();
+    void sendJoinChatRoom(RoomID roomID);
+    void sendCreateChatRoom(std::string roomName);
+    void sendLeaveChatRoom(RoomID roomID);
+    void sendMessageToRoom(RoomID roomID, std::string message);
 
 private:
-    void OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket) override;
-    void OnServerDisconnected() override;
+    void onPacketReceived(std::unique_ptr<NetworkPacket> serverPacket) override;
+    void onServerDisconnected() override;
 
 private:
     ClientNetworkInterface m_clientNetwork;
-    IRelayIMClientPacketHandler* m_handler;
+    RelayIMClientAbstractPacketHandler* m_handler;
 };
 
 #endif // RELAYIMCLIENT_H

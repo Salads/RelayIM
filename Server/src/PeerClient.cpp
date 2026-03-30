@@ -1,6 +1,6 @@
 #include "PeerClient.h"
 
-void PeerClient::Send(PacketData *packet)
+void PeerClient::send(PacketData *packet)
 {
     std::lock_guard<std::mutex> lock(m_sendBufferMutex);
     m_sendBuffer.insert(m_sendBuffer.end(), packet->begin(), packet->end());
@@ -14,7 +14,7 @@ PeerClient::~PeerClient()
 
     if (m_sendThread.joinable())
     {
-        MarkForDeletion(true);
+        markForDeletion(true);
         m_sendThreadCV.notify_one();
         m_sendThread.join();
     }
@@ -25,19 +25,19 @@ PeerClient::~PeerClient()
     }
 }
 
-bool PeerClient::GetMarkedForDeletion()
+bool PeerClient::getMarkedForDeletion()
 {
     return m_delete;
 }
 
-void PeerClient::MarkForDeletion(bool mark)
+void PeerClient::markForDeletion(bool mark)
 {
-    ClearSendBuffer();
+    clearSendBuffer();
     m_sendThreadCV.notify_one();
     m_delete = mark;
 }
 
-void PeerClient::ClearSendBuffer()
+void PeerClient::clearSendBuffer()
 {
     std::lock_guard lock(m_sendBufferMutex);
     m_sendBuffer.clear();

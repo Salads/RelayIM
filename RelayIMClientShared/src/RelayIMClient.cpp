@@ -1,12 +1,12 @@
 #include "RelayIMClient.h"
 
-RelayIMClient::RelayIMClient(IRelayIMClientPacketHandler* handler)
+RelayIMClient::RelayIMClient(RelayIMClientAbstractPacketHandler* handler)
     : m_clientNetwork(this), m_handler(handler)
 {}
 
-bool RelayIMClient::Initialize()
+bool RelayIMClient::initialize()
 {
-    if (!m_clientNetwork.Initialize())
+    if (!m_clientNetwork.initializeInterface())
     {
         return false;
     }
@@ -14,28 +14,28 @@ bool RelayIMClient::Initialize()
     return true;
 }
 
-bool RelayIMClient::Connect()
+bool RelayIMClient::connectToServer()
 {
-    return m_clientNetwork.Connect();
+    return m_clientNetwork.connectToServer();
 }
 
-void RelayIMClient::Shutdown()
+void RelayIMClient::shutdownClient()
 {
-    m_clientNetwork.Shutdown();
+    m_clientNetwork.shutdownInterface();
 }
 
-void RelayIMClient::OnServerDisconnected()
+void RelayIMClient::onServerDisconnected()
 {
-    // TODO(Salads): OnServerDisconnected
+    // TODO(Salads): onServerDisconnected
 }
 
-void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket)
+void RelayIMClient::onPacketReceived(std::unique_ptr<NetworkPacket> serverPacket)
 {
     std::unique_ptr<NetworkPacket> packet = std::move(serverPacket);
     PacketReader reader(packet.get());
-    PacketHeader header; reader.ReadHeader(header);
+    PacketHeader header; reader.readHeader(header);
 
-    Log::Get()->ConditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "RECV(%s)", PacketTypeToString(header.m_packetType));
+    Log::get()->conditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "RECV(%s)", packetTypeToString(header.m_packetType));
 
     switch (header.m_packetType)
     {
@@ -45,113 +45,113 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
         PeerID peerID;
         std::string username;
 
-        reader.ReadPacketResponseReason(responseReason);
+        reader.readPacketResponseReason(responseReason);
         if (responseReason == PacketResponseReason::Success)
         {
-            reader.ReadPeerID(peerID);
-            reader.ReadString(username);
+            reader.readPeerID(peerID);
+            reader.readString(username);
         }
         
-        m_handler->OnRegisterResponse(responseReason, peerID, username);
+        m_handler->onRegisterResponse(responseReason, peerID, username);
 
     } break;
     case PacketType_ListChatRooms_Result:
     {
         std::unique_ptr<std::vector<ChatRoomInfo>> rooms = std::make_unique<std::vector<ChatRoomInfo>>();
 
-        uint16_t nRooms = 0; reader.ReadUInt16(nRooms);
+        uint16_t nRooms = 0; reader.readUInt16(nRooms);
         for (int i = 0; i < nRooms; i++)
         {
-            RoomID roomID; reader.ReadRoomID(roomID);
-            std::string roomName; reader.ReadString(roomName);
+            RoomID roomID; reader.readRoomID(roomID);
+            std::string roomName; reader.readString(roomName);
 
             rooms->emplace_back(roomID, roomName);
         }
 
-        m_handler->OnListChatRoomsResponse(std::move(rooms));
+        m_handler->onListChatRoomsResponse(std::move(rooms));
 
     } break;
     case PacketType_JoinChatRoomResponse:
     {
-        PacketResponseReason result; reader.ReadPacketResponseReason(result);
+        PacketResponseReason result; reader.readPacketResponseReason(result);
         RoomID newRoomID;
         std::string newRoomname;
 
         if (result == PacketResponseReason::Success)
         {
-            reader.ReadRoomID(newRoomID);
-            reader.ReadString(newRoomname);
+            reader.readRoomID(newRoomID);
+            reader.readString(newRoomname);
         }
 
-        m_handler->OnJoinRoomResponse(result, newRoomID, newRoomname);
+        m_handler->onJoinRoomResponse(result, newRoomID, newRoomname);
 
     } break;
     case PacketType_CreateChatRoomResponse:
     {
-        PacketResponseReason result; reader.ReadPacketResponseReason(result);
+        PacketResponseReason result; reader.readPacketResponseReason(result);
         RoomID newRoomID;
         std::string newRoomname;
 
         if (result == PacketResponseReason::Success)
         {
-            reader.ReadRoomID(newRoomID);
-            reader.ReadString(newRoomname);
+            reader.readRoomID(newRoomID);
+            reader.readString(newRoomname);
         }
 
-        m_handler->OnCreateRoomResponse(result, newRoomID, newRoomname);
+        m_handler->onCreateRoomResponse(result, newRoomID, newRoomname);
 
     } break;
     case PacketType_RoomUpdate_MSG:
     {
-        RoomID roomID;   reader.ReadRoomID(roomID);
-        PeerID peerID;   reader.ReadPeerID(peerID);
-        std::string message; reader.ReadString(message);
+        RoomID roomID;   reader.readRoomID(roomID);
+        PeerID peerID;   reader.readPeerID(peerID);
+        std::string message; reader.readString(message);
 
-        m_handler->OnRoomUpdate_NewMessage(roomID, peerID, message);
+        m_handler->onRoomUpdateNewMessage(roomID, peerID, message);
         
     } break;
     case PacketType_RoomUpdate_FULL:
     {
-        RoomID roomID;   reader.ReadRoomID(roomID);
+        RoomID roomID;   reader.readRoomID(roomID);
 
         // ARRAY of users in chat room (some users might not have sent a message)
-        uint16_t nUsers = 0; reader.ReadUInt16(nUsers);
+        uint16_t nUsers = 0; reader.readUInt16(nUsers);
         for (int i = 0; i < nUsers; i++)
         {
-            PeerID userID; reader.ReadPeerID(userID);
-            std::string username; reader.ReadString(username);
+            PeerID userID; reader.readPeerID(userID);
+            std::string username; reader.readString(username);
 
-            m_handler->OnRoomUpdate_UserJoined(roomID, userID, username);
+            m_handler->onRoomUpdateUserJoined(roomID, userID, username);
         }
 
         std::unique_ptr<std::vector<ChatMessage>> messages = std::make_unique<std::vector<ChatMessage>>();
-        uint16_t nMessages = 0; reader.ReadUInt16(nMessages);
+        uint16_t nMessages = 0; reader.readUInt16(nMessages);
         for (int i = 0; i < nMessages; i++)
         {
-            PeerID userID; reader.ReadPeerID(userID);
-            std::string message; reader.ReadString(message);
+            PeerID userID; reader.readPeerID(userID);
+            std::string message; reader.readString(message);
 
             messages->emplace_back(userID, message);
         }
 
-        m_handler->OnRoomUpdate_FullUpdate(roomID, std::move(messages));
+        m_handler->onRoomUpdateFullUpdate(roomID, std::move(messages));
 
     } break;
     case PacketType_RoomUpdate_UserJoined:
     {
-        RoomID roomID; reader.ReadRoomID(roomID);
-        PeerID peerID; reader.ReadPeerID(peerID);
-        std::string username; reader.ReadString(username);
+        RoomID roomID; reader.readRoomID(roomID);
+        PeerID peerID; reader.readPeerID(peerID);
+        std::string username; reader.readString(username);
 
-        m_handler->OnRoomUpdate_UserJoined(roomID, peerID, username);
+        m_handler->onRoomUpdateUserJoined(roomID, peerID, username);
 
     } break;
     case PacketType_RoomUpdate_UserLeft:
     {
-        RoomID roomID; reader.ReadRoomID(roomID);
-        PeerID peerID; reader.ReadPeerID(peerID);
+        RoomID roomID; reader.readRoomID(roomID);
+        PeerID peerID; reader.readPeerID(peerID);
 
-        m_handler->OnRoomUpdate_UserLeft(roomID, peerID);
+        m_handler->onRoomUpdateUserLeft(roomID, peerID);
 
     } break;
     default:
@@ -161,70 +161,70 @@ void RelayIMClient::OnPacketReceived(std::unique_ptr<NetworkPacket> serverPacket
     }
 }
 
-void RelayIMClient::SendConnect(std::string desiredUsername)
+void RelayIMClient::sendConnect(std::string desiredUsername)
 {
     PacketData packetData;
     PacketWriter writer(packetData);
-    writer.WriteHeader(PacketType_Connect);
-    writer.WriteString(desiredUsername);
-    writer.Finalize();
+    writer.writeHeader(PacketType_Connect);
+    writer.writeString(desiredUsername);
+    writer.finalize();
 
-    m_clientNetwork.Send(packetData);
+    m_clientNetwork.sendPacket(packetData);
 }
 
-void RelayIMClient::SendRequestAllChatRooms()
+void RelayIMClient::sendRequestAllChatRooms()
 {
     PacketData packetData;
     PacketWriter writer(packetData);
-    writer.WriteHeader(PacketType_ListChatRooms);
-    writer.Finalize();
+    writer.writeHeader(PacketType_ListChatRooms);
+    writer.finalize();
 
-    m_clientNetwork.Send(packetData);
+    m_clientNetwork.sendPacket(packetData);
 }
 
-void RelayIMClient::SendJoinChatRoom(RoomID roomID)
+void RelayIMClient::sendJoinChatRoom(RoomID roomID)
 {
     PacketData packetData;
     PacketWriter writer(packetData);
-    writer.WriteHeader(PacketType_JoinChatRoom);
-    writer.WriteRoomID(roomID);
-    writer.Finalize();
+    writer.writeHeader(PacketType_JoinChatRoom);
+    writer.writeRoomId(roomID);
+    writer.finalize();
 
-    m_clientNetwork.Send(packetData);
+    m_clientNetwork.sendPacket(packetData);
 }
 
-void RelayIMClient::SendCreateChatRoom(std::string roomName)
+void RelayIMClient::sendCreateChatRoom(std::string roomName)
 {
     PacketData packetData;
     PacketWriter writer(packetData);
-    writer.WriteHeader(PacketType_CreateChatRoom);
-    writer.WriteString(roomName);
-    writer.Finalize();
+    writer.writeHeader(PacketType_CreateChatRoom);
+    writer.writeString(roomName);
+    writer.finalize();
 
-    m_clientNetwork.Send(packetData);
+    m_clientNetwork.sendPacket(packetData);
 }
 
-void RelayIMClient::SendLeaveChatRoom(RoomID roomID)
+void RelayIMClient::sendLeaveChatRoom(RoomID roomID)
 {
     PacketData packetData;
     PacketWriter writer(packetData);
-    writer.WriteHeader(PacketType_LeaveChatRoom);
-    writer.WriteRoomID(roomID);
-    writer.Finalize();
+    writer.writeHeader(PacketType_LeaveChatRoom);
+    writer.writeRoomId(roomID);
+    writer.finalize();
 
-    m_clientNetwork.Send(packetData);
+    m_clientNetwork.sendPacket(packetData);
 }
 
-void RelayIMClient::SendMessageToRoom(RoomID roomID, std::string message)
+void RelayIMClient::sendMessageToRoom(RoomID roomID, std::string message)
 {
-    Log::Get()->ConditionalWriteLine(LOG_UI, "Sending '%s' to Room %u", message, roomID);
+    Log::get()->conditionalWriteLine(LOG_UI, "Sending '%s' to Room %u", message, roomID);
 
     PacketData packetData;
     PacketWriter writer(packetData);
-    writer.WriteHeader(PacketType_SendMessage);
-    writer.WriteRoomID(roomID);
-    writer.WriteString(message);
-    writer.Finalize();
+    writer.writeHeader(PacketType_SendMessage);
+    writer.writeRoomId(roomID);
+    writer.writeString(message);
+    writer.finalize();
 
-    m_clientNetwork.Send(packetData);
+    m_clientNetwork.sendPacket(packetData);
 }

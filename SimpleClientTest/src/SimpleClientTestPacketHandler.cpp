@@ -5,33 +5,33 @@ SimpleClientTestPacketHandler::SimpleClientTestPacketHandler()
 {
     m_expectedIncomingPacketSequence =
     {
-        "SimpleClientTestPacketHandler::OnRegisterResponse",
-        "SimpleClientTestPacketHandler::OnCreateRoomResponse", //r1
-        "SimpleClientTestPacketHandler::OnCreateRoomResponse", //r2
-        "SimpleClientTestPacketHandler::OnRoomUpdate_NewMessage", // "test" -> r1
-        "SimpleClientTestPacketHandler::OnRoomUpdate_UserLeft", // r1
-        "SimpleClientTestPacketHandler::OnListChatRoomsResponse", // r1
-        "SimpleClientTestPacketHandler::OnJoinRoomResponse", // r1
-        "SimpleClientTestPacketHandler::OnRoomUpdate_FullUpdate" // 1 msg
+        "SimpleClientTestPacketHandler::onRegisterResponse",
+        "SimpleClientTestPacketHandler::onCreateRoomResponse", //r1
+        "SimpleClientTestPacketHandler::onCreateRoomResponse", //r2
+        "SimpleClientTestPacketHandler::onRoomUpdateNewMessage", // "test" -> r1
+        "SimpleClientTestPacketHandler::onRoomUpdateUserLeft", // r1
+        "SimpleClientTestPacketHandler::onListChatRoomsResponse", // r1
+        "SimpleClientTestPacketHandler::onJoinRoomResponse", // r1
+        "SimpleClientTestPacketHandler::onRoomUpdateFullUpdate" // 1 msg
     };
 }
 
 SimpleClientTestPacketHandler::~SimpleClientTestPacketHandler()
 {
-    m_client.Shutdown();
+    m_client.shutdownClient();
 }
 
-bool SimpleClientTestPacketHandler::Initialize()
+bool SimpleClientTestPacketHandler::initialize()
 {
-    return m_client.Initialize();
+    return m_client.initialize();
 }
 
-bool SimpleClientTestPacketHandler::Connect()
+bool SimpleClientTestPacketHandler::connectToServer()
 {
-    return m_client.Connect();
+    return m_client.connectToServer();
 }
 
-void SimpleClientTestPacketHandler::WaitForNextSequenceStep()
+void SimpleClientTestPacketHandler::waitForNextSequenceStep()
 {
     m_sequenceFlag = false;
     while(!m_sequenceFlag && m_success) {}
@@ -39,28 +39,28 @@ void SimpleClientTestPacketHandler::WaitForNextSequenceStep()
     m_currentSequenceIdx++;
 }
 
-void SimpleClientTestPacketHandler::AllowNextSequenceStep() 
+void SimpleClientTestPacketHandler::allowNextSequenceStep() 
 {
     m_sequenceFlag = true;
 }
 
-bool SimpleClientTestPacketHandler::TestStandardSequence()
+bool SimpleClientTestPacketHandler::testStandardSequence()
 {
     m_success = true;
     m_currentSequenceIdx = 0;
 
-    m_client.SendConnect("TestUsername");          WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendCreateChatRoom("r1");             WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendCreateChatRoom("r2");             WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendMessageToRoom(RoomID(0), "test"); WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendLeaveChatRoom(RoomID(0));         WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendRequestAllChatRooms();            WaitForNextSequenceStep(); if(!m_success) { return false; }
-    m_client.SendJoinChatRoom(RoomID(0));          WaitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendConnect("TestUsername");          waitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendCreateChatRoom("r1");             waitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendCreateChatRoom("r2");             waitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendMessageToRoom(RoomID(0), "test"); waitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendLeaveChatRoom(RoomID(0));         waitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendRequestAllChatRooms();            waitForNextSequenceStep(); if(!m_success) { return false; }
+    m_client.sendJoinChatRoom(RoomID(0));          waitForNextSequenceStep(); if(!m_success) { return false; }
 
     return m_success;
 }
 
-bool SimpleClientTestPacketHandler::CheckSequenceStep(const char* funcname)
+bool SimpleClientTestPacketHandler::checkSequenceStep(const char* funcname)
 {
     if(m_expectedIncomingPacketSequence[m_currentSequenceIdx] != funcname)
     {
@@ -70,22 +70,22 @@ bool SimpleClientTestPacketHandler::CheckSequenceStep(const char* funcname)
     return true;
 }
 
-void SimpleClientTestPacketHandler::OnRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username) 
+void SimpleClientTestPacketHandler::onRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username) 
 {
-    if(!CheckSequenceStep(__FUNCTION__) || reason != PacketResponseReason::Success || peerID != 0 || username != "TestUsername")
+    if(!checkSequenceStep(__FUNCTION__) || reason != PacketResponseReason::Success || peerID != 0 || username != "TestUsername")
     {
         m_success = false;
-        std::cout << "Failed: " << __FUNCTION__ << "Reason: " << ResponseTypeToString(reason) << "PeerID: " << peerID << "Username: " << username << std::endl;
+        std::cout << "Failed: " << __FUNCTION__ << "Reason: " << responseTypeToString(reason) << "PeerID: " << peerID << "Username: " << username << std::endl;
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }
 
-void SimpleClientTestPacketHandler::OnCreateRoomResponse(PacketResponseReason reason, RoomID roomID, std::string roomname)
+void SimpleClientTestPacketHandler::onCreateRoomResponse(PacketResponseReason reason, RoomID roomID, std::string roomname)
 {
-    if(!CheckSequenceStep(__FUNCTION__) || reason != PacketResponseReason::Success)
+    if(!checkSequenceStep(__FUNCTION__) || reason != PacketResponseReason::Success)
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
@@ -102,80 +102,80 @@ void SimpleClientTestPacketHandler::OnCreateRoomResponse(PacketResponseReason re
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }
 
-void SimpleClientTestPacketHandler::OnRoomUpdate_NewMessage(RoomID roomID, PeerID peerID, std::string message)
+void SimpleClientTestPacketHandler::onRoomUpdateNewMessage(RoomID roomID, PeerID peerID, std::string message)
 {
-    if(!CheckSequenceStep(__FUNCTION__) || roomID != 0 || peerID != 0 || message != "test")
+    if(!checkSequenceStep(__FUNCTION__) || roomID != 0 || peerID != 0 || message != "test")
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }
 
-void SimpleClientTestPacketHandler::OnRoomUpdate_UserLeft(RoomID roomID, PeerID peerID)
+void SimpleClientTestPacketHandler::onRoomUpdateUserLeft(RoomID roomID, PeerID peerID)
 {
-    if(!CheckSequenceStep(__FUNCTION__) || roomID != 0 || peerID != 0)
+    if(!checkSequenceStep(__FUNCTION__) || roomID != 0 || peerID != 0)
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }
 
-void SimpleClientTestPacketHandler::OnListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatrooms) 
+void SimpleClientTestPacketHandler::onListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatrooms) 
 {
-    if(!CheckSequenceStep(__FUNCTION__) || chatrooms->size() != 2)
+    if(!checkSequenceStep(__FUNCTION__) || chatrooms->size() != 2)
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }
 
-void SimpleClientTestPacketHandler::OnJoinRoomResponse(PacketResponseReason reason, RoomID roomID, std::string roomname) 
+void SimpleClientTestPacketHandler::onJoinRoomResponse(PacketResponseReason reason, RoomID roomID, std::string roomname) 
 {
-    if(!CheckSequenceStep(__FUNCTION__) || reason != PacketResponseReason::Success || roomID != 0 || roomname != "r1")
+    if(!checkSequenceStep(__FUNCTION__) || reason != PacketResponseReason::Success || roomID != 0 || roomname != "r1")
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }
 
-void SimpleClientTestPacketHandler::OnRoomUpdate_FullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages) 
+void SimpleClientTestPacketHandler::onRoomUpdateFullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages) 
 {
-    if(!CheckSequenceStep(__FUNCTION__) || roomID != 0 || messages->size() != 1 || messages->at(0).m_message != "test")
+    if(!checkSequenceStep(__FUNCTION__) || roomID != 0 || messages->size() != 1 || messages->at(0).m_message != "test")
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
     }
 }
 
-void SimpleClientTestPacketHandler::OnRoomUpdate_UserJoined(RoomID roomID, PeerID peerID, std::string username) 
+void SimpleClientTestPacketHandler::onRoomUpdateUserJoined(RoomID roomID, PeerID peerID, std::string username) 
 {
-    if(!CheckSequenceStep(__FUNCTION__))
+    if(!checkSequenceStep(__FUNCTION__))
     {
         m_success = false;
         std::cout << "Failed on " << __FUNCTION__ << std::endl;
     }
     else
     {
-        AllowNextSequenceStep();
+        allowNextSequenceStep();
     }
 }

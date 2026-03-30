@@ -12,7 +12,7 @@ struct ClientChatRoom
 {
     ClientChatRoom(RoomID roomID, std::string roomname);
 
-    RoomID m_roomID;
+    RoomID m_roomId;
     std::string m_roomname;
 
     std::vector<ChatMessage> m_messages;

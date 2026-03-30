@@ -8,8 +8,8 @@
 
 #include <WinSock2.h>
 
-void PrintWSAError(const char* message);
+void printWSAError(const char* message);
 
-std::string GetLocalTimestamp();
+std::string getLocalTimestamp();
 
 #endif // UTIL_H

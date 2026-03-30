@@ -25,20 +25,20 @@ public:
     /// Purely a socket-level connect, without registering a username
     /// </summary>
     /// <returns>true if Successful</returns>
-    bool TryConnect();
+    bool tryConnect();
 
-    void SetStatusUI(QConnectionStatus::Status status);
+    void setStatusUI(QConnectionStatus::Status status);
 
-    void UpdateWindowTitle();
+    void updateWindowTitle();
 
 private:
-    void InitializeSignalConnections();
-    void SetCurrentRoom(RoomID roomID);
+    void initializeSignalConnections();
+    void setCurrentRoom(RoomID roomID);
 
 public slots:
-    void Slot_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
-    void Slot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
-    void Slot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID);
+    void slotJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
+    void slotCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
+    void slotRoomUpdateUserLeft(RoomID roomID, PeerID peerID);
 
 private:
     Ui::RelayClientClass ui;

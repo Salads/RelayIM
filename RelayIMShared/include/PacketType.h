@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-const char* PacketTypeToString(uint8_t type);
+const char* packetTypeToString(uint8_t type);
 
 #define PACKET_TYPES \
     X(PacketType_Connect)               \

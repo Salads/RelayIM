@@ -1,6 +1,6 @@
 #include "PacketType.h"
 
-const char* PacketTypeToString(uint8_t type)
+const char* packetTypeToString(uint8_t type)
 {
     switch (type)
     {

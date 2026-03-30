@@ -10,12 +10,12 @@
 #include "RelayIMClient.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
 #include "models/QChatRoomMessagesModel/QChatRoomMessagesModel.h"
-#include "IRelayIMClientPacketHandler.h"
+#include "RelayIMClientAbstractPacketHandler.h"
 
 #include "Logging.h"
 #include "PacketResponseReason.h"
 
-class QModelManager : public QObject, IRelayIMClientPacketHandler
+class QModelManager : public QObject, RelayIMClientAbstractPacketHandler
 {
     Q_OBJECT  // Required for signals/slots
 
@@ -23,24 +23,24 @@ public:
     QModelManager(QObject* parent = nullptr);
     ~QModelManager();
 
-    bool Initialize();
-    bool Connect();
-    void Shutdown();
+    bool initialize();
+    bool connectToServer();
+    void shutdown();
 
-    PeerID GetLocalPeerID();
-    void SetLocalPeerID(PeerID peerID);
+    PeerID getLocalPeerId();
+    void setLocalPeerId(PeerID peerID);
 
-    void AddKnownUser(PeerID peerID, const std::string& username);
-    void AddUserToRoom(PeerID peerID, RoomID roomID);
-    void AddMessageToRoom(RoomID roomID, PeerID peerID, const std::string& message);
+    void addKnownUser(PeerID peerID, const std::string& username);
+    void addUserToRoom(PeerID peerID, RoomID roomID);
+    void addMessageToRoom(RoomID roomID, PeerID peerID, const std::string& message);
 
-    void RemoveUserFromRoom(PeerID peerID, RoomID roomID);
-    void RemoveJoinedChatRoom(RoomID roomID);
+    void removeUserFromRoom(PeerID peerID, RoomID roomID);
+    void removeJoinedChatRoom(RoomID roomID);
 
-    QModelIndex GetChatRoomIdx(RoomID roomID);
+    QModelIndex getChatRoomIdx(RoomID roomID);
 
-    bool HasJoinedRoom(RoomID roomID);
-    PacketResponseReason CheckDesiredUsername(const std::string& desiredUsername);
+    bool hasJoinedRoom(RoomID roomID);
+    PacketResponseReason checkDesiredUsername(const std::string& desiredUsername);
 
     /// <summary>
     /// Adds a chat room to the QChatRoomsModel, and creates a new QChatRoomMessagesModel for the RoomID given.
@@ -48,84 +48,84 @@ public:
     /// </summary>
     /// <param name="roomID">RoomID of new chat room</param>
     /// <param name="roomname">Display roomname of new chat room</param>
-    void AddJoinedChatRoom(RoomID roomID, const std::string& roomname);
+    void addJoinedChatRoom(RoomID roomID, const std::string& roomname);
 
-    QChatRoomsModel* GetModelForRooms();
-    QList<ChatMessage>* GetMessagesForRoom(RoomID roomID);
+    QChatRoomsModel* getModelForRooms();
+    QList<ChatMessage>* getMessagesForRoom(RoomID roomID);
 
-    RelayIMClient* GetClient();
+    RelayIMClient* getClient();
 
-    std::string GetUsernameByPeerID(PeerID peerID);
-    std::string GetRoomnameByRoomID(RoomID roomID);
+    std::string getUsernameByPeerId(PeerID peerID);
+    std::string getRoomnameByRoomId(RoomID roomID);
 
     // Local Client registration result
-    void OnRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username) override;
+    void onRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username) override;
 
     // Requested information of all existing chat rooms result
-    void OnListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms) override;
+    void onListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms) override;
 
     // Local Client join existing chat room result
-    void OnJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName) override;
+    void onJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName) override;
 
     // Local Client create chat room result (also joins room)
-    void OnCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName) override;
+    void onCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName) override;
 
     // Any Client has sent a message to a chat room
-    void OnRoomUpdate_NewMessage(RoomID roomID, PeerID peerID, std::string message) override;
+    void onRoomUpdateNewMessage(RoomID roomID, PeerID peerID, std::string message) override;
 
     // Local Client joined a existing chat room with messages/clients
-    void OnRoomUpdate_FullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages) override;
+    void onRoomUpdateFullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages) override;
 
     // Remote Client has joined a chat room we're in.
-    void OnRoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName) override;
+    void onRoomUpdateUserJoined(RoomID roomID, PeerID newPeerID, std::string newName) override;
 
     // Remote Client has left a chat room we're in.
-    void OnRoomUpdate_UserLeft(RoomID roomID, PeerID peerID) override;
+    void onRoomUpdateUserLeft(RoomID roomID, PeerID peerID) override;
     
 
 signals:
     // NOTE(Salads): Private signals for network data handling ONLY. Use Qt::QueuedConnection to bring data to Qt thread.
-    void NetEvent_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username, QPrivateSignal);
-    void NetEvent_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
-    void NetEvent_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
-    void NetEvent_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>, QPrivateSignal);
-    void NetEvent_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal);
-    void NetEvent_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal);
-    void NetEvent_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal);
-    void NetEvent_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID, QPrivateSignal);
+    void netEventRegisterResponse(PacketResponseReason result, PeerID peerID, std::string username, QPrivateSignal);
+    void netEventJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void netEventCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void netEventListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>, QPrivateSignal);
+    void netEventRoomUpdateMessage(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal);
+    void netEventRoomUpdateFull(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal);
+    void netEventRoomUpdateUserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal);
+    void netEventRoomUpdateUserLeft(RoomID roomID, PeerID peerID, QPrivateSignal);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Note(Salads): Events for use with UI, with the guarantee that the data is ready (and is on main Qt thread)
-    void Event_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username);
-    void Event_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
-    void Event_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
-    void Event_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>);
-    void Event_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message);
-    void Event_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
-    void Event_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName);
-    void Event_RoomUpdate_UserAboutToLeave(RoomID roomID, PeerID peerID); // This event happens BEFORE data alteration, since controls depend on the model that will be deleted.
+    void eventRegisterResponse(PacketResponseReason result, PeerID peerID, std::string username);
+    void eventJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
+    void eventCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
+    void eventListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>);
+    void eventRoomUpdateMessage(RoomID roomID, PeerID peerID, std::string message);
+    void eventRoomUpdateFull(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages);
+    void eventRoomUpdateUserJoined(RoomID roomID, PeerID newPeerID, std::string newName);
+    void eventRoomUpdateUserAboutToLeave(RoomID roomID, PeerID peerID); // This event happens BEFORE data alteration, since controls depend on the model that will be deleted.
 
 private slots:
     // NOTE(Salads): Private slots for network data handling ONLY. Use Qt::QueuedConnection to bring data to Qt thread.
-    void NetSlot_RegisterResponse(PacketResponseReason result, PeerID peerID, std::string username, QPrivateSignal);
-    void NetSlot_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
-    void NetSlot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
-    void NetSlot_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>, QPrivateSignal);
-    void NetSlot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal);
-    void NetSlot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal);
-    void NetSlot_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal);
-    void NetSlot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID, QPrivateSignal);
+    void netSlotRegisterResponse(PacketResponseReason result, PeerID peerID, std::string username, QPrivateSignal);
+    void netSlotJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void netSlotCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal);
+    void netSlotListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>>, QPrivateSignal);
+    void netSlotRoomUpdateMessage(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal);
+    void netSlotRoomUpdateFull(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal);
+    void netSlotRoomUpdateUserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal);
+    void netSlotRoomUpdateUserLeft(RoomID roomID, PeerID peerID, QPrivateSignal);
 
 private:
-    void InitializeClientCallbacks();
-    void DeleteRoomMessagesModel(RoomID roomID);
+    void initializeClientCallbacks();
+    void deleteRoomMessagesModel(RoomID roomID);
 
 private:
     RelayIMClient m_client;
 
     bool m_callbacksInitialized = false;
 
-    PeerID m_localPeerID; 
+    PeerID m_localPeerId; 
 
     QHash<PeerID, std::string> m_knownUsers;
     QHash<PeerID, QSet<RoomID>> m_userRooms;

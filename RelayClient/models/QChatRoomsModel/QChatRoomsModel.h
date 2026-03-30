@@ -29,14 +29,14 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void AddJoinedChatRoom(RoomID roomID, QString roomname);
-    void RemoveJoinedChatRoom(RoomID roomID);
+    void addJoinedChatRoom(RoomID roomID, QString roomname);
+    void removeJoinedChatRoom(RoomID roomID);
 
-    qsizetype FindRoom(RoomID roomID);
-    bool RoomExists(const std::string& roomname);
-    void ReplaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData);
+    qsizetype findRoom(RoomID roomID);
+    bool roomExists(const std::string& roomname);
+    void replaceAll(std::shared_ptr<std::vector<ChatRoomInfo>> newData);
 
-    std::shared_ptr<ChatRoomInfo> GetChatRoomInfo(RoomID roomID);
+    std::shared_ptr<ChatRoomInfo> getChatRoomInfo(RoomID roomID);
 
 private:
     QVector<ChatRoomInfo> m_chatRooms;

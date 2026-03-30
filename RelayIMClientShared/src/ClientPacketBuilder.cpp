@@ -5,9 +5,9 @@ PacketData ClientPacketBuilder::BuildConnectPacket(std::string userName)
     PacketData result;
     PacketWriter writer(result);
 
-    writer.WriteHeader(PacketType_Connect);
-    writer.WriteString(userName);
-    writer.Finalize();
+    writer.writeHeader(PacketType_Connect);
+    writer.writeString(userName);
+    writer.finalize();
 
     return result;
 }
@@ -17,8 +17,8 @@ PacketData ClientPacketBuilder::BuildListChatRoomsPacket()
     PacketData result;
     PacketWriter writer(result);
 
-    writer.WriteHeader(PacketType_ListChatRooms);
-    writer.Finalize();
+    writer.writeHeader(PacketType_ListChatRooms);
+    writer.finalize();
 
     return result;
 }
@@ -28,9 +28,9 @@ PacketData ClientPacketBuilder::BuildJoinChatRoomPacket(RoomID roomID)
     PacketData result;
     PacketWriter writer(result);
 
-    writer.WriteHeader(PacketType_JoinChatRoom);
-    writer.WriteRoomID(roomID);
-    writer.Finalize();
+    writer.writeHeader(PacketType_JoinChatRoom);
+    writer.writeRoomId(roomID);
+    writer.finalize();
 
     return result;
 }
@@ -40,9 +40,9 @@ PacketData ClientPacketBuilder::BuildCreateChatRoomPacket(std::string roomName)
     PacketData result;
     PacketWriter writer(result);
 
-    writer.WriteHeader(PacketType_CreateChatRoom);
-    writer.WriteString(roomName);
-    writer.Finalize();
+    writer.writeHeader(PacketType_CreateChatRoom);
+    writer.writeString(roomName);
+    writer.finalize();
 
     return result;
 }
@@ -52,9 +52,9 @@ PacketData ClientPacketBuilder::BuildLeaveChatRoomPacket(RoomID roomID)
     PacketData result;
     PacketWriter writer(result);
 
-    writer.WriteHeader(PacketType_LeaveChatRoom);
-    writer.WriteRoomID(roomID);
-    writer.Finalize();
+    writer.writeHeader(PacketType_LeaveChatRoom);
+    writer.writeRoomId(roomID);
+    writer.finalize();
 
     return result;
 }
@@ -64,10 +64,10 @@ PacketData ClientPacketBuilder::BuildSendMessagePacket(RoomID roomID, std::strin
     PacketData result;
     PacketWriter writer(result);
 
-    writer.WriteHeader(PacketType_SendMessage);
-    writer.WriteRoomID(roomID);
-    writer.WriteString(message);
-    writer.Finalize();
+    writer.writeHeader(PacketType_SendMessage);
+    writer.writeRoomId(roomID);
+    writer.writeString(message);
+    writer.finalize();
 
     return result;
 }

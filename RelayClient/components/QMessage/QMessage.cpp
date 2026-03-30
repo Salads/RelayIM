@@ -39,12 +39,12 @@ QMessage::QMessage(QWidget *parent)
 QMessage::~QMessage()
 {}
 
-void QMessage::SetContents(std::string username, std::string message, int viewportWidth)
+void QMessage::setContents(std::string username, std::string message, int viewportWidth)
 {
     m_usernameLabel->setText(QString::fromStdString(username) + ": ");
     m_messageEdit->setText(QString::fromStdString(message));
 
-    QMessageTextConstraints constraints = GetTextConstraints(username, message, viewportWidth);
+    QMessageTextConstraints constraints = getTextConstraints(username, message, viewportWidth);
 
     m_usernameLabel->setMinimumSize(constraints.m_usernameSize);
     m_usernameLabel->setMaximumSize(constraints.m_usernameSize);
@@ -60,7 +60,7 @@ void QMessage::SetContents(std::string username, std::string message, int viewpo
     adjustSize(); // shrinkwrap
 }
 
-QMessageTextConstraints QMessage::GetTextConstraints(std::string username, std::string message, int viewportWidth)
+QMessageTextConstraints QMessage::getTextConstraints(std::string username, std::string message, int viewportWidth)
 {
     QFontMetrics metrics(Font);
     int usernameTextWidth = metrics.horizontalAdvance(QString::fromStdString(username));

@@ -1,17 +1,17 @@
 #include "Logging.h"
 
 Log* g_logInstance = nullptr;
-Log* Log::Get()
+Log* Log::get()
 {
     if(!g_logInstance)
     {
-        Initialize("defaultlog.txt");
+        initialize("defaultlog.txt");
     }
 
     return g_logInstance;
 }
 
-void Log::Initialize(std::string filename)
+void Log::initialize(std::string filename)
 {
     if(!g_logInstance)
     {
@@ -19,7 +19,7 @@ void Log::Initialize(std::string filename)
     }
 }
 
-void Log::Destroy()
+void Log::destroy()
 {
     g_logInstance->~Log();
 }

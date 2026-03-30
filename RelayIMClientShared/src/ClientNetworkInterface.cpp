@@ -1,15 +1,15 @@
 #include "ClientNetworkInterface.h"
 
-ClientNetworkInterface::ClientNetworkInterface(IClientPacketHandler* handler)
+ClientNetworkInterface::ClientNetworkInterface(ClientAbstractPacketHandler* handler)
     : m_handler(handler)
 {}
 
-bool ClientNetworkInterface::Initialize()
+bool ClientNetworkInterface::initializeInterface()
 {
     WSADATA wsaData;
     int wsaStartupError = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaStartupError) {
-        PrintWSAError("WSAStartup failed");
+        printWSAError("WSAStartup failed");
         return false;
     }
 
@@ -25,7 +25,7 @@ bool ClientNetworkInterface::Initialize()
     // Resolve the server address and port
     int iResult = getaddrinfo(DEFAULT_ADDRESS, DEFAULT_PORT, &hints, &m_addrInfo);
     if (iResult != 0) {
-        PrintWSAError("getaddrinfo failed");
+        printWSAError("getaddrinfo failed");
         WSACleanup();
         return false;
     }
@@ -34,7 +34,7 @@ bool ClientNetworkInterface::Initialize()
     m_clientSocket = socket(m_addrInfo->ai_family, m_addrInfo->ai_socktype, m_addrInfo->ai_protocol);
 
     if (m_clientSocket == INVALID_SOCKET) {
-        PrintWSAError("Error at socket()");
+        printWSAError("Error at socket()");
         freeaddrinfo(m_addrInfo);
         WSACleanup();
         return false;
@@ -44,7 +44,7 @@ bool ClientNetworkInterface::Initialize()
     return true;
 }
 
-bool ClientNetworkInterface::Connect()
+bool ClientNetworkInterface::connectToServer()
 {
     // Connect to server.
     int connectResult = connect(m_clientSocket, m_addrInfo->ai_addr, (int)m_addrInfo->ai_addrlen);
@@ -56,12 +56,12 @@ bool ClientNetworkInterface::Connect()
     }
 
     m_running = true;
-    m_receiveThread = std::thread(&ClientNetworkInterface::ReceiveLoop, this);
+    m_receiveThread = std::thread(&ClientNetworkInterface::receiveLoop, this);
 
     return true;
 }
 
-void ClientNetworkInterface::ReceiveLoop()
+void ClientNetworkInterface::receiveLoop()
 {
     uint8_t receiveBuffer[NETWORK_BUFLEN];
 
@@ -73,14 +73,14 @@ void ClientNetworkInterface::ReceiveLoop()
         if (recvResult == 0)
         {
             std::cout << "Server disconnected" << std::endl;
-            m_handler->OnServerDisconnected();
+            m_handler->onServerDisconnected();
 
             break;
         }
         else if (recvResult == SOCKET_ERROR)
         {
-            PrintWSAError("recv failed");
-            m_handler->OnServerDisconnected();
+            printWSAError("recv failed");
+            m_handler->onServerDisconnected();
 
             break;
         }
@@ -111,7 +111,7 @@ void ClientNetworkInterface::ReceiveLoop()
                 m_receiveBuffer.erase(m_receiveBuffer.begin(), m_receiveBuffer.begin() + packetSize);
 
                 std::unique_ptr<NetworkPacket> newPacket = std::make_unique<NetworkPacket>(PeerID(), std::move(newPacketData));
-                m_handler->OnPacketReceived(std::move(newPacket));
+                m_handler->onPacketReceived(std::move(newPacket));
             }
             else
             {
@@ -122,7 +122,7 @@ void ClientNetworkInterface::ReceiveLoop()
     } // while(m_running)
 }
 
-void ClientNetworkInterface::Shutdown()
+void ClientNetworkInterface::shutdownInterface()
 {
     m_running = false;
 
@@ -142,19 +142,19 @@ void ClientNetworkInterface::Shutdown()
     m_isInitialized = false;
 }
 
-void ClientNetworkInterface::Send(PacketData& data)
+void ClientNetworkInterface::sendPacket(PacketData& data)
 {
     if (!m_isInitialized)
     {
-        printf("ClientNetworkInterface not initialized. Cannot send data.\n");
+        printf("ClientNetworkInterface not initialized. Cannot sendPacket data.\n");
         return;
     }
 
     uint8_t* packetType = data.data() + 7;
-    Log::Get()->ConditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "SEND(%s)", PacketTypeToString(*packetType));
+    Log::get()->conditionalWriteLine(LOG_NETWORK_PACKET_TYPES, "SEND(%s)", packetTypeToString(*packetType));
 
     int iResult = send(m_clientSocket, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
     if (iResult == SOCKET_ERROR) {
-        printf("send failed: %d\n", WSAGetLastError());
+        printf("sendPacket failed: %d\n", WSAGetLastError());
     }
 }

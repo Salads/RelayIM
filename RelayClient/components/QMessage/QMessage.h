@@ -23,9 +23,9 @@ public:
     QMessage(QWidget *parent = nullptr);
     ~QMessage();
 
-    void SetContents(std::string username, std::string message, int viewportWidth);
+    void setContents(std::string username, std::string message, int viewportWidth);
 
-    static QMessageTextConstraints GetTextConstraints(std::string username, std::string message, int viewportWidth);
+    static QMessageTextConstraints getTextConstraints(std::string username, std::string message, int viewportWidth);
 
 public:
     inline static const QFont Font = QFont("Arial");

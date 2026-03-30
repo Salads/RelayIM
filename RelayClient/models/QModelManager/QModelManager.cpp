@@ -11,41 +11,41 @@ QModelManager::~QModelManager()
     m_chatRoomMessages.clear();
 }
 
-bool QModelManager::Initialize()
+bool QModelManager::initialize()
 {
-    InitializeClientCallbacks();
+    initializeClientCallbacks();
 
-    return m_client.Initialize();
+    return m_client.initialize();
 }
 
-bool QModelManager::Connect()
+bool QModelManager::connectToServer()
 {
-    return m_client.Connect();
+    return m_client.connectToServer();
 }
 
-void QModelManager::Shutdown()
+void QModelManager::shutdown()
 {
-    m_client.Shutdown();
+    m_client.shutdownClient();
 }
 
-void QModelManager::SetLocalPeerID(PeerID peerID)
+void QModelManager::setLocalPeerId(PeerID peerID)
 {
-    m_localPeerID = peerID;
+    m_localPeerId = peerID;
 }
 
-void QModelManager::AddKnownUser(PeerID peerID, const std::string& username)
+void QModelManager::addKnownUser(PeerID peerID, const std::string& username)
 {
     m_knownUsers[peerID] = username;
 }
 
-void QModelManager::AddUserToRoom(PeerID peerID, RoomID roomID)
+void QModelManager::addUserToRoom(PeerID peerID, RoomID roomID)
 {
     m_userRooms[peerID].insert(roomID);
 }
 
-QModelIndex QModelManager::GetChatRoomIdx(RoomID roomID)
+QModelIndex QModelManager::getChatRoomIdx(RoomID roomID)
 {
-    qsizetype rowIdx = m_joinedChatRoomsModel.FindRoom(roomID);
+    qsizetype rowIdx = m_joinedChatRoomsModel.findRoom(roomID);
     if(rowIdx == -1)
     {
         return QModelIndex();
@@ -54,12 +54,12 @@ QModelIndex QModelManager::GetChatRoomIdx(RoomID roomID)
     return m_joinedChatRoomsModel.index(rowIdx);
 }
 
-bool QModelManager::HasJoinedRoom(RoomID roomID)
+bool QModelManager::hasJoinedRoom(RoomID roomID)
 {
-    return m_joinedChatRoomsModel.FindRoom(roomID) != -1;
+    return m_joinedChatRoomsModel.findRoom(roomID) != -1;
 }
 
-void QModelManager::DeleteRoomMessagesModel(RoomID roomID)
+void QModelManager::deleteRoomMessagesModel(RoomID roomID)
 {
     if(m_chatRoomMessages.contains(roomID))
     {
@@ -67,20 +67,20 @@ void QModelManager::DeleteRoomMessagesModel(RoomID roomID)
     }
 }
 
-void QModelManager::AddJoinedChatRoom(RoomID roomID, const std::string& roomname)
+void QModelManager::addJoinedChatRoom(RoomID roomID, const std::string& roomname)
 {
-    DeleteRoomMessagesModel(roomID);
-    m_joinedChatRoomsModel.AddJoinedChatRoom(roomID, QString::fromStdString(roomname));
+    deleteRoomMessagesModel(roomID);
+    m_joinedChatRoomsModel.addJoinedChatRoom(roomID, QString::fromStdString(roomname));
     m_chatRoomMessages[roomID] = QList<ChatMessage>();
 }
 
-void QModelManager::RemoveJoinedChatRoom(RoomID roomID)
+void QModelManager::removeJoinedChatRoom(RoomID roomID)
 {
-    m_joinedChatRoomsModel.RemoveJoinedChatRoom(roomID);
-    DeleteRoomMessagesModel(roomID);
+    m_joinedChatRoomsModel.removeJoinedChatRoom(roomID);
+    deleteRoomMessagesModel(roomID);
 }
 
-void QModelManager::AddMessageToRoom(RoomID roomID, PeerID peerID, const std::string& message)
+void QModelManager::addMessageToRoom(RoomID roomID, PeerID peerID, const std::string& message)
 {
     if(m_chatRoomMessages.contains(roomID))
     {
@@ -88,16 +88,16 @@ void QModelManager::AddMessageToRoom(RoomID roomID, PeerID peerID, const std::st
     }
     else
     {
-        Log::Get()->ConditionalWriteLine(LOG_NETWORK_EVENTS, "Tried to add message to non-existing room! (Room:%u, Peer:%u)", roomID, peerID);
+        Log::get()->conditionalWriteLine(LOG_NETWORK_EVENTS, "Tried to add message to non-existing room! (Room:%u, Peer:%u)", roomID, peerID);
     }
 }
 
-void QModelManager::RemoveUserFromRoom(PeerID peerID, RoomID roomID)
+void QModelManager::removeUserFromRoom(PeerID peerID, RoomID roomID)
 {
     m_userRooms[peerID].remove(roomID);
 }
 
-PacketResponseReason QModelManager::CheckDesiredUsername(const std::string& desiredUsername)
+PacketResponseReason QModelManager::checkDesiredUsername(const std::string& desiredUsername)
 {
     if(desiredUsername.empty() || desiredUsername[0] == ' ')
     {
@@ -115,69 +115,69 @@ PacketResponseReason QModelManager::CheckDesiredUsername(const std::string& desi
     return PacketResponseReason::Success;
 }
 
-void QModelManager::InitializeClientCallbacks()
+void QModelManager::initializeClientCallbacks()
 {
     if (m_callbacksInitialized) { return; }
 
 
-    connect(this, &QModelManager::NetEvent_RegisterResponse,      this, &QModelManager::NetSlot_RegisterResponse,      static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_ListChatRoomsResponse, this, &QModelManager::NetSlot_ListChatRoomsResponse, static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_JoinRoomResponse,      this, &QModelManager::NetSlot_JoinRoomResponse,      static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_CreateRoomResponse,    this, &QModelManager::NetSlot_CreateRoomResponse,    static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_RoomUpdate_Message,    this, &QModelManager::NetSlot_RoomUpdate_Message,    static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_RoomUpdate_FULL,       this, &QModelManager::NetSlot_RoomUpdate_FULL,       static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_RoomUpdate_UserJoined, this, &QModelManager::NetSlot_RoomUpdate_UserJoined, static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-    connect(this, &QModelManager::NetEvent_RoomUpdate_UserLeft,   this, &QModelManager::NetSlot_RoomUpdate_UserLeft,   static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventRegisterResponse,      this, &QModelManager::netSlotRegisterResponse,      static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventListChatRoomsResponse, this, &QModelManager::netSlotListChatRoomsResponse, static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventJoinRoomResponse,      this, &QModelManager::netSlotJoinRoomResponse,      static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventCreateRoomResponse,    this, &QModelManager::netSlotCreateRoomResponse,    static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventRoomUpdateMessage,    this, &QModelManager::netSlotRoomUpdateMessage,    static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventRoomUpdateFull,       this, &QModelManager::netSlotRoomUpdateFull,       static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventRoomUpdateUserJoined, this, &QModelManager::netSlotRoomUpdateUserJoined, static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
+    connect(this, &QModelManager::netEventRoomUpdateUserLeft,   this, &QModelManager::netSlotRoomUpdateUserLeft,   static_cast<Qt::ConnectionType>(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
 
     m_callbacksInitialized = true;
 }
 
-void QModelManager::OnRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username)
+void QModelManager::onRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username)
 {
-    emit NetEvent_RegisterResponse(reason, peerID, username, QPrivateSignal());
+    emit netEventRegisterResponse(reason, peerID, username, QPrivateSignal());
 }
 
-void QModelManager::OnListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
+void QModelManager::onListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> chatRooms)
 {
-    emit NetEvent_ListChatRoomsResponse(chatRooms, QPrivateSignal());
+    emit netEventListChatRoomsResponse(chatRooms, QPrivateSignal());
 }
 
-void QModelManager::OnJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+void QModelManager::onJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
 {
-    emit NetEvent_JoinRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
+    emit netEventJoinRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
 }
 
-void QModelManager::OnCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+void QModelManager::onCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
 {
-    emit NetEvent_CreateRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
+    emit netEventCreateRoomResponse(reason, newRoomID, newChatRoomName, QPrivateSignal());
 }
 
-void QModelManager::OnRoomUpdate_NewMessage(RoomID roomID, PeerID peerID, std::string message)
+void QModelManager::onRoomUpdateNewMessage(RoomID roomID, PeerID peerID, std::string message)
 {
-    emit NetEvent_RoomUpdate_Message(roomID, peerID, message, QPrivateSignal());
+    emit netEventRoomUpdateMessage(roomID, peerID, message, QPrivateSignal());
 }
 
-void QModelManager::OnRoomUpdate_FullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
+void QModelManager::onRoomUpdateFullUpdate(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages)
 {
-    emit NetEvent_RoomUpdate_FULL(roomID, messages, QPrivateSignal());
+    emit netEventRoomUpdateFull(roomID, messages, QPrivateSignal());
 }
 
-void QModelManager::OnRoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName)
+void QModelManager::onRoomUpdateUserJoined(RoomID roomID, PeerID newPeerID, std::string newName)
 {
-    emit NetEvent_RoomUpdate_UserJoined(roomID, newPeerID, newName, QPrivateSignal());
+    emit netEventRoomUpdateUserJoined(roomID, newPeerID, newName, QPrivateSignal());
 }
 
-void QModelManager::OnRoomUpdate_UserLeft(RoomID roomID, PeerID peerID)
+void QModelManager::onRoomUpdateUserLeft(RoomID roomID, PeerID peerID)
 {
-    emit NetEvent_RoomUpdate_UserLeft(roomID, peerID, QPrivateSignal());
+    emit netEventRoomUpdateUserLeft(roomID, peerID, QPrivateSignal());
 }
 
-PeerID QModelManager::GetLocalPeerID()
+PeerID QModelManager::getLocalPeerId()
 {
-    return m_localPeerID;
+    return m_localPeerId;
 }
 
-QList<ChatMessage>* QModelManager::GetMessagesForRoom(RoomID roomID)
+QList<ChatMessage>* QModelManager::getMessagesForRoom(RoomID roomID)
 {
     if (!m_chatRoomMessages.contains(roomID))
     {
@@ -187,17 +187,17 @@ QList<ChatMessage>* QModelManager::GetMessagesForRoom(RoomID roomID)
     return &m_chatRoomMessages[roomID];
 }
 
-QChatRoomsModel* QModelManager::GetModelForRooms()
+QChatRoomsModel* QModelManager::getModelForRooms()
 {
     return &m_joinedChatRoomsModel;
 }
 
-RelayIMClient* QModelManager::GetClient()
+RelayIMClient* QModelManager::getClient()
 {
     return &m_client;
 }
 
-std::string QModelManager::GetUsernameByPeerID(PeerID peerID)
+std::string QModelManager::getUsernameByPeerId(PeerID peerID)
 {
     if(m_knownUsers.contains(peerID))
     {
@@ -209,85 +209,85 @@ std::string QModelManager::GetUsernameByPeerID(PeerID peerID)
     }
 }
 
-std::string QModelManager::GetRoomnameByRoomID(RoomID roomID)
+std::string QModelManager::getRoomnameByRoomId(RoomID roomID)
 {
-    return m_joinedChatRoomsModel.GetChatRoomInfo(roomID)->m_roomname;
+    return m_joinedChatRoomsModel.getChatRoomInfo(roomID)->m_roomname;
 }
 
-void QModelManager::NetSlot_ListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> messages, QPrivateSignal)
+void QModelManager::netSlotListChatRoomsResponse(std::shared_ptr<std::vector<ChatRoomInfo>> messages, QPrivateSignal)
 {
-    emit Event_ListChatRoomsResponse(messages);
+    emit eventListChatRoomsResponse(messages);
 }
 
-void QModelManager::NetSlot_RegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username, QPrivateSignal)
+void QModelManager::netSlotRegisterResponse(PacketResponseReason reason, PeerID peerID, std::string username, QPrivateSignal)
 {
-    qDebug() << "NetSlot_RegisterResponse - emitting Event_RegisterReponse";
+    qDebug() << "netSlotRegisterResponse - emitting eventRegisterResponse";
 
     if(reason == PacketResponseReason::Success)
     {
-        AddKnownUser(peerID, username);
-        SetLocalPeerID(peerID);
+        addKnownUser(peerID, username);
+        setLocalPeerId(peerID);
     }
 
-    emit Event_RegisterResponse(reason, peerID, username);
+    emit eventRegisterResponse(reason, peerID, username);
 }
 
-void QModelManager::NetSlot_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal)
+void QModelManager::netSlotJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal)
 {
     if(reason == PacketResponseReason::Success)
     {
-        AddJoinedChatRoom(newRoomID, newChatRoomName);
-        AddUserToRoom(GetLocalPeerID(), newRoomID);
+        addJoinedChatRoom(newRoomID, newChatRoomName);
+        addUserToRoom(getLocalPeerId(), newRoomID);
     }
 
-    emit Event_JoinRoomResponse(reason, newRoomID, newChatRoomName);
+    emit eventJoinRoomResponse(reason, newRoomID, newChatRoomName);
 }
 
-void QModelManager::NetSlot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal)
+void QModelManager::netSlotCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName, QPrivateSignal)
 {
     if(reason == PacketResponseReason::Success)
     {
-        Log::Get()->ConditionalWriteLine(LOG_NETWORK_EVENTS, "Created Room: %s (ID=%u)", newChatRoomName, newRoomID);
-        AddJoinedChatRoom(newRoomID, newChatRoomName);
-        AddUserToRoom(GetLocalPeerID(), newRoomID);
+        Log::get()->conditionalWriteLine(LOG_NETWORK_EVENTS, "Created Room: %s (ID=%u)", newChatRoomName, newRoomID);
+        addJoinedChatRoom(newRoomID, newChatRoomName);
+        addUserToRoom(getLocalPeerId(), newRoomID);
     }
 
-    emit Event_CreateRoomResponse(reason, newRoomID, newChatRoomName);
+    emit eventCreateRoomResponse(reason, newRoomID, newChatRoomName);
 }
 
-void QModelManager::NetSlot_RoomUpdate_Message(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal _)
+void QModelManager::netSlotRoomUpdateMessage(RoomID roomID, PeerID peerID, std::string message, QPrivateSignal _)
 {
-    AddMessageToRoom(roomID, peerID, message);
-    emit Event_RoomUpdate_Message(roomID, peerID, message);
+    addMessageToRoom(roomID, peerID, message);
+    emit eventRoomUpdateMessage(roomID, peerID, message);
 }
 
-void QModelManager::NetSlot_RoomUpdate_FULL(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal)
+void QModelManager::netSlotRoomUpdateFull(RoomID roomID, std::shared_ptr<std::vector<ChatMessage>> messages, QPrivateSignal)
 {
     std::vector<ChatMessage>* pMessages = messages.get();
     for(int i = 0; i < pMessages->size(); i++)
     {
         const ChatMessage& message = pMessages->at(i);
-        AddMessageToRoom(roomID, message.m_senderID, message.m_message);
+        addMessageToRoom(roomID, message.m_senderId, message.m_message);
     }
 
-    emit Event_RoomUpdate_FULL(roomID, messages);
+    emit eventRoomUpdateFull(roomID, messages);
 }
 
-void QModelManager::NetSlot_RoomUpdate_UserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal)
+void QModelManager::netSlotRoomUpdateUserJoined(RoomID roomID, PeerID newPeerID, std::string newName, QPrivateSignal)
 {
-    AddKnownUser(newPeerID, newName);
-    AddUserToRoom(newPeerID, roomID);
+    addKnownUser(newPeerID, newName);
+    addUserToRoom(newPeerID, roomID);
 
-    emit Event_RoomUpdate_UserJoined(roomID, newPeerID, newName);
+    emit eventRoomUpdateUserJoined(roomID, newPeerID, newName);
 }
 
-void QModelManager::NetSlot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID, QPrivateSignal)
+void QModelManager::netSlotRoomUpdateUserLeft(RoomID roomID, PeerID peerID, QPrivateSignal)
 {
-    emit Event_RoomUpdate_UserAboutToLeave(roomID, peerID);
+    emit eventRoomUpdateUserAboutToLeave(roomID, peerID);
 
-    RemoveUserFromRoom(peerID, roomID);
-    if(peerID == GetLocalPeerID())
+    removeUserFromRoom(peerID, roomID);
+    if(peerID == getLocalPeerId())
     {
-        RemoveJoinedChatRoom(roomID);
+        removeJoinedChatRoom(roomID);
     }
 }

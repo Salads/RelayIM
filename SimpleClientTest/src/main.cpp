@@ -9,24 +9,24 @@
 
 int main()
 {
-    Log::Initialize("simple-client-test.log");
+    Log::initialize("simple-client-test.log");
     SimpleClientTestPacketHandler handler;
 
-    if (!handler.Initialize())
+    if (!handler.initialize())
     {
         std::cerr << "Failed to initialize client." << std::endl;
         return 1;
     }
 
-    if (!handler.Connect())
+    if (!handler.connectToServer())
     {
         std::cout << "Client failed to connect." << std::endl;
         return 1;
     }
 
-    bool success = handler.TestStandardSequence();
+    bool success = handler.testStandardSequence();
     std::cout << "Final Result: " << success << std::endl;
     while(true) {};
 
-    Log::Destroy();
+    Log::destroy();
 }

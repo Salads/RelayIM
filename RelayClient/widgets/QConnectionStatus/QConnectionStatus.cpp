@@ -6,14 +6,14 @@ QConnectionStatus::QConnectionStatus(QWidget* parent)
     setMinimumSize(250, 15);
     setMaximumSize(250, 15);
 
-    SetStatus(Status::NotConnected);
+    setStatus(Status::NotConnected);
 }
 
 QConnectionStatus::~QConnectionStatus()
 {
 }
 
-void QConnectionStatus::SetStatus(QConnectionStatus::Status status)
+void QConnectionStatus::setStatus(QConnectionStatus::Status status)
 {
     switch(status)
     {

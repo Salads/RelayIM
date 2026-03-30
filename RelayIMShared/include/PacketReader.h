@@ -16,17 +16,17 @@ class PacketReader
 public:
     PacketReader(const NetworkPacket *data);
 
-    bool ReadRoomID(RoomID& out);
-    bool ReadPeerID(PeerID& out);
+    bool readRoomID(RoomID& out);
+    bool readPeerID(PeerID& out);
 
-    bool ReadUInt8(uint8_t& outValue);
-    bool ReadUInt16(uint16_t& outValue);
-    bool ReadUInt32(uint32_t& outValue);
-    bool ReadString(std::string &outString);
+    bool readUInt8(uint8_t& outValue);
+    bool readUInt16(uint16_t& outValue);
+    bool readUInt32(uint32_t& outValue);
+    bool readString(std::string &outString);
 
-    bool ReadPacketResponseReason(PacketResponseReason& reason);
+    bool readPacketResponseReason(PacketResponseReason& reason);
 
-    bool ReadHeader(PacketHeader& outHeader);
+    bool readHeader(PacketHeader& outHeader);
 
 private:
     const std::vector<uint8_t> *m_data;

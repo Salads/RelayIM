@@ -23,7 +23,7 @@ RelayClient::RelayClient(QModelManager* manager, QWidget *parent)
     QHBoxLayout* buttonLayout = new QHBoxLayout();
 
     m_roomsListView = new QListView();
-    m_roomsListView->setModel(m_manager->GetModelForRooms());
+    m_roomsListView->setModel(m_manager->getModelForRooms());
     m_roomsListView->setSelectionMode(QListView::SelectionMode::SingleSelection);
     m_roomsListView->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     vLayoutChatRooms->addWidget(m_roomsListView, 9);
@@ -46,13 +46,13 @@ RelayClient::RelayClient(QModelManager* manager, QWidget *parent)
 
     m_leaveChatRoomButton->setEnabled(false); // First load = no rooms. When we get rooms, the current should automatically be changed.
 
-    m_manager->Initialize();
-    InitializeSignalConnections();
+    m_manager->initialize();
+    initializeSignalConnections();
 }
 
-void RelayClient::SetCurrentRoom(RoomID roomID)
+void RelayClient::setCurrentRoom(RoomID roomID)
 {
-    QModelIndex newRoomIdx = m_manager->GetChatRoomIdx(roomID);
+    QModelIndex newRoomIdx = m_manager->getChatRoomIdx(roomID);
     if(newRoomIdx.isValid())
     {
         // The signal connection for currentChanged -> chat widget should handle chat widget room update.
@@ -60,18 +60,18 @@ void RelayClient::SetCurrentRoom(RoomID roomID)
     }
 }
 
-void RelayClient::InitializeSignalConnections()
+void RelayClient::initializeSignalConnections()
 {
-    connect(m_manager, &QModelManager::Event_JoinRoomResponse,            this, &RelayClient::Slot_JoinRoomResponse);
-    connect(m_manager, &QModelManager::Event_CreateRoomResponse,          this, &RelayClient::Slot_CreateRoomResponse);
-    connect(m_manager, &QModelManager::Event_RoomUpdate_UserAboutToLeave, this, &RelayClient::Slot_RoomUpdate_UserLeft);
+    connect(m_manager, &QModelManager::eventJoinRoomResponse,            this, &RelayClient::slotJoinRoomResponse);
+    connect(m_manager, &QModelManager::eventCreateRoomResponse,          this, &RelayClient::slotCreateRoomResponse);
+    connect(m_manager, &QModelManager::eventRoomUpdateUserAboutToLeave, this, &RelayClient::slotRoomUpdateUserLeft);
 
     // Sets chat widget room model when room on left is selected
     connect(m_roomsListView, &QListView::clicked, this, [this](const QModelIndex& clickedItem)
     {
         // NOTE(Salads): Via Docs: clicked emitted only when index is valid.
         QVariant roomID = clickedItem.data(QChatRoomsModel::Role::RoomIDRole);
-        m_chatWidget->SetRoomID(static_cast<RoomID>(roomID.toUInt()));
+        m_chatWidget->setRoomId(static_cast<RoomID>(roomID.toUInt()));
     });
 
     connect(m_createOrJoinChatRoomButton, &QPushButton::clicked, this, [this](bool checked)
@@ -86,8 +86,8 @@ void RelayClient::InitializeSignalConnections()
         QModelIndex currentIndex = m_roomsListView->currentIndex();
         if(currentIndex.isValid())
         {
-            RoomID roomID(m_manager->GetModelForRooms()->data(currentIndex, QChatRoomsModel::Role::RoomIDRole).toUInt());
-            m_manager->GetClient()->SendLeaveChatRoom(roomID);
+            RoomID roomID(m_manager->getModelForRooms()->data(currentIndex, QChatRoomsModel::Role::RoomIDRole).toUInt());
+            m_manager->getClient()->sendLeaveChatRoom(roomID);
         }
     });
 
@@ -98,67 +98,67 @@ void RelayClient::InitializeSignalConnections()
 
         if(isSomethingSelected)
         {
-            RoomID roomID(m_manager->GetModelForRooms()->data(current, QChatRoomsModel::Role::RoomIDRole).toUInt());
-            m_chatWidget->SetRoomID(roomID);
+            RoomID roomID(m_manager->getModelForRooms()->data(current, QChatRoomsModel::Role::RoomIDRole).toUInt());
+            m_chatWidget->setRoomId(roomID);
         }
     });
 }
 
-void RelayClient::Slot_JoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+void RelayClient::slotJoinRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
 {
     if(reason == PacketResponseReason::Success)
     {
-        SetCurrentRoom(newRoomID); // Set current room to our newly joined room
+        setCurrentRoom(newRoomID); // Set current room to our newly joined room
     }
 }
 
-void RelayClient::Slot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
+void RelayClient::slotCreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName)
 {
     if(reason == PacketResponseReason::Success)
     {
-        SetCurrentRoom(newRoomID); // Set current room to our newly created room
+        setCurrentRoom(newRoomID); // Set current room to our newly created room
     }
 }
 
-void RelayClient::Slot_RoomUpdate_UserLeft(RoomID roomID, PeerID peerID)
+void RelayClient::slotRoomUpdateUserLeft(RoomID roomID, PeerID peerID)
 {
-    if(peerID == m_manager->GetLocalPeerID())
+    if(peerID == m_manager->getLocalPeerId())
     {
-        if(m_chatWidget->GetRoomID() == roomID)
+        if(m_chatWidget->getRoomId() == roomID)
         {
-            m_chatWidget->SetRoomID(RoomID());
+            m_chatWidget->setRoomId(RoomID());
         }
     }
 }
 
-bool RelayClient::TryConnect()
+bool RelayClient::tryConnect()
 {
-    m_connectionStatus->SetStatus(QConnectionStatus::Status::Connecting);
-    if(m_manager->Connect())
+    m_connectionStatus->setStatus(QConnectionStatus::Status::Connecting);
+    if(m_manager->connectToServer())
     {
-        m_connectionStatus->SetStatus(QConnectionStatus::Status::ConnectedUnregistered);
+        m_connectionStatus->setStatus(QConnectionStatus::Status::ConnectedUnregistered);
         return true;
     }
     else
     {
-        m_connectionStatus->SetStatus(QConnectionStatus::Status::NotConnected);
+        m_connectionStatus->setStatus(QConnectionStatus::Status::NotConnected);
         return false;
     }
 }
 
 RelayClient::~RelayClient()
 {
-    m_manager->Shutdown();
+    m_manager->shutdown();
 }
 
-void RelayClient::SetStatusUI(QConnectionStatus::Status status)
+void RelayClient::setStatusUI(QConnectionStatus::Status status)
 {
-    m_connectionStatus->SetStatus(status);
+    m_connectionStatus->setStatus(status);
 }
 
-void RelayClient::UpdateWindowTitle()
+void RelayClient::updateWindowTitle()
 {
-    std::string localUsername = m_manager->GetUsernameByPeerID(m_manager->GetLocalPeerID());
+    std::string localUsername = m_manager->getUsernameByPeerId(m_manager->getLocalPeerId());
     QString newTitle = QString("Relay IM (%1)").arg(QString::fromStdString(localUsername));
     setWindowTitle(newTitle);
 }

@@ -9,7 +9,7 @@ struct ChatMessage
 {
     ChatMessage(PeerID peerID, std::string message);
 
-    PeerID m_senderID;
+    PeerID m_senderId;
     std::string m_message;
 };
 

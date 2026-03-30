@@ -1,6 +1,6 @@
 #include "PacketResponseReason.h"
 
-const char* ResponseTypeToString(uint8_t type)
+const char* responseTypeToString(uint8_t type)
 {
     switch(type)
     {

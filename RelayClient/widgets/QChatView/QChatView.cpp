@@ -11,7 +11,7 @@ QChatView::QChatView(QModelManager* manager, QWidget *parent)
 QChatView::~QChatView()
 {}
 
-int QChatView::GetViewportWidth()
+int QChatView::getViewportWidth()
 {
     QScrollBar* vBar = verticalScrollBar();
     return width() - (vBar->isVisible() ? vBar->width() : 0);

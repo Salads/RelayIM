@@ -40,7 +40,7 @@ QChatRoom::QChatRoom(QWidget *parent)
 QChatRoom::~QChatRoom()
 {}
 
-void QChatRoom::Initialize(int roomId, const std::string roomName)
+void QChatRoom::initialize(int roomId, const std::string roomName)
 {
     m_roomNameLabel->setText(QString::fromStdString(roomName));
 }

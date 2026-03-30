@@ -15,35 +15,35 @@
 #include "ChatClient.h"
 #include "ServerNetworkInterface.h"
 #include "NetworkPacket.h"
-#include "IServerPacketHandler.h"
+#include "ServerAbstractPacketHandler.h"
 #include "RoomID.h"
 #include "PeerID.h"
 
-class RelayIMServer : public IServerPacketHandler
+class RelayIMServer : public ServerAbstractPacketHandler
 {
 public:
     RelayIMServer();
-    bool Initialize();
-    bool Start();
-    void Stop();
+    bool initializeServer();
+    bool start();
+    void stop();
 
     // Things that should happen on the main thread, go here.
-    void Update();
+    void update();
 
-    bool GetIsInitialized() const;
-    bool GetIsRunning() const;
-    void HandleNewClient(PeerID newPeerID);
+    bool isInitialized() const;
+    bool getIsRunning() const;
+    void handleNewClient(PeerID newPeerID);
 
 private:
-    void AddPacketToQueue(std::unique_ptr<NetworkPacket> newPacket);
-    void ProcessClientPackets();
+    void addPacketToQueue(std::unique_ptr<NetworkPacket> newPacket);
+    void processClientPackets();
 
-    bool IsUsernameTaken(std::string& newUsername);
-    bool IsRoomnameTaken(std::string& newRoomname);
+    bool isUsernameTaken(std::string& newUsername);
+    bool isRoomnameTaken(std::string& newRoomname);
 
-    void OnNewClient(PeerID newPeerID) override;
-    void OnClientDisconnected(PeerID peerID) override;
-    void OnPacketReceived(PeerID peerID, std::unique_ptr<NetworkPacket> packet) override;
+    void onNewClient(PeerID newPeerID) override;
+    void onClientDisconnected(PeerID peerID) override;
+    void onPacketReceived(PeerID peerID, std::unique_ptr<NetworkPacket> packet) override;
 
 private:
     bool m_isInitialized = false;

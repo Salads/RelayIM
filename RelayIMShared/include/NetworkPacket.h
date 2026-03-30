@@ -10,7 +10,7 @@ struct NetworkPacket
 {
     NetworkPacket(PeerID _peerID, std::unique_ptr<PacketData> _packetData);
 
-    PeerID m_peerID;
+    PeerID m_peerId;
     std::unique_ptr<PacketData> m_data;
 };
 

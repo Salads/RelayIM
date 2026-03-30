@@ -29,9 +29,9 @@ class Log
 {
 public:
 
-    static Log* Get();
-    static void Initialize(std::string filename);
-    static void Destroy();
+    static Log* get();
+    static void initialize(std::string filename);
+    static void destroy();
 
     Log(std::string logFilename);
     ~Log();
@@ -40,7 +40,7 @@ public:
 
     // Simply prints a formatted string. Formatting is the same as printf.
     template <typename ... Args>
-    void WriteLine(const char* fmt, Args const& ... args) noexcept
+    void writeLine(const char* fmt, Args const& ... args) noexcept
     {
         std::lock_guard lock(m_mutex);
         if(!m_initialized) { return; }
@@ -53,10 +53,10 @@ public:
     };
 
     template <typename ... Args>
-    void ConditionalWriteLine(bool condition, const char* fmt, Args const& ... args) noexcept
+    void conditionalWriteLine(bool condition, const char* fmt, Args const& ... args) noexcept
     {
         if(!condition) { return; }
-        WriteLine(fmt, args ...);
+        writeLine(fmt, args ...);
     };
 
 private:

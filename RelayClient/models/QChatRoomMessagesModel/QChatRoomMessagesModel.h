@@ -28,16 +28,16 @@ public:
     QChatRoomMessagesModel(QObject* parent = nullptr);
     ~QChatRoomMessagesModel();
 
-    void Initialize(QHash<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info);
-    void Initialize(QHash<PeerID, std::string>* knownUsers, RoomID roomID, std::string chatRoomName);
+    void initialize(QHash<PeerID, std::string>* knownUsers, std::shared_ptr<ChatRoomInfo> info);
+    void initialize(QHash<PeerID, std::string>* knownUsers, RoomID roomID, std::string chatRoomName);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void AddMessage(PeerID peerID, const std::string& message);
-    RoomID GetRoomID();
-    std::string GetRoomname();
+    void addMessage(PeerID peerID, const std::string& message);
+    RoomID getRoomId();
+    std::string getRoomname();
 
 private:
 

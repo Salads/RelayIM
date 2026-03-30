@@ -12,16 +12,16 @@ class ClientUser
 public:
     ClientUser(PeerID peerID, std::string username);
 
-    std::string GetUsername();
-    PeerID GetPeerID();
-    size_t GetNumRooms();
+    std::string getUsername();
+    PeerID getPeerId();
+    size_t getNumRooms();
 
-    void AddToRoom(RoomID roomID);
-    void RemoveFromRoom(RoomID roomID);
+    void addToRoom(RoomID roomID);
+    void removeFromRoom(RoomID roomID);
 
 private:
 
-    PeerID m_peerID;
+    PeerID m_peerId;
     std::string m_username;
 
     std::unordered_set<RoomID> m_rooms;
