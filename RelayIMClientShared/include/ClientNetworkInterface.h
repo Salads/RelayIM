@@ -1,13 +1,9 @@
 #ifndef CLIENTNETWORKINTERFACE_H
 #define CLIENTNETWORKINTERFACE_H
 
-#include <WinSock2.h>
-#include <WS2tcpip.h>
 #include <iostream>
 #include <vector>
 #include <atomic>
-#include <functional>
-#include <mutex>
 
 #include "NetworkInterface.h"
 #include "NetworkPacket.h"
@@ -16,6 +12,9 @@
 #include "PeerID.h"
 #include "NetworkConfig.h"
 #include "PacketType.h"
+
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 
 class ClientNetworkInterface : public NetworkInterface
 {

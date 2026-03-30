@@ -5,11 +5,9 @@
 #include <QScrollArea>
 #include <QStyle>
 #include <QResizeEvent>
-#include "ui_QChatView.h"
 
 #include "ChatMessage.h"
 #include "models/QModelManager/QModelManager.h"
-#include "models/QChatModel/QChatModel.h"
 
 class QChatView : public QScrollArea
 {
@@ -19,18 +17,15 @@ public:
     QChatView(QModelManager* manager, QWidget *parent = nullptr);
     ~QChatView();
 
-    void SetRoom(RoomID roomID);
-
     int GetViewportWidth();
+
+signals:
+    void onResize(QSize oldSize, QSize newSize);
 
 protected:
     void resizeEvent(QResizeEvent* event);
 
 private:
-    Ui::QChatViewClass ui;
-
-    QChatModel* m_model;
-
     QModelManager* m_manager;
 };
 

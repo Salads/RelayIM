@@ -1,14 +1,13 @@
 #ifndef CHATROOM_H
 #define CHATROOM_H
 
-#include "ChatMessage.h"
-#include "PacketData.h"
-#include "RoomID.h"
-#include "PeerID.h"
-
 #include <string>
 #include <vector>
 #include <unordered_set>
+
+#include "ChatMessage.h"
+#include "RoomID.h"
+#include "PeerID.h"
 
 class ChatRoom
 {

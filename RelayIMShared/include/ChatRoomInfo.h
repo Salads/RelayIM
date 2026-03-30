@@ -2,6 +2,7 @@
 #define CHATROOMINFO_H
 
 #include <string>
+
 #include "RoomID.h"
 
 struct ChatRoomInfo

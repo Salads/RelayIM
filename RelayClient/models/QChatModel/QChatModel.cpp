@@ -1,5 +1,4 @@
 #include "QChatModel.h"
-#include "widgets/QChatView/QChatView.h"
 
 QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
     : m_chatView(view), m_manager(manager), QWidget(parent)
@@ -7,11 +6,13 @@ QChatModel::QChatModel(QChatView* view, QModelManager* manager, QWidget* parent)
     m_messagePositionsStartY.reserve(UINT16_MAX);
 
     m_vBar = view->verticalScrollBar();
+    m_chatView->setWidget(this);
 
     connect(m_manager, &QModelManager::Event_RoomUpdate_Message, this, &QChatModel::Slot_RoomUpdate_Message);
     connect(m_manager, &QModelManager::Event_RoomUpdate_FULL, this, &QChatModel::Slot_RoomUpdate_FULL);
     connect(m_vBar, &QScrollBar::rangeChanged, this, &QChatModel::Slot_ScrollRangeChanged);
     connect(m_vBar, &QScrollBar::valueChanged, this, &QChatModel::Slot_ScrollValueChanged);
+    connect(m_chatView, &QChatView::onResize, this, &QChatModel::HandleResize);
 }
 
 void QChatModel::Slot_ScrollRangeChanged(int min, int max)
@@ -215,7 +216,7 @@ void QChatModel::Refresh()
     RenderObjects();
 }
 
-void QChatModel::HandleResize()
+void QChatModel::HandleResize(QSize oldSize, QSize newSize)
 {
     PrecalculateMessagePositions(true);
     RenderObjects();

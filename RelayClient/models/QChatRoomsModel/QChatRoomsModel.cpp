@@ -1,8 +1,5 @@
 #include "QChatRoomsModel.h"
 
-#include <QMutexLocker>
-#include <QMutex>
-
 QChatRoomsModel::QChatRoomsModel(QObject *parent)
     : QAbstractListModel(parent)
 {}

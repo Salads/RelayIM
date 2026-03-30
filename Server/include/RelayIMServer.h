@@ -1,7 +1,6 @@
 #ifndef RELAYIMSERVER_H
 #define RELAYIMSERVER_H
 
-#include <WinSock2.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <thread>
@@ -10,6 +9,8 @@
 #include <queue>
 
 #include "PacketData.h"
+#include "PacketReader.h"
+#include "PacketWriter.h"
 #include "ChatRoom.h"
 #include "ChatClient.h"
 #include "ServerNetworkInterface.h"

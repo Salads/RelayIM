@@ -2,18 +2,15 @@
 #define RELAYCLIENT_H
 
 #include <QMainWindow>
-#include <QResizeEvent>
 #include <QListView>
 #include <QPushButton>
 #include <QBoxLayout>
-#include <QErrorMessage>
-#include "ui_RelayClient.h"
+#include "ui_RelayClient.h" // Used by status bar
 
 #include "models/QModelManager/QModelManager.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
 #include "widgets/QChatWidget/QChatWidget.h"
 #include "widgets/QConnectionStatus/QConnectionStatus.h"
-#include "windows/QRegisterDialog/QRegisterDialog.h"
 #include "windows/ChatRoomsDialog/QChatRoomsDialog.h"
 
 class RelayClient : public QMainWindow

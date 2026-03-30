@@ -1,5 +1,4 @@
 #include "ChatRoom.h"
-#include "PacketData.h"
 
 ChatRoom::ChatRoom(RoomID roomID, std::string roomName)
     : m_roomID(roomID), m_roomName(std::move(roomName))

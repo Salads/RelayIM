@@ -1,5 +1,4 @@
 #include "PacketType.h"
-#include "PacketData.h"
 
 const char* PacketTypeToString(uint8_t type)
 {

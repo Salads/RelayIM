@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+
 #include "RoomID.h"
 #include "PacketWriter.h"
 #include "PacketData.h"

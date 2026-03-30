@@ -3,8 +3,6 @@
 QChatRoomsDialog::QChatRoomsDialog(QModelManager* manager, QWidget *parent)
     : QDialog(parent)
 {
-    ui.setupUi(this);
-
     m_manager = manager;
     
     QVBoxLayout* mainVLayout = new QVBoxLayout(this);

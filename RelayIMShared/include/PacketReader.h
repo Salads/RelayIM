@@ -1,14 +1,15 @@
 #ifndef PACKETREADER_H
 #define PACKETREADER_H
 
+#include <cstdint>
+#include <vector>
+#include <string>
+
 #include "PacketHeader.h"
 #include "NetworkPacket.h"
 #include "RoomID.h"
 #include "PeerID.h"
 #include "PacketResponseReason.h"
-
-#include <vector>
-#include <string>
 
 class PacketReader
 {

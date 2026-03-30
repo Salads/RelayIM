@@ -3,8 +3,6 @@
 QChatRoom::QChatRoom(QWidget *parent)
     : QPushButton(parent)
 {
-    ui.setupUi(this);
-
     setMinimumSize(100, 40);
     setFixedSize(100, 40);
 

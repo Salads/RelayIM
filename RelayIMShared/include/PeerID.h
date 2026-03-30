@@ -2,8 +2,8 @@
 #define PEERID_H
 
 #include <cstdint>
-#include <functional>
 #include <ostream>
+#include <functional>
 
 #define INVALID_PEER_ID -1
 

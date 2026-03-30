@@ -2,6 +2,7 @@
 #define PACKETHEADER_H
 
 #include <cstdint>
+
 #include "PacketType.h"
 
 #pragma pack(push, 1)

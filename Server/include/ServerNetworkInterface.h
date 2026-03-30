@@ -1,13 +1,12 @@
 #ifndef SERVERNETWORKINTERFACE_H
 #define SERVERNETWORKINTERFACE_H
 
-#include <WinSock2.h>
-#include <WS2tcpip.h>
 #include <unordered_map>
 #include <thread>
 #include <atomic>
-#include <functional>
 #include <mutex>
+#include <memory>
+#include <cstdint>
 #include <queue>
 
 #include "Util.h"
@@ -19,6 +18,10 @@
 #include "IServerPacketHandler.h"
 #include "NetworkConfig.h"
 #include "PacketType.h"
+#include "PeerID.h"
+
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 
 class ServerNetworkInterface : public NetworkInterface
 {

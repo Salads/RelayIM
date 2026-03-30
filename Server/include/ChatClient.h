@@ -1,9 +1,6 @@
 #ifndef CHATCLIENT_H
 #define CHATCLIENT_H
 
-#include <WinSock2.h>
-#include <cstdint>
-#include <thread>
 #include <vector>
 #include <string>
 

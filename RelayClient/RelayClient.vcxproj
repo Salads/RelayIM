@@ -122,12 +122,6 @@
     <ClCompile Include="windows\QRegisterDialog\QRegisterDialog.cpp" />
     <ClCompile Include="windows\RelayClient\RelayClient.cpp" />
     <ClCompile Include="main.cpp" />
-    <QtUic Include="components\QChatInput\QChatInput.ui" />
-    <QtUic Include="components\QChatRoom\QChatRoom.ui" />
-    <QtUic Include="widgets\QChatView\QChatView.ui" />
-    <QtUic Include="widgets\QChatWidget\QChatWidget.ui" />
-    <QtUic Include="widgets\QConnectionStatus\QConnectionStatus.ui" />
-    <QtUic Include="windows\ChatRoomsDialog\QChatRoomsDialog.ui" />
     <QtUic Include="windows\RelayClient\RelayClient.ui" />
     <QtRcc Include="windows\RelayClient\RelayClient.qrc" />
   </ItemGroup>

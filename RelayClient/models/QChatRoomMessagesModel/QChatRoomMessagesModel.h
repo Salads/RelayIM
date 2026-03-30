@@ -1,17 +1,17 @@
 #ifndef QCHATROOMMESSAGESMODEL_H
 #define QCHATROOMMESSAGESMODEL_H
 
-#include "ChatMessage.h"
-#include "ChatRoomInfo.h"
-#include "RoomID.h"
-#include "PeerID.h"
-
 #include <QObject>
 #include <QAbstractListModel>
 #include <QVector>
 #include <QList>
 #include <QMutex>
 #include <QHash>
+
+#include "ChatMessage.h"
+#include "ChatRoomInfo.h"
+#include "RoomID.h"
+#include "PeerID.h"
 
 class QChatRoomMessagesModel  : public QAbstractListModel
 {

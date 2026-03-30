@@ -7,14 +7,14 @@
 
 #include "PacketData.h"
 #include "ClientNetworkInterface.h"
-#include "ClientChatRoom.h"
 #include "ChatRoomInfo.h"
-#include "ClientUser.h"
 #include "IClientPacketHandler.h"
 #include "IRelayIMClientPacketHandler.h"
 #include "RoomID.h"
 #include "PeerID.h"
 #include "PacketHeader.h"
+#include "PacketWriter.h"
+#include "PacketReader.h"
 
 class RelayIMClient : public IClientPacketHandler
 {

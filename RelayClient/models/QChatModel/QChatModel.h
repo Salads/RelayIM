@@ -1,25 +1,21 @@
 #ifndef QCHATMODEL_H
 #define QCHATMODEL_H
 
-#include <stdint.h>
-#include <memory>
-#include <vector>
-#include <cstdint>
-
 #include <QWidget>
-#include <QList>
-#include <QFontMetrics>
 #include <QScrollBar>
-#include <QVBoxLayout>
 #include <QVector>
 
-#include "ChatMessage.h"
 #include "models/QModelManager/QModelManager.h"
 #include "components/QMessage/QMessage.h"
+#include "widgets/QChatView/QChatView.h"
+
+#include "ChatMessage.h"
 #include "RoomID.h"
 #include "PeerID.h"
 
-class QChatView;
+#include <memory>
+#include <vector>
+#include <cstdint>
 
 /// <summary>
 /// For use with QChatModel, holds result for a single chat message to be rendered.
@@ -45,7 +41,7 @@ public:
     void SetRoom(RoomID roomID);
 
     void Refresh();
-    void HandleResize();
+    void HandleResize(QSize oldSize, QSize newSize);
     void RenderObjects();
 
 public slots:

@@ -111,24 +111,6 @@
     <QtUic Include="windows\RelayClient\RelayClient.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="widgets\QChatWidget\QChatWidget.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="components\QChatInput\QChatInput.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="components\QChatRoom\QChatRoom.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="widgets\QConnectionStatus\QConnectionStatus.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="windows\ChatRoomsDialog\QChatRoomsDialog.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="widgets\QChatView\QChatView.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="windows\RelayClient\RelayClient.qrc">

@@ -4,17 +4,16 @@
 #include <QDialog>
 #include <QBoxLayout>
 #include <QLabel>
-#include <QFrame>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QListView>
 #include <QGroupBox>
 #include <QMessageBox>
-#include "ui_QChatRoomsDialog.h"
-#include "PacketResponseReason.h"
 
 #include "models/QModelManager/QModelManager.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
+
+#include "PacketResponseReason.h"
 
 class QChatRoomsDialog : public QDialog
 {
@@ -35,8 +34,6 @@ private:
     void Slot_CreateRoomResponse(PacketResponseReason reason, RoomID newRoomID, std::string newChatRoomName);
 
 private:
-    Ui::QChatRoomsDialogClass ui;
-
     QModelManager* m_manager;
 
     QChatRoomsModel m_model;

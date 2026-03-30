@@ -1,10 +1,10 @@
 #ifndef NETWORKPACKET_H
 #define NETWORKPACKET_H
 
+#include <memory>
+
 #include "PacketData.h"
 #include "PeerID.h"
-
-#include <memory>
 
 struct NetworkPacket
 {

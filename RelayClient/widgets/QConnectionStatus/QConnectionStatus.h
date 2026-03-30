@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QPainter>
-#include "ui_QConnectionStatus.h"
 
 class QConnectionStatus : public QWidget
 {
@@ -22,8 +21,6 @@ protected:
     void paintEvent(QPaintEvent*);
 
 private:
-    Ui::QConnectionStatusClass ui;
-
     Status m_status = Status::NotConnected;
     QString m_statusStr = "";
     Qt::GlobalColor m_iconColor;

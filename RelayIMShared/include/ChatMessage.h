@@ -2,6 +2,7 @@
 #define CHATMESSAGE_H
 
 #include <string>
+
 #include "PeerID.h"
 
 struct ChatMessage

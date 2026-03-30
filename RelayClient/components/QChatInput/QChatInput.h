@@ -6,8 +6,6 @@
 
 #include "models/QModelManager/QModelManager.h"
 
-#include "ui_QChatInput.h"
-
 class QChatInput : public QTextEdit
 {
     Q_OBJECT
@@ -19,10 +17,7 @@ public:
     void SetRoomID(RoomID roomID);
 
 private:
-    Ui::QChatInputClass ui;
-
     QModelManager* m_manager;
-
     RoomID m_roomID;
 };
 

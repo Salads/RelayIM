@@ -1,9 +1,4 @@
-#include <iostream>
-
 #include "RelayIMClient.h"
-#include "PacketReader.h"
-#include "PacketWriter.h"
-#include "Logging.h"
 
 RelayIMClient::RelayIMClient(IRelayIMClientPacketHandler* handler)
     : m_clientNetwork(this), m_handler(handler)

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "ClientUser.h"
 
 ClientUser::ClientUser(PeerID peerID, std::string username)

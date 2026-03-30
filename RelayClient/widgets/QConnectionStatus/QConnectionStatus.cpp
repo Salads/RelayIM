@@ -3,8 +3,6 @@
 QConnectionStatus::QConnectionStatus(QWidget* parent)
     : QWidget(parent)
 {
-    ui.setupUi(this);
-
     setMinimumSize(250, 15);
     setMaximumSize(250, 15);
 

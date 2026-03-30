@@ -2,8 +2,11 @@
 #include <QPalette>
 #include <QColor>
 #include <QFile>
+#include <QErrorMessage>
 
 #include "windows/RelayClient/RelayClient.h"
+#include "windows//QRegisterDialog/QRegisterDialog.h"
+
 #include "Logging.h"
 #include "Util.h"
 

@@ -1,5 +1,3 @@
-#include <WinSock2.h>
-#include <iostream>
 #include "Util.h"
 
 void PrintWSAError(const char* message)

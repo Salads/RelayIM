@@ -1,15 +1,14 @@
 #ifndef PACKETWRITER_H
 #define PACKETWRITER_H
 
+#include <vector>
+#include <string>
+
 #include "RoomID.h"
 #include "PeerID.h"
 #include "PacketType.h"
 #include "PacketData.h"
 #include "NetworkConfig.h"
-
-#include <vector>
-#include <string>
-
 
 class PacketWriter
 {

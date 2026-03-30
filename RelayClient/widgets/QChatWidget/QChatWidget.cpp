@@ -1,14 +1,8 @@
-
-#include <QBoxLayout>
-#include <QFrame>
-
 #include "widgets/QChatWidget/QChatWidget.h"
 
 QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     : QWidget(parent)
 {
-    ui.setupUi(this);
-
     m_manager = manager;
 
     // Ensure this widget stretches to fill available space
@@ -21,6 +15,7 @@ QChatWidget::QChatWidget(QModelManager *manager, QWidget *parent)
     vLayoutMainContent->setContentsMargins(10, 0, 10, 0);
 
     m_chatListView = new QChatView(m_manager);
+    m_chatModel = new QChatModel(m_chatListView, m_manager);
 
     m_chatInput = new QChatInput(m_manager);
 
@@ -43,7 +38,7 @@ void QChatWidget::SetRoomID(RoomID roomID)
         m_roomNameLabel->setText(QString::fromStdString("# " + roomname));
     }
 
-    m_chatListView->SetRoom(roomID);
+    m_chatModel->SetRoom(roomID);
     m_chatInput->SetRoomID(roomID);
     m_currentRoomID = roomID;
 }

@@ -1,7 +1,6 @@
 #ifndef NETWORKINTERFACE_H
 #define NETWORKINTERFACE_H
 
-
 class NetworkInterface
 {
 public: 

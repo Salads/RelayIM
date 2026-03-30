@@ -5,12 +5,14 @@
 #include <QMutexLocker>
 #include <QAbstractItemModel>
 #include <QHash>
+#include <QScrollBar>
 
 #include "RelayIMClient.h"
 #include "models/QChatRoomsModel/QChatRoomsModel.h"
 #include "models/QChatRoomMessagesModel/QChatRoomMessagesModel.h"
-#include "Logging.h"
 #include "IRelayIMClientPacketHandler.h"
+
+#include "Logging.h"
 #include "PacketResponseReason.h"
 
 class QModelManager : public QObject, IRelayIMClientPacketHandler

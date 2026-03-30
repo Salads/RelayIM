@@ -1,12 +1,13 @@
 #ifndef QMESSAGE_H
 #define QMESSAGE_H
 
-#include <string>
 #include <QWidget>
 #include <QLabel>
 #include <QTextEdit>
 #include <QBoxLayout>
-#include <qlineedit.h>
+#include <QLineEdit>
+
+#include <string>
 
 struct QMessageTextConstraints
 {

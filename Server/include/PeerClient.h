@@ -1,13 +1,17 @@
 #ifndef PEERCLIENT_H
 #define PEERCLIENT_H
 
-#include <WinSock2.h>
+#include <cstdint>
 #include <thread>
 #include <vector>
+#include <mutex>
+#include <atomic>
 #include <condition_variable>
 
 #include "PacketData.h"
 #include "PeerID.h"
+
+#include <WinSock2.h>
 
 class PeerClient
 {

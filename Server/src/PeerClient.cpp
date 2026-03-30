@@ -1,7 +1,5 @@
 #include "PeerClient.h"
 
-#include "Logging.h"
-
 void PeerClient::Send(PacketData *packet)
 {
     std::lock_guard<std::mutex> lock(m_sendBufferMutex);
