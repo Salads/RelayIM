@@ -11,6 +11,7 @@
 #include <QFontMetrics>
 #include <QScrollBar>
 #include <QVBoxLayout>
+#include <QVector>
 
 #include "ChatMessage.h"
 #include "models/QModelManager/QModelManager.h"
@@ -19,9 +20,6 @@
 #include "PeerID.h"
 
 class QChatView;
-//#include "widgets/QChatView/QChatView.h"
-
-using std::vector;
 
 /// <summary>
 /// For use with QChatModel, holds result for a single chat message to be rendered.
@@ -69,7 +67,7 @@ private:
 
     void ClearMessagePositions();
     void ClearRenderObjects();
-    std::vector<QMessagePosition> GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
+    QVector<QMessagePosition> GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY);
 
 private:
 

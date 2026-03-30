@@ -45,7 +45,7 @@ void QChatModel::RenderObjects()
         pixEndY = pixStartY + m_vBar->pageStep();
     }
 
-    std::vector<QMessagePosition> positions = GetMessagesForRender(pixStartY, pixEndY);
+    QVector<QMessagePosition> positions = GetMessagesForRender(pixStartY, pixEndY);
 
     // Make sure we have the exact amount of QMessage objects
     qsizetype nObjectsNeeded = positions.size();
@@ -221,9 +221,9 @@ void QChatModel::HandleResize()
     RenderObjects();
 }
 
-std::vector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY)
+QVector<QMessagePosition> QChatModel::GetMessagesForRender(uint64_t viewportStartY, uint64_t viewportEndY)
 {
-    std::vector<QMessagePosition> result;
+    QVector<QMessagePosition> result;
 
     // Binary Search, using viewportStartY
     qsizetype leftIdx = 0;
