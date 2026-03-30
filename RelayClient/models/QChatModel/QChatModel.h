@@ -79,8 +79,8 @@ private:
 
     RoomID m_roomID;
 
-    vector<uint64_t> m_messagePositionsStartY;
-    vector<uint64_t> m_messagePositionsEndY;
+    QVector<uint64_t> m_messagePositionsStartY;
+    QVector<uint64_t> m_messagePositionsEndY;
     QList<ChatMessage>* m_messages;
     QList<QMessage*> m_messageObjects;
 
