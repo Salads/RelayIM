@@ -20,7 +20,7 @@ class RelayIMClient : public ClientAbstractPacketHandler
 {
 public:
     RelayIMClient(RelayIMClientAbstractPacketHandler* handler);
-    bool initialize();
+    bool initializeClient();
     bool connectToServer();
     void shutdownClient();
     

@@ -4,7 +4,7 @@ RelayIMClient::RelayIMClient(RelayIMClientAbstractPacketHandler* handler)
     : m_clientNetwork(this), m_handler(handler)
 {}
 
-bool RelayIMClient::initialize()
+bool RelayIMClient::initializeClient()
 {
     if (!m_clientNetwork.initializeInterface())
     {
