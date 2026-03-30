@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERVERNETWORKINTERFACE_H
+#define SERVERNETWORKINTERFACE_H
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
@@ -54,3 +55,5 @@ private:
 
     IServerPacketHandler* m_handler;
 };
+
+#endif // SERVERNETWORKINTERFACE_H

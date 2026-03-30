@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHATROOMINFO_H
+#define CHATROOMINFO_H
 
 #include <string>
 #include "RoomID.h"
@@ -11,3 +12,5 @@ struct ChatRoomInfo
     RoomID m_roomID;
     std::string m_roomname;
 };
+
+#endif // CHATROOMINFO_H

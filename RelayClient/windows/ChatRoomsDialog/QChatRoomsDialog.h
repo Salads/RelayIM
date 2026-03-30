@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATROOMSDIALOG_H
+#define QCHATROOMSDIALOG_H
 
 #include <QDialog>
 #include <QBoxLayout>
@@ -49,4 +50,6 @@ private:
 
     QPushButton* m_createButton;
 };
+
+#endif // QCHATROOMSDIALOG_H
 

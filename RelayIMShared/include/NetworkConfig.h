@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORKCONFIG_H
+#define NETWORKCONFIG_H
 
 #define DEFAULT_PORT "27015"
 #define DEFAULT_ADDRESS "localhost"
@@ -8,3 +9,5 @@
 
 #define NETWORK_PASSCODE 0xDEADBEEF
 #define NETWORK_VERSION 1
+
+#endif // NETWORKCONFIG_H

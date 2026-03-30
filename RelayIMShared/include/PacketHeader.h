@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETHEADER_H
+#define PACKETHEADER_H
 
 #include <cstdint>
 #include "PacketType.h"
@@ -12,3 +13,5 @@ struct PacketHeader
     PacketType  m_packetType;
 };
 #pragma pack(pop)
+
+#endif // PACKETHEADER_H

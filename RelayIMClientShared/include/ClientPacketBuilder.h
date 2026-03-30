@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CLIENTPACKETBUILDER_H
+#define CLIENTPACKETBUILDER_H
 
 #include <vector>
 #include <string>
@@ -19,3 +20,5 @@ public:
     PacketData BuildLeaveChatRoomPacket(RoomID roomID);
     PacketData BuildSendMessagePacket(RoomID roomID, std::string message);
 };
+
+#endif // CLIENTPACKETBUILDER_H

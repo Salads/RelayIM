@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATROOMMESSAGESMODEL_H
+#define QCHATROOMMESSAGESMODEL_H
 
 #include "ChatMessage.h"
 #include "ChatRoomInfo.h"
@@ -45,4 +46,6 @@ private:
     QList<ChatMessage> m_messages;
     QHash<PeerID, std::string> *m_knownUsers;
 };
+
+#endif // QCHATROOMMESSAGESMODEL_H
 

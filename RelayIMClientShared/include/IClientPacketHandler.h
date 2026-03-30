@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ICLIENTPACKETHANDLER_H
+#define ICLIENTPACKETHANDLER_H
 
 #include <memory>
 
@@ -15,3 +16,5 @@ public:
     virtual void OnPacketReceived(std::unique_ptr<NetworkPacket> packet) = 0;
     virtual void OnServerDisconnected() = 0;
 };
+
+#endif // ICLIENTPACKETHANDLER_H

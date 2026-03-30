@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATVIEW_H
+#define QCHATVIEW_H
 
 #include <QWidget>
 #include <QScrollArea>
@@ -32,4 +33,6 @@ private:
 
     QModelManager* m_manager;
 };
+
+#endif // QCHATVIEW_H
 

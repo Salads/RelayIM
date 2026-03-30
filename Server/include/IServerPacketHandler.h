@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ISERVERPACKETHANDLER_H
+#define ISERVERPACKETHANDLER_H
 
 #include <memory>
 
@@ -11,3 +12,5 @@ public:
     virtual void OnClientDisconnected(PeerID peerID) = 0;
     virtual void OnPacketReceived(PeerID peerID, std::unique_ptr<NetworkPacket> packet) = 0;
 };
+
+#endif // ISERVERPACKETHANDLER_H

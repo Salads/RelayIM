@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATROOM_H
+#define QCHATROOM_H
 
 #include <QPushButton>
 #include "ui_QChatRoom.h"
@@ -21,4 +22,6 @@ private:
 
     QLabel* m_roomNameLabel;
 };
+
+#endif // QCHATROOM_H
 

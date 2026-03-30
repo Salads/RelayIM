@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETWRITER_H
+#define PACKETWRITER_H
 
 #include "RoomID.h"
 #include "PeerID.h"
@@ -34,3 +35,5 @@ public:
 private:
     std::vector<uint8_t> *m_buffer;
 };
+
+#endif // PACKETWRITER_H

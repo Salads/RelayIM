@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CLIENTUSER_H
+#define CLIENTUSER_H
 
 #include <string>
 #include <unordered_set>
@@ -24,3 +25,5 @@ private:
 
     std::unordered_set<RoomID> m_rooms;
 };
+
+#endif // CLIENTUSER_H

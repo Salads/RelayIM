@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RELAYIMSERVER_H
+#define RELAYIMSERVER_H
 
 #include <WinSock2.h>
 #include <unordered_map>
@@ -65,3 +66,5 @@ private:
 
     std::thread m_packetHandlerThread;
 };
+
+#endif // RELAYIMSERVER_H

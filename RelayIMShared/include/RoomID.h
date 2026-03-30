@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ROOMID_H
+#define ROOMID_H
 
 #include <cstdint>
 #include <ostream>
@@ -41,3 +42,5 @@ namespace std
         }
     };
 }
+
+#endif // ROOMID_H

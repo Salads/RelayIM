@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PEERID_H
+#define PEERID_H
 
 #include <cstdint>
 #include <functional>
@@ -41,3 +42,5 @@ namespace std
         }
     };
 }
+
+#endif // PEERID_H

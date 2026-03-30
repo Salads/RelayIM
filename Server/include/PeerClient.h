@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PEERCLIENT_H
+#define PEERCLIENT_H
 
 #include <WinSock2.h>
 #include <thread>
@@ -37,3 +38,5 @@ public:
     std::vector<uint8_t> m_sendBuffer;
     std::mutex m_sendBufferMutex;
 };
+
+#endif // PEERCLIENT_H

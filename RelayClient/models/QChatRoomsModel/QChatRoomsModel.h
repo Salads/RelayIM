@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATROOMSMODEL_H
+#define QCHATROOMSMODEL_H
 
 #include <QObject>
 #include <QAbstractListModel>
@@ -40,3 +41,5 @@ public:
 private:
     QVector<ChatRoomInfo> m_chatRooms;
 };
+
+#endif // QCHATROOMSMODEL_H

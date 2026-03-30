@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETREADER_H
+#define PACKETREADER_H
 
 #include "PacketHeader.h"
 #include "NetworkPacket.h"
@@ -31,3 +32,5 @@ private:
     const uint8_t *m_cursor;
     const uint8_t *m_end;
 };
+
+#endif // PACKETREADER_H

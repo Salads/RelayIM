@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LOGGING_H
+#define LOGGING_H
 
 // User-level network-data events
 #define LOG_NETWORK_EVENTS true
@@ -64,3 +65,5 @@ private:
     FILE* m_file = nullptr;
     std::mutex m_mutex;
 };
+
+#endif // LOGGING_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIMPLECLIENTTESTPACKETHANDLER_H
+#define SIMPLECLIENTTESTPACKETHANDLER_H
 
 #include "IRelayIMClientPacketHandler.h"
 #include "RelayImClient.h"
@@ -66,3 +67,5 @@ private:
     std::atomic_bool m_sequenceFlag = false;
     std::atomic_bool m_success = false;
 };
+
+#endif // SIMPLECLIENTTESTPACKETHANDLER_H

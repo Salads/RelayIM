@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QMODELMANAGER_H
+#define QMODELMANAGER_H
 
 #include <QObject>
 #include <QMutexLocker>
@@ -130,3 +131,5 @@ private:
     QChatRoomsModel m_joinedChatRoomsModel;
     QHash<RoomID, QList<ChatMessage>> m_chatRoomMessages;
 };
+
+#endif // QMODELMANAGER_H

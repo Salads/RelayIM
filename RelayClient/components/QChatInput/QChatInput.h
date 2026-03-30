@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATINPUT_H
+#define QCHATINPUT_H
 
 #include <QTextEdit>
 #include <QKeyEvent>
@@ -24,4 +25,6 @@ private:
 
     RoomID m_roomID;
 };
+
+#endif // QCHATINPUT_H
 

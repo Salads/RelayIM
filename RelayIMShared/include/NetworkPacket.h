@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORKPACKET_H
+#define NETWORKPACKET_H
 
 #include "PacketData.h"
 #include "PeerID.h"
@@ -12,3 +13,5 @@ struct NetworkPacket
     PeerID m_peerID;
     std::unique_ptr<PacketData> m_data;
 };
+
+#endif // NETWORKPACKET_H

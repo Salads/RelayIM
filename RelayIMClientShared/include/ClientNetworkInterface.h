@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CLIENTNETWORKINTERFACE_H
+#define CLIENTNETWORKINTERFACE_H
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
@@ -41,3 +42,5 @@ private:
 
     IClientPacketHandler* m_handler;
 };
+
+#endif // CLIENTNETWORKINTERFACE_H

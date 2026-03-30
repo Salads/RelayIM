@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IRELAYIMCLIENTPACKETHANDLER_H
+#define IRELAYIMCLIENTPACKETHANDLER_H
 
 #include <string>
 #include <memory>
@@ -38,3 +39,5 @@ public:
     virtual void OnRoomUpdate_UserLeft(RoomID roomID, PeerID peerID) = 0;
 
 };
+
+#endif // IRELAYIMCLIENTPACKETHANDLER_H

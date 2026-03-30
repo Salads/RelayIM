@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETTYPE_H
+#define PACKETTYPE_H
 
 #include <cstdint>
 
@@ -101,3 +102,5 @@ enum PacketType : uint8_t
             RoomID:4u - room that user left
             PeerID:4u - user that left the room
 */
+
+#endif // PACKETTYPE_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RELAYIMCLIENT_H
+#define RELAYIMCLIENT_H
 
 #include <vector>
 #include <string>
@@ -38,3 +39,5 @@ private:
     ClientNetworkInterface m_clientNetwork;
     IRelayIMClientPacketHandler* m_handler;
 };
+
+#endif // RELAYIMCLIENT_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATWIDGET_H
+#define QCHATWIDGET_H
 
 #include <QWidget>
 #include <QListView>
@@ -31,4 +32,6 @@ private:
 
     RoomID m_currentRoomID;
 };
+
+#endif // QCHATWIDGET_H
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORKINTERFACE_H
+#define NETWORKINTERFACE_H
 
 
 class NetworkInterface
@@ -11,3 +12,5 @@ public:
 protected:
     bool m_isInitialized = false;
 };
+
+#endif // NETWORKINTERFACE_H

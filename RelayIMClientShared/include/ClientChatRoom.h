@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CLIENTCHATROOM_H
+#define CLIENTCHATROOM_H
 
 #include <vector>
 #include <unordered_set>
@@ -16,3 +17,5 @@ struct ClientChatRoom
     std::vector<ChatMessage> m_messages;
     std::unordered_set<PeerID> m_users;
 };
+
+#endif // CLIENTCHATROOM_H

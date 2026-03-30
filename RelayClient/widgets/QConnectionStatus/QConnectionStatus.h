@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCONNECTIONSTATUS_H
+#define QCONNECTIONSTATUS_H
 
 #include <QWidget>
 #include <QPainter>
@@ -27,4 +28,6 @@ private:
     QString m_statusStr = "";
     Qt::GlobalColor m_iconColor;
 };
+
+#endif // QCONNECTIONSTATUS_H
 

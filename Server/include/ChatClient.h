@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHATCLIENT_H
+#define CHATCLIENT_H
 
 #include <WinSock2.h>
 #include <cstdint>
@@ -23,3 +24,5 @@ public:
 
     ChatClientStatus m_status = ChatClientStatus_Fresh;
 };
+
+#endif // CHATCLIENT_H

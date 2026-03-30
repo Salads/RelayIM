@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RELAYCLIENT_H
+#define RELAYCLIENT_H
 
 #include <QMainWindow>
 #include <QResizeEvent>
@@ -57,4 +58,6 @@ private:
 
     QConnectionStatus* m_connectionStatus;
 };
+
+#endif // RELAYCLIENT_H
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <chrono>
 
@@ -7,3 +8,5 @@
 void PrintWSAError(const char* message);
 
 std::string GetLocalTimestamp();
+
+#endif // UTIL_H

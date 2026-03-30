@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHATROOM_H
+#define CHATROOM_H
 
 #include "ChatMessage.h"
 #include "PacketData.h"
@@ -28,3 +29,5 @@ private:
     std::vector<ChatMessage> m_messages;
     std::unordered_set<PeerID> m_clients;
 };
+
+#endif // CHATROOM_H

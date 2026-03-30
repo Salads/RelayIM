@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QREGISTERDIALOG_H
+#define QREGISTERDIALOG_H
 
 #include <QDialog>
 #include <QLineEdit>
@@ -34,4 +35,6 @@ private:
 
     bool m_registerSuccess = false;
 };
+
+#endif // QREGISTERDIALOG_H
 

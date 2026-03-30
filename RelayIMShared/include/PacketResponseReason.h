@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKETRESPONSEREASON_H
+#define PACKETRESPONSEREASON_H
 
 #include <cstdint>
 
@@ -19,3 +20,5 @@ enum PacketResponseReason : uint8_t
     PACKET_RESPONSE_REASONS
 #undef X
 };
+
+#endif // PACKETRESPONSEREASON_H

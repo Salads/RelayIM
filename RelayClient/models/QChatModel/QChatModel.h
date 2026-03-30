@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QCHATMODEL_H
+#define QCHATMODEL_H
 
 #include <stdint.h>
 #include <memory>
@@ -90,4 +91,6 @@ private:
     
     const int c_chatWindowMargin = 10;
 };
+
+#endif // QCHATMODEL_H
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QMESSAGE_H
+#define QMESSAGE_H
 
 #include <string>
 #include <QWidget>
@@ -38,4 +39,6 @@ private:
     QLabel* m_usernameLabel;
     QTextEdit* m_messageEdit;
 };
+
+#endif // QMESSAGE_H
 
